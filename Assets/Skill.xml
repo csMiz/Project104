@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<content>
+  <heroskill>
+    <skill id="0" name="天空中飞翔的巫女" parent="-1" user="Reimu" type="Buff" stage="1" cost="2">
+      <buff target="Reimu" side="Self" name="move" value="1"/>
+      <buff target="Reimu" side="Self" name="movetype" value="SkyBase"/>
+    </skill>
+    <skill id="1" name="博丽神社的巫女" parent="-1" user="Reimu" type="Buff" stage="1" cost="2">
+      <buff target="Reimu" side="Self" name="damageto" receiver="Youkai" value="20p"/>
+    </skill>
+    <skill id="2" name="灵符「梦想封印」" parent="-1" user="Reimu" type="SC" interval="5" range="1,1" stage="1" cost="3">
+      <atk target="Reimu" side="Self" hitrange="1,1" atktype="Danmaku" value="18,25" />
+    </skill>
+    <skill id="3" name="梦符「封魔阵」" parent="-1" user="Reimu" type="SC" interval="4" range="1,1" stage="2" cost="3">
+      <atk target="Reimu" side="Self" hitrange="1,1" atktype="Laser" value="15,18" />
+    </skill>
+    <skill id="4" name="「梦想天生」" parent="2,3" user="Reimu" type="SC" interval="12" range="1,1" stage="2" cost="4">
+      <atk target="Reimu" side="Self" hitrange="1,1" atktype="Danmaku" value="35,52" effect="NoCounterattack" />
+    </skill>
+    <skill id="5" name="幻想乡的巫女" parent="0,1" user="Reimu" type="Buff" replace="1" stage="2" cost="3">
+      <buff target="Reimu" side="Self" name="damageto" receiver="Youkai" value="50p"/>
+    </skill>
+
+    <skill id="6" name="绯红色的恶魔" parent="-1" user="Remilia" type="Buff" stage="1" cost="2" >
+      <buff target="Remilia" side="Self" name="atkall" value="5"/>
+    </skill>
+    <skill id="7" name="操纵命运" parent="-1" user="Remilia" type="Buff" stage="1" cost="2">
+      <buff target="Remilia" side="Self" name="luck" value="5"/>
+    </skill>
+    <skill id="8" name="红符「红色不夜城」" parent="6" user="Remilia" type="SC" interval="5" range="0,0" stage="2" cost="3">
+      <atk target="Remilia" side="Self" hitrange="1,2" atktype="Laser" value="14,17" />
+      <airatk target="Remilia" side="Self" hitrange="1,2" atktype="Laser" value="29,33" />
+      <restrict name="LandActivateOnly" />
+    </skill>
+    <skill id="9" name="「Red Magic」" parent="6" user="Remilia" type="SC" interval="5" range="1,1" stage="2" cost="4">
+      <atk target="Remilia" side="Self" hitrange="1,1" atktype="Danmaku" value="17,22"  />
+    </skill>
+    <skill id="10" name="神枪「Spear the Gungnir」" parent="8,9" user="Remilia" type="SC" interval="7" range="1,2" stage="2" cost="4" >
+      <atk target="Remilia" side="Self" hitrange="1,1" atktype="Laser" value="25,29" effect="LinearHitRange2,SkipDefend" />
+    </skill>
+    <skill id="11" name="Vampire Kiss" parent="-1" user="Remilia" type="Buff" stage="2" cost="3" >
+      <buff target="Remilia" side="Self" name="damegetorecover" value="20p"/>
+    </skill>
+  </heroskill>
+
+</content>

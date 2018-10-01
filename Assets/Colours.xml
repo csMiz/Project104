@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<content>
+  <set index="0">
+    <base value="255,255,64,89"/>
+    <light value="191,255,191,204"/>
+    <dark value="255,179,77,85"/>
+    <based1 value="0,0,0,0"/>
+    <basel1 value="0,0,0,0"/>
+    <lightd1 value="255,204,140,166"/>
+    <lightl1 value="0,0,0,0"/>
+    <darkd1 value="0,0,0,0"/>
+    <darkl1 value="0,0,0,0"/>
+  </set>
+</content>

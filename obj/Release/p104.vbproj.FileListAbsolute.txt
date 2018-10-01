@@ -1,0 +1,13 @@
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Release\p104.exe.config
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Release\p104.exe
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Release\p104.pdb
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Release\p104.xml
+C:\Users\asdfg\Desktop\Project104\p104\p104\obj\Release\p104.Form1.resources
+C:\Users\asdfg\Desktop\Project104\p104\p104\obj\Release\p104.Resources.resources
+C:\Users\asdfg\Desktop\Project104\p104\p104\obj\Release\p104.vbproj.GenerateResource.cache
+C:\Users\asdfg\Desktop\Project104\p104\p104\obj\Release\p104.vbproj.CoreCompileInputs.cache
+C:\Users\asdfg\Desktop\Project104\p104\p104\obj\Release\p104.exe
+C:\Users\asdfg\Desktop\Project104\p104\p104\obj\Release\p104.xml
+C:\Users\asdfg\Desktop\Project104\p104\p104\obj\Release\p104.pdb
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Release\SlimDX.dll
+C:\Users\asdfg\Desktop\Project104\p104\p104\obj\Release\p104.vbproj.CopyComplete

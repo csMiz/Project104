@@ -1,0 +1,400 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+p104
+</name>
+</assembly>
+<members>
+<member name="T:p104.My.Resources.Resources">
+<summary>
+  一个强类型的资源类，用于查找本地化的字符串等。
+</summary>
+</member>
+<member name="P:p104.My.Resources.Resources.ResourceManager">
+<summary>
+  返回此类使用的缓存的 ResourceManager 实例。
+</summary>
+</member>
+<member name="P:p104.My.Resources.Resources.Culture">
+<summary>
+  重写当前线程的 CurrentUICulture 属性
+  重写当前线程的 CurrentUICulture 属性。
+</summary>
+</member>
+<member name="P:p104.My.Resources.Resources.hex_forest">
+<summary>
+  查找 System.Drawing.Bitmap 类型的本地化资源。
+</summary>
+</member>
+<member name="P:p104.My.Resources.Resources.hex_grass">
+<summary>
+  查找 System.Drawing.Bitmap 类型的本地化资源。
+</summary>
+</member>
+<member name="P:p104.My.Resources.Resources.hex_grass1">
+<summary>
+  查找 System.Drawing.Bitmap 类型的本地化资源。
+</summary>
+</member>
+<member name="P:p104.My.Resources.Resources.hex_mountain">
+<summary>
+  查找 System.Drawing.Bitmap 类型的本地化资源。
+</summary>
+</member>
+<member name="P:p104.My.Resources.Resources.UnitTemplates">
+<summary>
+  查找类似 &lt;?xml version=&quot;1.0&quot;?&gt;
+
+&lt;ut&gt;
+	&lt;index&gt;0&lt;/index&gt;
+	&lt;name&gt;毛玉&lt;/name&gt;
+	&lt;unittype&gt;Gedama&lt;/unittype&gt;
+	&lt;hp&gt;10&lt;/hp&gt;
+	&lt;move&gt;LandAndWater&lt;/move&gt;
+	&lt;attack&gt;
+		&lt;damage&gt;Physical&lt;/damage&gt;
+		&lt;value&gt;5,7&lt;/value&gt;
+		&lt;atkrange&gt;1,1&lt;/atkrange&gt;
+		&lt;hitrange&gt;1,1&lt;/hitrange&gt;
+	&lt;/attack&gt;
+	&lt;defend&gt;
+		&lt;value&gt;0&lt;/value&gt;
+		&lt;resistance&gt;0.3,0,0&lt;/resistance&gt;
+	&lt;/defend&gt;
+&lt;/ut&gt;
+ 的本地化字符串。
+</summary>
+</member>
+<member name="F:p104.DefendType.Resistance">
+ <summary>
+ 分别对应物理抗性，弹幕抗性，镭射抗性
+ </summary>
+</member>
+<member name="P:p104.GameHero.Name">
+ <summary>
+ 名称
+ </summary>
+</member>
+<member name="P:p104.GameHero.Description">
+ <summary>
+ 描述
+ </summary>
+</member>
+<member name="P:p104.GameHero.Level">
+ <summary>
+ 等级
+ </summary>
+</member>
+<member name="P:p104.GameHero.EXP">
+ <summary>
+ 经验
+ </summary>
+</member>
+<member name="P:p104.GameHero.SkillPoint">
+ <summary>
+ 技能点
+ </summary>
+</member>
+<member name="F:p104.GameHero.SkillTree">
+ <summary>
+ 技能树
+ </summary>
+</member>
+<member name="F:p104.GameHero.MySkills">
+ <summary>
+ 已习得的技能
+ </summary>
+</member>
+<member name="T:p104.GameItem">
+ <summary>
+ 游戏物品基类，用于消耗品，装备，合成素材等等
+ </summary>
+</member>
+<member name="T:p104.GameUnit">
+ <summary>
+ 行动单位类
+ </summary>
+</member>
+<member name="P:p104.GameUnit.UnitId">
+ <summary>
+ 单位唯一id
+ </summary>
+</member>
+<member name="P:p104.GameUnit.ShownName">
+ <summary>
+ 显示的名字
+ </summary>
+</member>
+<member name="F:p104.GameUnit.UnitType">
+ <summary>
+ 字段
+ </summary>
+</member>
+<member name="P:p104.GameUnit.Position">
+ <summary>
+ 单位所处位置
+ </summary>
+</member>
+<member name="P:p104.GameUnit.PositionTmpMove">
+ <summary>
+ 移动单位后的临时位置
+ </summary>
+</member>
+<member name="F:p104.GameUnit.FullHP">
+ <summary>
+ HP
+ </summary>
+</member>
+<member name="P:p104.GameUnit.MovementType">
+ <summary>
+ 行动类型
+ </summary>
+</member>
+<member name="F:p104.GameUnit.AttackPoint">
+ <summary>
+ 进攻点数
+ </summary>
+</member>
+<member name="F:p104.GameUnit.DefendPoint">
+ <summary>
+ 防守点数
+ </summary>
+</member>
+<member name="F:p104.GameUnit.Spirit">
+ <summary>
+ 士气
+ </summary>
+</member>
+<member name="P:p104.GameUnit.Status">
+ <summary>
+ 状态
+ </summary>
+</member>
+<member name="P:p104.GameUnit.Player">
+ <summary>
+ 此单位归属于
+ </summary>
+</member>
+<member name="F:p104.GameUnitType.Gedama">
+ <summary>
+ 毛玉
+ </summary>
+</member>
+<member name="F:p104.GameUnitType.Yousei">
+ <summary>
+ 妖精
+ </summary>
+</member>
+<member name="F:p104.GameUnitType.Youkai">
+ <summary>
+ 妖怪
+ </summary>
+</member>
+<member name="T:p104.HeroSkill">
+ <summary>
+ 英雄技能类
+ </summary>
+</member>
+<member name="M:p104.HeroSkill.Activate">
+ <summary>
+ 触发buff或使用符卡
+ </summary>
+</member>
+<member name="T:p104.HeroSkillTree">
+ <summary>
+ 英雄技能树类
+ </summary>
+</member>
+<member name="T:p104.Player">
+ <summary>
+ 游戏玩家类
+ </summary>
+</member>
+<member name="P:p104.Player.Movement">
+ <summary>
+ 行动力
+ </summary>
+</member>
+<member name="P:p104.Player.Point">
+ <summary>
+ 钱
+ </summary>
+</member>
+<member name="T:p104.UnitTemplateRepository">
+ <summary>
+ 单位模板仓库类
+ </summary>
+</member>
+<member name="M:p104.UnitTemplateRepository.Instance">
+ <summary>
+ 单例模式
+ </summary>
+</member>
+<member name="M:p104.UnitTemplateRepository.LoadTemplates(System.String)">
+ <summary>
+ 加载所有单位模板
+ </summary>
+</member>
+<member name="M:p104.UnitTemplateRepository.GetTemplate(System.Int16)">
+ <summary>
+ 根据index获取模板
+ </summary>
+</member>
+<member name="T:p104.GameMap">
+ <summary>
+ 游戏世界大地图的地图类
+ </summary>
+</member>
+<member name="M:p104.GameMap.LoadFromFile(System.IO.FileStream)">
+ <summary>
+ 加载游戏大地图
+ </summary>
+</member>
+<member name="M:p104.GameMap.GetEdges(System.Int32)">
+ <summary>
+ 搜索通路
+ </summary>
+</member>
+<member name="T:p104.MapBlock">
+ <summary>
+ 世界大地图的地图块类
+ </summary>
+</member>
+<member name="M:p104.SkirmishMap.DivideLayers(System.Int16,System.Int16,System.Int16,System.Int16)">
+ <summary>
+ 按高度分层
+ </summary>
+</member>
+<member name="T:p104.GameResources">
+ <summary>
+ 游戏资源模块
+ </summary>
+</member>
+<member name="F:p104.GameResources.UnitTemplates">
+ <summary>
+ 游戏单位模板仓库单例
+ </summary>
+</member>
+<member name="M:p104.GameResources.LoadResources(SlimDX.Direct2D.RenderTarget)">
+ <summary>
+ 从程序内部加载资源
+ </summary>
+ <param name="rt"></param>
+</member>
+<member name="M:p104.GameResources.LoadBitmap(SlimDX.Direct2D.RenderTarget,System.Drawing.Bitmap)">
+ <summary>
+ 将system.drawing.bitmap转换为d2dbitmap
+ </summary>
+</member>
+<member name="T:p104.GameTest">
+ <summary>
+ 游戏测试类
+ </summary>
+</member>
+<member name="T:p104.IMouseArea">
+ <summary>
+ 鼠标判定区接口
+ </summary>
+</member>
+<member name="T:p104.LoggingService">
+ <summary>
+ 对程序内各属性的监听服务类
+ </summary>
+</member>
+<member name="M:p104.LoggingService.Log(p104.LogSenderType,System.Int32,p104.LogMessageType,System.Object)">
+ <summary>
+ 记录一条日志
+ </summary>
+ <param name="senderType">操作类型</param>
+ <param name="senderId">属性Id</param>
+ <param name="message">内容类型</param>
+ <param name="value">值</param>
+</member>
+<member name="T:p104.LogSenderType">
+ <summary>
+ 记录日志操作类型枚举
+ </summary>
+</member>
+<member name="T:p104.LogMessageType">
+ <summary>
+ 记录日志内容类型枚举
+ </summary>
+</member>
+<member name="T:p104.MathHelper">
+ <summary>
+ 数学助手类
+ </summary>
+</member>
+<member name="M:p104.MathHelper.GetDistance(p104.PointF2,p104.PointF2)">
+ <summary>
+ 计算两点间距离
+ </summary>
+</member>
+<member name="T:p104.PointF2">
+ <summary>
+ 简化的PointF结构体
+ </summary>
+</member>
+<member name="T:p104.PointF2M">
+ <summary>
+ 受监控的PointF2类
+ </summary>
+</member>
+<member name="T:p104.PointI">
+ <summary>
+ XY均为Short类型的Point结构体
+ </summary>
+</member>
+<member name="T:p104.MonitoredProperty">
+ <summary>
+ 受到监视的属性类
+ </summary>
+</member>
+<member name="T:p104.SpectatorCamera">
+ <summary>
+ 观察者类
+ </summary>
+</member>
+<member name="F:p104.SpectatorCamera.CameraFocus">
+ <summary>
+ 视图中心
+ </summary>
+</member>
+<member name="F:p104.SpectatorCamera.Zoom">
+ <summary>
+ 缩放倍率，大于零并且小于等于1
+ </summary>
+</member>
+<member name="F:p104.SpectatorCamera.Resolve">
+ <summary>
+ 分辨率
+ </summary>
+</member>
+<member name="T:p104.SpectatorCamera.Draw">
+ <summary>
+ 定义绘图委托
+ </summary>
+</member>
+<member name="F:p104.SpectatorCamera.PaintingLayers">
+ <summary>
+ 分层绘图，不考虑小窗口穿透的模式
+ </summary>
+</member>
+<member name="F:p104.SpectatorCamera.PaintingLayersDescription">
+ <summary>
+ 图层说明，用于鼠标点击判定
+ </summary>
+</member>
+<member name="F:p104.SpectatorCamera.RT">
+ <summary>
+ d2d画布对象
+ </summary>
+</member>
+<member name="T:p104.GameImageLayer">
+ <summary>
+ 图层分类枚举
+ </summary>
+</member>
+</members>
+</doc>

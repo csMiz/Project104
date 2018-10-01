@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<content>
+  <side value="0" name="Remilia" type="Player" team="0">
+    <character>
+      <unit template="0" />
+      <unit template="0" />
+      <unit template="1" />
+    </character>
+    <building>
+      
+    </building>
+    <giventech>
+      
+    </giventech>
+    <startpos>
+      <pos value="0,0" />
+      <pos value="1,0" />
+      <pos value="0,1" />
+    </startpos>
+    <endgame>
+      <win>
+        <winevent name="Clean" value="0"/>
+      </win>
+      <lose>
+        <loseevent name="Clean" value="0"/>
+        <loseevent name="Turn" value="20" />
+      </lose>
+    </endgame>
+    <resources point="20" />
+  </side>
+
+  <side value="1" name="Reimu" type="AI" team="1" >
+    <character>
+      <unit template="1" />
+      <unit template="1" />
+    </character>
+    <building>
+
+    </building>
+    <startpos>
+      <pos value="6,5" />
+      <pos value="6,6" />
+      <pos value="5,6" />
+    </startpos>
+    <resources point="20" />
+  </side>
+
+  <side value="2" name="Cirno" type="AI" team="-1">
+    <character>
+      <unit template="1" />
+    </character>
+    <building>
+
+    </building>
+    <startpos>
+      <pos value="3,3" />
+      <pos value="3,4" />
+    </startpos>
+    <resources point="40" />
+  </side>
+
+  <placeholder>
+    <building>
+      
+    </building>
+    <treasure>
+      
+    </treasure>
+    <trigger>
+      
+    </trigger>
+  </placeholder>
+</content >

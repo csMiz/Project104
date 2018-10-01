@@ -1,0 +1,138 @@
+﻿Imports System.Drawing.Imaging
+Imports SlimDX
+Imports SlimDX.Direct2D
+Imports System.Math
+Imports System.Xml
+Imports System.Text.RegularExpressions
+
+''' <summary>
+''' 游戏资源模块
+''' </summary>
+Module GameResources
+    ''' <summary>
+    ''' 游戏单位模板仓库单例
+    ''' </summary>
+    Public UnitTemplates As UnitTemplateRepository = UnitTemplateRepository.Instance
+    Public UnitImages As UnitImageRepository = UnitImageRepository.Instance
+    Public GameIcons As GameIconRepository = GameIconRepository.Instance
+
+    Public BITMAP_HEX_GRASS As Bitmap
+    Public BITMAP_HEX_FOREST As Bitmap
+    Public BITMAP_HEX_MOUNTAIN As Bitmap
+
+    Public TERRAIN_BITMAP As New List(Of Bitmap)
+
+    Public Const SIX_TWO_FIVE As Single = 62.5
+    Public Const THREE_SEVEN_FIVE As Single = 375
+    Public ReadOnly SIX_TWO_FIVE_ROOT3 As Single = 62.5 * Sqrt(3)
+    Public ReadOnly TWO_FIFTY_ROOT3 As Single = 250 * Sqrt(3)
+    Public ReadOnly ONE_TWO_FIVE_ROOT3 As Single = 125 * Sqrt(3)
+    Public Const FIVE_HUNDRED As Single = 500
+
+    ''' <summary>
+    ''' 阵营颜色预设列表
+    ''' </summary>
+    Public SideColorList As List(Of SolidColorBrushSet) = Nothing
+
+    Public ReadOnly AllGameStages As New List(Of SingleGameLoopStage) From {0, 1, 2, 3, 4, 5}
+
+    ''' <summary>
+    ''' 从程序内部加载资源
+    ''' </summary>
+    ''' <param name="rt"></param>
+    Public Sub LoadResources(rt As RenderTarget)
+        Dim gdi_hex_grass As System.Drawing.Bitmap = My.Resources.hex_grass
+        BITMAP_HEX_GRASS = LoadBitmap(rt, gdi_hex_grass)
+        Dim gdi_hex_forest As System.Drawing.Bitmap = My.Resources.hex_forest
+        BITMAP_HEX_FOREST = LoadBitmap(rt, gdi_hex_forest)
+        Dim gdi_hex_mountain As System.Drawing.Bitmap = My.Resources.hex_mountain
+        BITMAP_HEX_MOUNTAIN = LoadBitmap(rt, gdi_hex_mountain)
+
+        With TERRAIN_BITMAP
+            .Add(Nothing) 'none
+            .Add(Nothing)
+            .Add(BITMAP_HEX_MOUNTAIN)
+            .Add(BITMAP_HEX_FOREST)
+            .Add(Nothing)
+            .Add(BITMAP_HEX_GRASS)
+        End With
+
+        Dim unitTemplatesString As String = My.Resources.UnitTemplates
+        UnitTemplates.LoadTemplates(unitTemplatesString)
+
+        UnitImages.LoadFromFiles(rt)
+        GameIcons.LoadFromFiles(rt)
+
+        SideColorList = SolidColorBrushSet.LoadFromXml(rt, My.Resources.Colours)
+
+    End Sub
+
+    ''' <summary>
+    ''' 将system.drawing.bitmap转换为d2dbitmap
+    ''' </summary>
+    Public Function LoadBitmap(rt As RenderTarget, drawingBitmap As System.Drawing.Bitmap) As Bitmap
+        Dim result As Bitmap = Nothing
+        Dim drawingBitmapData As BitmapData = drawingBitmap.LockBits(New Rectangle(0, 0, drawingBitmap.Width, drawingBitmap.Height), ImageLockMode.ReadOnly, Imaging.PixelFormat.Format32bppPArgb)
+        Dim dataStreamxx As DataStream = New DataStream(drawingBitmapData.Scan0, drawingBitmapData.Stride * drawingBitmapData.Height, True, False)
+        Dim properties As Direct2D.BitmapProperties = New Direct2D.BitmapProperties()
+        properties.PixelFormat = New Direct2D.PixelFormat(DXGI.Format.R8G8B8A8_UNorm, Direct2D.AlphaMode.Premultiplied)
+        result = New Direct2D.Bitmap(rt, New Size(drawingBitmap.Width, drawingBitmap.Height), dataStreamxx, drawingBitmapData.Stride, properties)
+        drawingBitmap.UnlockBits(drawingBitmapData)
+        Return result
+    End Function
+
+
+
+End Module
+
+''' <summary>
+''' 游戏阵营颜色预设
+''' </summary>
+Public Class SolidColorBrushSet
+    Public BaseColor As Brush = Nothing
+    Public LightColor As Brush = Nothing
+    Public DarkColor As Brush = Nothing
+    Public BaseL1Color As Brush = Nothing
+    Public LightL1Color As Brush = Nothing
+    Public DarkL1Color As Brush = Nothing
+    Public BaseD1Color As Brush = Nothing
+    Public LightD1Color As Brush = Nothing
+    Public DarkD1Color As Brush = Nothing
+
+    Public Shared Function LoadFromXml(rt As RenderTarget, xml As String) As List(Of SolidColorBrushSet)
+        Dim resultList As New List(Of SolidColorBrushSet)
+        Dim xmlDoc As New XmlDocument()
+        xmlDoc.LoadXml(xml)
+        Dim root As XmlNode = xmlDoc.SelectSingleNode("content")
+        Dim xnl As XmlNodeList = root.ChildNodes
+        For Each itemSet As XmlNode In xnl
+            Dim resultSet As New SolidColorBrushSet
+            Dim elementSet As XmlElement = CType(itemSet, XmlElement)
+            Dim elementChild As XmlNodeList = elementSet.ChildNodes
+            For Each itemColor As XmlNode In elementChild
+                Dim elementColor As XmlElement = CType(itemColor, XmlElement)
+                Dim colorString As String = elementColor.GetAttribute("value")
+                Dim argbString() As String = Regex.Split(colorString, ",")
+                Dim colorValue As New Color4 With {
+                    .Alpha = CInt(argbString(0)) / 255,
+                    .Red = CInt(argbString(1)) / 255,
+                    .Green = CInt(argbString(2)) / 255,
+                    .Blue = CInt(argbString(3)) / 255
+                }
+                If elementColor.Name = "base" Then
+                    resultSet.BaseColor = New SolidColorBrush(rt, colorValue)
+                ElseIf elementColor.Name = "light" Then
+                    resultSet.LightColor = New SolidColorBrush(rt, colorValue)
+                ElseIf elementColor.Name = "dark" Then
+                    resultSet.DarkColor = New SolidColorBrush(rt, colorValue)
+                ElseIf elementColor.Name = "lightd1" Then
+                    resultSet.LightD1Color = New SolidColorBrush(rt, colorValue)
+
+                End If
+            Next
+            resultList.Add(resultSet)
+        Next
+        Return resultList
+    End Function
+
+End Class

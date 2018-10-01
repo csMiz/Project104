@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<content>
+  <ut index="0" name="毛玉" unittype="Kedama" hp="10" move="LandAndWater,5" burden="1" view="2">
+    <attack damage="Physical" value="5,7" atkrange="1,1" hitrange="1,1" />
+    <defend value="0" resistance="0.1,0.1,0"/>
+  </ut>
+  
+  <ut index="1" name="妖精" unittype="Yousei" hp="20" move="LandAndWater,5" burden="2" view="2">
+    <attack damage="Physical" value="9,13" atkrange="1,1" hitrange="1,1" />
+    <defend value="2" resistance="0.2,0.2,0.05"/>
+  </ut>
+
+  <ut index="2" name="妖怪" unittype="Youkai" hp="30" move="SkyBase,4" burden="3" view="3">
+    <attack damage="Physical" value="14,21" atkrange="1,1" hitrange="1,1" />
+    <defend value="4" resistance="0.5,0.3,0.1"/>
+  </ut>
+
+  <ht index="0" name="博丽灵梦" description="博丽神社的巫女" unittype="Reimu,Human" move="LandBase,4"
+      hp="25"  burden="6" view="3" lvupexp="15">
+    <attack damage="Danmaku" value="16,20" atkrange="1,1" hitrange="1,1"/>
+    <subatk damage="Danmaku" value="6,10" atkrange="1,2" hitrange="1,1" special="MustHit"/>
+    <defend value="2" resistance="0.2,0.5,0.2"/>
+    <lvup item="hp" rate="45" />
+    <lvup item="atkdmg" rate="60" />
+    <lvup item="subatkdmg" rate="35" />
+    <lvup item="def" rate="15" />
+    <lvup item="resistance1" pace="0.01" rate="80"/>
+    <lvup item="resistance2" pace="0.02" rate="85"/>
+    <lvup item="resistance3" pace="0.01" rate="85"/>
+    <lvup item="movevalue" rate="15" />
+  </ht>
+
+  <ht index="1" name="蕾米莉亚·斯卡雷特" description="永远幼小的红月" unittype="Remilia,Youkai,Vampire"
+      move="LandSky,5" hp="40"  burden="8" view="3" lvupexp="20">
+    <attack damage="Danmaku" value="14,19" atkrange="1,1" hitrange="1,1"/>
+    <subatk damage="Physical" value="25,28" atkrange="1,1" hitrange="1,1" hitrate="80"/>
+    <defend value="4" resistance="0.45,0.35,0.1"/>
+    <lvup item="hp" pace="2" rate="70" />
+    <lvup item="atkdmg" rate="50" />
+    <lvup item="subatkdmg" rate="50" />
+    <lvup item="def" rate="25" />
+    <lvup item="resistance1" pace="0.01" rate="80"/>
+    <lvup item="resistance2" pace="0.01" rate="70"/>
+    <lvup item="resistance3" pace="0.01" rate="60"/>
+    <lvup item="movevalue" rate="15" />
+  </ht>
+</content>
