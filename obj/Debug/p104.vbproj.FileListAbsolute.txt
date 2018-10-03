@@ -9,6 +9,12 @@ C:\Users\asdfg\Desktop\Project104\p104\p104\obj\Debug\p104.vbproj.CoreCompileInp
 C:\Users\asdfg\Desktop\Project104\p104\p104\obj\Debug\p104.exe
 C:\Users\asdfg\Desktop\Project104\p104\p104\obj\Debug\p104.xml
 C:\Users\asdfg\Desktop\Project104\p104\p104\obj\Debug\p104.pdb
-C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SlimDX.dll
 C:\Users\asdfg\Desktop\Project104\p104\p104\obj\Debug\p104.vbproj.CopyComplete
-C:\Users\asdfg\Desktop\Project104\p104\p104\obj\Debug\p104.vbprojAssemblyReference.cache
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.Direct2D1.dll
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.dll
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.DXGI.dll
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.pdb
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.Direct2D1.pdb
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.Direct2D1.xml
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.DXGI.pdb
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.DXGI.xml

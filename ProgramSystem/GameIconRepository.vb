@@ -1,4 +1,4 @@
-﻿Imports SlimDX.Direct2D
+﻿Imports Sharpdx.Direct2d1
 
 ''' <summary>
 ''' Icon仓库类

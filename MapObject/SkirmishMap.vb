@@ -1,6 +1,7 @@
 ﻿Imports System.IO
-Imports SlimDX.Direct2D
+Imports SharpDX.Direct2D1
 Imports System.Math
+Imports SharpDX.Mathematics.Interop
 
 Public Class SkirmishMap
     Private Blocks(49, 49) As SkirmishMapBlock
@@ -77,7 +78,7 @@ Public Class SkirmishMap
     End Sub
 
     Public Sub DrawHexMap(ByRef renderTarget As WindowRenderTarget, ByRef spectator As SpectatorCamera)
-        Dim brush1 As New SolidColorBrush(renderTarget, New SlimDX.Color4(1.0, 0.9, 0.2, 0.2))
+        Dim brush1 As New SolidColorBrush(renderTarget, New RawColor4(1.0, 0.9, 0.2, 0.2))
         Dim cameraX As Single = spectator.CameraFocus.X
         Dim cameraY As Single = spectator.CameraFocus.Y
         Dim centreX As Single = spectator.Resolve.X / 2
@@ -94,14 +95,25 @@ Public Class SkirmishMap
                 Dim blockLayer As List(Of SkirmishMapBlock) = BlockLayers(i)
                 For j = 0 To blockLayer.Count - 1
                     Dim block As SkirmishMapBlock = blockLayer(j)
-                    Dim rect As New Rectangle(centreX - cameraX + block.X * THREE_SEVEN_FIVE * zoom, centreY - cameraY + block.Y * TWO_FIFTY_ROOT3 * zoom + ONE_TWO_FIVE_ROOT3 * zoom * (block.X Mod 2), bitmap_side_length, bitmap_side_length)
-                    .DrawBitmap(TERRAIN_BITMAP(block.Terrain), rect)
+                    Dim blockCentreX As Single = block.X * THREE_SEVEN_FIVE * zoom
+                    Dim blockCentreY As Single = block.Y * TWO_FIFTY_ROOT3 * zoom + ONE_TWO_FIVE_ROOT3 * zoom * (block.X Mod 2)
+                    '实现伪3d效果
+                    Dim fake3dHorizontalOffset As Single = block.Altitude * 0.02 * (blockCentreX - cameraX)
+                    Dim fake3dVerticalOffset As Single = block.Altitude * 0.08 * (blockCentreY - cameraY)
+                    Dim rectLeft As Single = centreX - cameraX + blockCentreX + fake3dHorizontalOffset
+                    Dim rectTop As Single = centreY - cameraY + blockCentreY + fake3dVerticalOffset
+
+                    Dim rect As New RawRectangleF(rectLeft, rectTop, rectLeft + bitmap_side_length, rectTop + bitmap_side_length)
+                    .DrawBitmap(TERRAIN_BITMAP(block.Terrain), rect, 1.0F, BitmapInterpolationMode.Linear)
+
+
+
                 Next
             Next
-            .DrawEllipse(brush1, New Ellipse With {
-                         .Center = New PointF(spectator.Resolve.X / 2, spectator.Resolve.Y / 2),
-                         .RadiusX = 25,
-                         .RadiusY = 25})
+            '.DrawEllipse(brush1, New Ellipse With {
+            '             .Center = New PointF(spectator.Resolve.X / 2, spectator.Resolve.Y / 2),
+            '             .RadiusX = 25,
+            '             .RadiusY = 25})
             '.DrawBitmap(BITMAP_HEX_GRASS, New Rectangle(spectator.Resolve.X / 2 + drawRangeX * 500 * zoom, spectator.Resolve.Y / 2 - 33.5 * zoom, 500 * zoom, 500 * zoom))
         End With
     End Sub

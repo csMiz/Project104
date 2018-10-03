@@ -1,5 +1,5 @@
 ﻿Imports System.IO
-Imports SlimDX.Direct2D
+Imports Sharpdx.Direct2d1
 
 ''' <summary>
 ''' 游戏测试类

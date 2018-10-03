@@ -61,7 +61,20 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  查找类似  的本地化字符串。
+        '''  查找类似 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        '''&lt;content&gt;
+        '''  &lt;set index=&quot;0&quot;&gt;
+        '''    &lt;base value=&quot;255,255,64,89&quot;/&gt;
+        '''    &lt;light value=&quot;191,255,191,204&quot;/&gt;
+        '''    &lt;dark value=&quot;255,179,77,85&quot;/&gt;
+        '''    &lt;based1 value=&quot;0,0,0,0&quot;/&gt;
+        '''    &lt;basel1 value=&quot;0,0,0,0&quot;/&gt;
+        '''    &lt;lightd1 value=&quot;255,204,140,166&quot;/&gt;
+        '''    &lt;lightl1 value=&quot;0,0,0,0&quot;/&gt;
+        '''    &lt;darkd1 value=&quot;0,0,0,0&quot;/&gt;
+        '''    &lt;darkl1 value=&quot;0,0,0,0&quot;/&gt;
+        '''  &lt;/set&gt;
+        '''&lt;/content&gt; 的本地化字符串。
         '''</summary>
         Friend ReadOnly Property Colours() As String
             Get

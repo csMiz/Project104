@@ -1,20 +1,33 @@
 ﻿Imports System.Drawing.Imaging
-Imports SlimDX
-Imports SlimDX.Direct2D
+Imports SharpDX
+Imports SharpDX.Direct2D1
+Imports SharpDX.DirectWrite
 Imports System.Math
 Imports System.Xml
 Imports System.Text.RegularExpressions
+Imports SharpDX.Mathematics.Interop
 
 ''' <summary>
 ''' 游戏资源模块
 ''' </summary>
 Module GameResources
+
     ''' <summary>
-    ''' 游戏单位模板仓库单例
+    ''' 游戏单位模板仓库
     ''' </summary>
     Public UnitTemplates As UnitTemplateRepository = UnitTemplateRepository.Instance
+    ''' <summary>
+    ''' 单位图片资源仓库
+    ''' </summary>
     Public UnitImages As UnitImageRepository = UnitImageRepository.Instance
+    ''' <summary>
+    ''' 游戏图标资源仓库
+    ''' </summary>
     Public GameIcons As GameIconRepository = GameIconRepository.Instance
+    ''' <summary>
+    ''' 文字字体助手
+    ''' </summary>
+    Public GameFontHelper As FontHelper = FontHelper.Instance
 
     Public BITMAP_HEX_GRASS As Bitmap
     Public BITMAP_HEX_FOREST As Bitmap
@@ -37,9 +50,8 @@ Module GameResources
     Public ReadOnly AllGameStages As New List(Of SingleGameLoopStage) From {0, 1, 2, 3, 4, 5}
 
     ''' <summary>
-    ''' 从程序内部加载资源
+    ''' 加载资源
     ''' </summary>
-    ''' <param name="rt"></param>
     Public Sub LoadResources(rt As RenderTarget)
         Dim gdi_hex_grass As System.Drawing.Bitmap = My.Resources.hex_grass
         BITMAP_HEX_GRASS = LoadBitmap(rt, gdi_hex_grass)
@@ -65,6 +77,10 @@ Module GameResources
 
         SideColorList = SolidColorBrushSet.LoadFromXml(rt, My.Resources.Colours)
 
+        GameFontHelper.AddFontFile(Application.StartupPath & "\P104_Font1.ttf", "P104_Font1")
+
+
+
     End Sub
 
     ''' <summary>
@@ -74,9 +90,9 @@ Module GameResources
         Dim result As Bitmap = Nothing
         Dim drawingBitmapData As BitmapData = drawingBitmap.LockBits(New Rectangle(0, 0, drawingBitmap.Width, drawingBitmap.Height), ImageLockMode.ReadOnly, Imaging.PixelFormat.Format32bppPArgb)
         Dim dataStreamxx As DataStream = New DataStream(drawingBitmapData.Scan0, drawingBitmapData.Stride * drawingBitmapData.Height, True, False)
-        Dim properties As Direct2D.BitmapProperties = New Direct2D.BitmapProperties()
-        properties.PixelFormat = New Direct2D.PixelFormat(DXGI.Format.R8G8B8A8_UNorm, Direct2D.AlphaMode.Premultiplied)
-        result = New Direct2D.Bitmap(rt, New Size(drawingBitmap.Width, drawingBitmap.Height), dataStreamxx, drawingBitmapData.Stride, properties)
+        Dim properties As Direct2D1.BitmapProperties = New Direct2D1.BitmapProperties()
+        properties.PixelFormat = New Direct2D1.PixelFormat(DXGI.Format.B8G8R8A8_UNorm, Direct2D1.AlphaMode.Premultiplied)
+        result = New Direct2D1.Bitmap(rt, New Size2(drawingBitmap.Width, drawingBitmap.Height), dataStreamxx, drawingBitmapData.Stride, properties)
         drawingBitmap.UnlockBits(drawingBitmapData)
         Return result
     End Function
@@ -113,11 +129,11 @@ Public Class SolidColorBrushSet
                 Dim elementColor As XmlElement = CType(itemColor, XmlElement)
                 Dim colorString As String = elementColor.GetAttribute("value")
                 Dim argbString() As String = Regex.Split(colorString, ",")
-                Dim colorValue As New Color4 With {
-                    .Alpha = CInt(argbString(0)) / 255,
-                    .Red = CInt(argbString(1)) / 255,
-                    .Green = CInt(argbString(2)) / 255,
-                    .Blue = CInt(argbString(3)) / 255
+                Dim colorValue As New RawColor4 With {
+                    .A = CInt(argbString(0)) / 255,
+                    .R = CInt(argbString(1)) / 255,
+                    .G = CInt(argbString(2)) / 255,
+                    .B = CInt(argbString(3)) / 255
                 }
                 If elementColor.Name = "base" Then
                     resultSet.BaseColor = New SolidColorBrush(rt, colorValue)
@@ -136,3 +152,4 @@ Public Class SolidColorBrushSet
     End Function
 
 End Class
+

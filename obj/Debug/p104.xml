@@ -24,7 +24,20 @@ p104
 </member>
 <member name="P:p104.My.Resources.Resources.Colours">
 <summary>
-  查找类似  的本地化字符串。
+  查找类似 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;content&gt;
+  &lt;set index=&quot;0&quot;&gt;
+    &lt;base value=&quot;255,255,64,89&quot;/&gt;
+    &lt;light value=&quot;191,255,191,204&quot;/&gt;
+    &lt;dark value=&quot;255,179,77,85&quot;/&gt;
+    &lt;based1 value=&quot;0,0,0,0&quot;/&gt;
+    &lt;basel1 value=&quot;0,0,0,0&quot;/&gt;
+    &lt;lightd1 value=&quot;255,204,140,166&quot;/&gt;
+    &lt;lightl1 value=&quot;0,0,0,0&quot;/&gt;
+    &lt;darkd1 value=&quot;0,0,0,0&quot;/&gt;
+    &lt;darkl1 value=&quot;0,0,0,0&quot;/&gt;
+  &lt;/set&gt;
+&lt;/content&gt; 的本地化字符串。
 </summary>
 </member>
 <member name="P:p104.My.Resources.Resources.hex_forest">
@@ -414,6 +427,41 @@ p104
  英雄技能仓库类
  </summary>
 </member>
+<member name="T:p104.UnitImageRepository">
+ <summary>
+ 单位图片资源仓库类
+ </summary>
+</member>
+<member name="F:p104.UnitImageRepository.DetailLeftPanel">
+ <summary>
+ 详情面板左侧立绘
+ </summary>
+</member>
+<member name="M:p104.UnitImageRepository.Instance">
+ <summary>
+ 单例
+ </summary>
+</member>
+<member name="M:p104.UnitImageRepository.LoadFromFiles(SharpDX.Direct2D1.RenderTarget)">
+ <summary>
+ 从程序根目录下加载资源
+ </summary>
+</member>
+<member name="M:p104.UnitImageRepository.GetHeroLeftPanelArtwork(System.Int16)">
+ <summary>
+ 获取英雄立绘组
+ </summary>
+</member>
+<member name="M:p104.UnitImageRepository.GetUnitLeftPanelArtwork(System.Int16)">
+ <summary>
+ 获取普通单位立绘组
+ </summary>
+</member>
+<member name="T:p104.LeftPanelImageSet">
+ <summary>
+ 立绘图片组类
+ </summary>
+</member>
 <member name="T:p104.UnitTemplateRepository">
  <summary>
  单位模板仓库类
@@ -464,6 +512,41 @@ p104
  按高度分层
  </summary>
 </member>
+<member name="T:p104.FontHelper">
+ <summary>
+ 字体助手类
+ </summary>
+</member>
+<member name="M:p104.FontHelper.Instance">
+ <summary>
+ 单例
+ </summary>
+</member>
+<member name="T:p104.TextResource">
+ <summary>
+ 多语言文字资源类
+ </summary>
+</member>
+<member name="T:p104.GameIconRepository">
+ <summary>
+ Icon仓库类
+ </summary>
+</member>
+<member name="M:p104.GameIconRepository.Instance">
+ <summary>
+ 单例
+ </summary>
+</member>
+<member name="M:p104.GameIconRepository.LoadFromFiles(SharpDX.Direct2D1.RenderTarget)">
+ <summary>
+ 从程序根目录下加载资源
+ </summary>
+</member>
+<member name="T:p104.GameLive2dImage">
+ <summary>
+ Live2d图像，用于立绘等
+ </summary>
+</member>
 <member name="T:p104.GameResources">
  <summary>
  游戏资源模块
@@ -471,7 +554,22 @@ p104
 </member>
 <member name="F:p104.GameResources.UnitTemplates">
  <summary>
- 游戏单位模板仓库单例
+ 游戏单位模板仓库
+ </summary>
+</member>
+<member name="F:p104.GameResources.UnitImages">
+ <summary>
+ 单位图片资源仓库
+ </summary>
+</member>
+<member name="F:p104.GameResources.GameIcons">
+ <summary>
+ 游戏图标资源仓库
+ </summary>
+</member>
+<member name="F:p104.GameResources.GameFontHelper">
+ <summary>
+ 文字字体助手
  </summary>
 </member>
 <member name="F:p104.GameResources.SideColorList">
@@ -479,13 +577,12 @@ p104
  阵营颜色预设列表
  </summary>
 </member>
-<member name="M:p104.GameResources.LoadResources(SlimDX.Direct2D.RenderTarget)">
+<member name="M:p104.GameResources.LoadResources(SharpDX.Direct2D1.RenderTarget)">
  <summary>
- 从程序内部加载资源
+ 加载资源
  </summary>
- <param name="rt"></param>
 </member>
-<member name="M:p104.GameResources.LoadBitmap(SlimDX.Direct2D.RenderTarget,System.Drawing.Bitmap)">
+<member name="M:p104.GameResources.LoadBitmap(SharpDX.Direct2D1.RenderTarget,System.Drawing.Bitmap)">
  <summary>
  将system.drawing.bitmap转换为d2dbitmap
  </summary>
@@ -662,7 +759,7 @@ p104
  Skirmish模式下的单位详细信息面板类
  </summary>
 </member>
-<member name="M:p104.UnitDetailDialog.PaintDialog(SlimDX.Direct2D.WindowRenderTarget@,p104.SpectatorCamera@)">
+<member name="M:p104.UnitDetailDialog.PaintDialog(SharpDX.Direct2D1.WindowRenderTarget@,p104.SpectatorCamera@)">
  <summary>
  绘制对话框
  </summary>

@@ -10,7 +10,7 @@ Public Class Form1
         Me.Show()
         Call test.SpectatorTest()
         Call test.UnitTest()
-        Call test.DialogTest()
+        'Call test.DialogTest()
 
         PaintThread = New Thread(AddressOf d2dPaint)
         PaintThread.Start()

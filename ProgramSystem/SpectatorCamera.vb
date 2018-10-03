@@ -1,5 +1,5 @@
-﻿Imports SlimDX
-Imports SlimDX.Direct2D
+﻿Imports SharpDX
+Imports SharpDX.Direct2D1
 
 ''' <summary>
 ''' 观察者类
@@ -38,9 +38,9 @@ Public Class SpectatorCamera
 
     Public Sub InitializeDirect2d()
         Dim factory As New Factory
-        Dim wrtp As New WindowRenderTargetProperties With {
-            .Handle = Form1.Handle,
-            .PixelSize = New Size(Resolve.X, Resolve.Y)}
+        Dim wrtp As New HwndRenderTargetProperties With {
+            .Hwnd = Form1.Handle,
+            .PixelSize = New Size2(Resolve.X, Resolve.Y)}
         Dim rtp As New RenderTargetProperties With {
             .PixelFormat = New PixelFormat(DXGI.Format.B8G8R8A8_UNorm, AlphaMode.Ignore),
             .Type = RenderTargetType.Default}
