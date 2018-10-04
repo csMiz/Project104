@@ -77,8 +77,8 @@ Public Class SkirmishMap
         Next
     End Sub
 
-    Public Sub DrawHexMap(ByRef renderTarget As WindowRenderTarget, ByRef spectator As SpectatorCamera)
-        Dim brush1 As New SolidColorBrush(renderTarget, New RawColor4(1.0, 0.9, 0.2, 0.2))
+    Public Sub DrawHexMap(ByRef renderTarget As RenderTarget, ByRef spectator As SpectatorCamera)
+        Dim brush1 As New SolidColorBrush(renderTarget, New RawColor4(0.9, 0.2, 0.2, 1.0))
         Dim cameraX As Single = spectator.CameraFocus.X
         Dim cameraY As Single = spectator.CameraFocus.Y
         Dim centreX As Single = spectator.Resolve.X / 2
@@ -108,12 +108,15 @@ Public Class SkirmishMap
 
 
 
+
+
+
                 Next
             Next
-            '.DrawEllipse(brush1, New Ellipse With {
-            '             .Center = New PointF(spectator.Resolve.X / 2, spectator.Resolve.Y / 2),
-            '             .RadiusX = 25,
-            '             .RadiusY = 25})
+            .DrawEllipse(New Ellipse With {
+                         .Point = New RawVector2(spectator.Resolve.X / 2, spectator.Resolve.Y / 2),
+                         .RadiusX = 25,
+                         .RadiusY = 25}, brush1)
             '.DrawBitmap(BITMAP_HEX_GRASS, New Rectangle(spectator.Resolve.X / 2 + drawRangeX * 500 * zoom, spectator.Resolve.Y / 2 - 33.5 * zoom, 500 * zoom, 500 * zoom))
         End With
     End Sub

@@ -6,6 +6,7 @@ Imports System.Math
 Imports System.Xml
 Imports System.Text.RegularExpressions
 Imports SharpDX.Mathematics.Interop
+Imports SharpDX.IO
 
 ''' <summary>
 ''' 游戏资源模块
@@ -32,6 +33,8 @@ Module GameResources
     Public BITMAP_HEX_GRASS As Bitmap
     Public BITMAP_HEX_FOREST As Bitmap
     Public BITMAP_HEX_MOUNTAIN As Bitmap
+
+    Public TEST_BITMAP As Bitmap1
 
     Public TERRAIN_BITMAP As New List(Of Bitmap)
 
@@ -60,6 +63,8 @@ Module GameResources
         Dim gdi_hex_mountain As System.Drawing.Bitmap = My.Resources.hex_mountain
         BITMAP_HEX_MOUNTAIN = LoadBitmap(rt, gdi_hex_mountain)
 
+
+
         With TERRAIN_BITMAP
             .Add(Nothing) 'none
             .Add(Nothing)
@@ -78,8 +83,6 @@ Module GameResources
         SideColorList = SolidColorBrushSet.LoadFromXml(rt, My.Resources.Colours)
 
         GameFontHelper.AddFontFile(Application.StartupPath & "\P104_Font1.ttf", "P104_Font1")
-
-
 
     End Sub
 

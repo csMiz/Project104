@@ -18,3 +18,7 @@ C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.Direct2D1.pdb
 C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.Direct2D1.xml
 C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.DXGI.pdb
 C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.DXGI.xml
+C:\Users\asdfg\Desktop\Project104\p104\p104\obj\Debug\p104.vbprojAssemblyReference.cache
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.Direct3D11.dll
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.Direct3D11.pdb
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.Direct3D11.xml

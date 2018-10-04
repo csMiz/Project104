@@ -749,6 +749,11 @@ p104
  d2d画布对象
  </summary>
 </member>
+<member name="F:p104.SpectatorCamera.d2dContext">
+ <summary>
+ Direct2D 1.1 画布对象
+ </summary>
+</member>
 <member name="T:p104.GameImageLayer">
  <summary>
  图层分类枚举
@@ -759,7 +764,7 @@ p104
  Skirmish模式下的单位详细信息面板类
  </summary>
 </member>
-<member name="M:p104.UnitDetailDialog.PaintDialog(SharpDX.Direct2D1.WindowRenderTarget@,p104.SpectatorCamera@)">
+<member name="M:p104.UnitDetailDialog.PaintDialog(SharpDX.Direct2D1.RenderTarget@,p104.SpectatorCamera@)">
  <summary>
  绘制对话框
  </summary>
