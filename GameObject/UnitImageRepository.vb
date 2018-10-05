@@ -27,7 +27,7 @@ Public Class UnitImageRepository
     ''' <summary>
     ''' 从程序根目录下加载资源
     ''' </summary>
-    Public Sub LoadFromFiles(rt As RenderTarget)
+    Public Sub LoadFromFiles(rt As SharpDX.Direct2D1.DeviceContext)
 
     End Sub
 

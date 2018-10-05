@@ -22,7 +22,7 @@ Public MustInherit Class GameDialog
         End With
     End Sub
 
-    Public MustOverride Sub PaintDialog(ByRef rt As RenderTarget, ByRef spec As SpectatorCamera)
+    Public MustOverride Sub PaintDialog(ByRef rt As SharpDX.Direct2D1.DeviceContext, ByRef spec As SpectatorCamera)
 
     Public Sub MouseDown(e As MouseEventArgs)
     End Sub

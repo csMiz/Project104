@@ -22,7 +22,7 @@ Public Class SpectatorCamera
     ''' <summary>
     ''' 定义绘图委托
     ''' </summary>
-    Public Delegate Sub Draw(ByRef renderTarget As RenderTarget, ByRef spectator As SpectatorCamera)
+    Public Delegate Sub Draw(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera)
 
     ''' <summary>
     ''' 分层绘图，不考虑小窗口穿透的模式
@@ -48,8 +48,7 @@ Public Class SpectatorCamera
     Private d2dTarget As SharpDX.Direct2D1.Bitmap1
 
     Public Sub InitializeDirect2d()
-        '改用d2d1.1 需要重写
-        '----------------
+        '-------d2d1.0初始化方法---------
         'Dim factory As New Factory
         'Dim wrtp As New HwndRenderTargetProperties With {
         '    .Hwnd = Form1.Handle,
@@ -58,7 +57,7 @@ Public Class SpectatorCamera
         '    .PixelFormat = New PixelFormat(DXGI.Format.B8G8R8A8_UNorm, AlphaMode.Ignore),
         '    .Type = RenderTargetType.Default}
         'RT = New WindowRenderTarget(factory, rtp, wrtp)
-        '----------------
+        '--------已改用d2d1.1--------
         Dim defaultDevice As SharpDX.Direct3D11.Device = New SharpDX.Direct3D11.Device(DriverType.Hardware, Direct3D11.DeviceCreationFlags.Debug Or Direct3D11.DeviceCreationFlags.BgraSupport)
         device = defaultDevice.QueryInterface(Of SharpDX.Direct3D11.Device1)()
         d3dContext = device.ImmediateContext.QueryInterface(Of SharpDX.Direct3D11.DeviceContext1)()
@@ -95,6 +94,7 @@ Public Class SpectatorCamera
         d2dTarget = New Bitmap1(d2dContext, backBuffer, Properties)
 
 
+
         Call GameResources.LoadResources(d2dContext)
     End Sub
 
@@ -105,6 +105,7 @@ Public Class SpectatorCamera
             For i = PaintingLayers.Count - 1 To 0 Step -1
                 PaintingLayers(i).Invoke(d2dContext, Me)
             Next
+
             d2dContext.EndDraw()
             swapChain.Present(0, DXGI.PresentFlags.None)    '0 or 1, I don't know
         End If

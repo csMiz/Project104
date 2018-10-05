@@ -126,7 +126,7 @@ Public Class GameUnit
     End Sub
 
     Public Function GetSideColorSet() As SolidColorBrushSet
-        Return SideColorList(Me.Player)
+        Return SIDE_COLOUR(Me.Player)
     End Function
 
 End Class

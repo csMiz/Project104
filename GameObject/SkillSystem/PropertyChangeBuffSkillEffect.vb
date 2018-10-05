@@ -16,7 +16,7 @@ Public Class PropertyChangeBuffSkillEffect
         Dim effectFunction As EffectActivate = Nothing
         If HandlePropertyName = "move" Then
             effectFunction = Sub(sender As GameUnit, target As List(Of GameUnit))
-                                 Dim buff As New GameUnitBuff(Me.ParentSkillName, AllGameStages, "行动力上升")
+                                 Dim buff As New GameUnitBuff(Me.ParentSkillName, ALL_GAME_STAGES, "行动力上升")
                                  Dim paramList As New List(Of String) From {
                                      EffectValueText
                                  }
@@ -25,7 +25,7 @@ Public Class PropertyChangeBuffSkillEffect
                              End Sub
         ElseIf HandlePropertyName = "movetype" Then
             effectFunction = Sub(sender As GameUnit, target As List(Of GameUnit))
-                                 Dim buff As New GameUnitBuff(Me.ParentSkillName, AllGameStages, "行动方式改为<ps>")   '<ps>表示参数字符串，<pv>表示参数值
+                                 Dim buff As New GameUnitBuff(Me.ParentSkillName, ALL_GAME_STAGES, "行动方式改为<ps>")   '<ps>表示参数字符串，<pv>表示参数值
                                  Dim paramList As New List(Of String)
                                  paramList.Add(EffectValueText)
                                  buff.AddEffect(New KeyValuePair(Of String, List(Of String))("move", paramList))

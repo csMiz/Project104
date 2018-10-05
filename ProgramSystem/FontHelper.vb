@@ -58,7 +58,7 @@ Public Class TextItem
         FontColor = color
     End Sub
 
-    Public Sub GenerateImage(rt As Sharpdx.Direct2d1.RenderTarget)
+    Public Sub GenerateImage(rt As SharpDX.Direct2D1.DeviceContext)
         Dim bitmap As New System.Drawing.Bitmap(ImageSize.X, ImageSize.Y)
         Dim G As Graphics = Graphics.FromImage(bitmap)
         G.DrawString(Text, New Drawing.Font(UsingFontFamily, FontSize), FontColor, 0, 0)

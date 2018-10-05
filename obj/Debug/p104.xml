@@ -40,26 +40,6 @@ p104
 &lt;/content&gt; 的本地化字符串。
 </summary>
 </member>
-<member name="P:p104.My.Resources.Resources.hex_forest">
-<summary>
-  查找 System.Drawing.Bitmap 类型的本地化资源。
-</summary>
-</member>
-<member name="P:p104.My.Resources.Resources.hex_grass">
-<summary>
-  查找 System.Drawing.Bitmap 类型的本地化资源。
-</summary>
-</member>
-<member name="P:p104.My.Resources.Resources.hex_grass1">
-<summary>
-  查找 System.Drawing.Bitmap 类型的本地化资源。
-</summary>
-</member>
-<member name="P:p104.My.Resources.Resources.hex_mountain">
-<summary>
-  查找 System.Drawing.Bitmap 类型的本地化资源。
-</summary>
-</member>
 <member name="P:p104.My.Resources.Resources.MapScriptTest">
 <summary>
   查找类似 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
@@ -442,7 +422,7 @@ p104
  单例
  </summary>
 </member>
-<member name="M:p104.UnitImageRepository.LoadFromFiles(SharpDX.Direct2D1.RenderTarget)">
+<member name="M:p104.UnitImageRepository.LoadFromFiles(SharpDX.Direct2D1.DeviceContext)">
  <summary>
  从程序根目录下加载资源
  </summary>
@@ -512,6 +492,21 @@ p104
  按高度分层
  </summary>
 </member>
+<member name="T:p104.SkirmishMapBlock">
+ <summary>
+ 单个六边形地图块类
+ </summary>
+</member>
+<member name="F:p104.SkirmishMapBlock.ImgLeft">
+ <summary>
+ 贴图左端
+ </summary>
+</member>
+<member name="F:p104.SkirmishMapBlock.ImgTop">
+ <summary>
+ 贴图顶端
+ </summary>
+</member>
 <member name="T:p104.FontHelper">
  <summary>
  字体助手类
@@ -537,7 +532,7 @@ p104
  单例
  </summary>
 </member>
-<member name="M:p104.GameIconRepository.LoadFromFiles(SharpDX.Direct2D1.RenderTarget)">
+<member name="M:p104.GameIconRepository.LoadFromFiles(SharpDX.Direct2D1.DeviceContext)">
  <summary>
  从程序根目录下加载资源
  </summary>
@@ -572,12 +567,22 @@ p104
  文字字体助手
  </summary>
 </member>
-<member name="F:p104.GameResources.SideColorList">
+<member name="F:p104.GameResources.TERRAIN_BITMAP">
+ <summary>
+ 六边形地形块图片
+ </summary>
+</member>
+<member name="F:p104.GameResources.TERRAIN_BASECOLOUR">
+ <summary>
+ 六边形地形块底部颜色
+ </summary>
+</member>
+<member name="F:p104.GameResources.SIDE_COLOUR">
  <summary>
  阵营颜色预设列表
  </summary>
 </member>
-<member name="M:p104.GameResources.LoadResources(SharpDX.Direct2D1.RenderTarget)">
+<member name="M:p104.GameResources.LoadResources(SharpDX.Direct2D1.DeviceContext)">
  <summary>
  加载资源
  </summary>
@@ -586,6 +591,14 @@ p104
  <summary>
  将system.drawing.bitmap转换为d2dbitmap
  </summary>
+</member>
+<member name="M:p104.GameResources.LoadBitmapUsingWIC(SharpDX.Direct2D1.DeviceContext,System.String)">
+ <summary>
+ 使用WIC载入图片资源
+ </summary>
+ <param name="context">d2dContext对象</param>
+ <param name="filePath">图片路径</param>
+ <returns></returns>
 </member>
 <member name="T:p104.SolidColorBrushSet">
  <summary>
@@ -764,7 +777,7 @@ p104
  Skirmish模式下的单位详细信息面板类
  </summary>
 </member>
-<member name="M:p104.UnitDetailDialog.PaintDialog(SharpDX.Direct2D1.RenderTarget@,p104.SpectatorCamera@)">
+<member name="M:p104.UnitDetailDialog.PaintDialog(SharpDX.Direct2D1.DeviceContext@,p104.SpectatorCamera@)">
  <summary>
  绘制对话框
  </summary>

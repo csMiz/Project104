@@ -22,3 +22,9 @@ C:\Users\asdfg\Desktop\Project104\p104\p104\obj\Debug\p104.vbprojAssemblyReferen
 C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.Direct3D11.dll
 C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.Direct3D11.pdb
 C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.Direct3D11.xml
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.RawInput.dll
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.XInput.dll
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.RawInput.pdb
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.RawInput.xml
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.XInput.pdb
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.XInput.xml

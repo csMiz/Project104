@@ -1,5 +1,7 @@
 ﻿Imports System.ComponentModel
 Imports System.Threading
+Imports SharpDX.XInput
+Imports SharpDX.RawInput
 
 Public Class Form1
     Private test As New GameTest
@@ -15,10 +17,13 @@ Public Class Form1
         PaintThread = New Thread(AddressOf d2dPaint)
         PaintThread.Start()
 
+        Device.RegisterDevice(SharpDX.Multimedia.UsagePage.Generic, SharpDX.Multimedia.UsageId.GenericKeyboard, DeviceFlags.None)
+        AddHandler Device.KeyboardInput, AddressOf test_keydown
+
     End Sub
 
     Public Sub d2dPaint()
-        Dim paintGame As New paintGame(AddressOf test.user.PaintImage)
+        Dim paintGame As New paintGame(AddressOf test.User.PaintImage)
         Dim starttime
         Dim endtime
         Dim a1 As TimeSpan
@@ -37,6 +42,15 @@ L1:
     End Sub
 
     Private Sub Form1_MouseDown(sender As Object, e As MouseEventArgs) Handles Me.MouseDown
+
+        'Dim controller As Controller = New Controller(UserIndex.One)
+        'Dim gamePad As Gamepad = controller.GetState().Gamepad  'xinput->手柄
+
+
+    End Sub
+
+    Public Sub test_keydown(sender As Object, args As KeyboardInputEventArgs)
+        'MsgBox(args.Key)    '为什么不断变化的？
 
     End Sub
 End Class

@@ -83,46 +83,6 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  查找 System.Drawing.Bitmap 类型的本地化资源。
-        '''</summary>
-        Friend ReadOnly Property hex_forest() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("hex_forest", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  查找 System.Drawing.Bitmap 类型的本地化资源。
-        '''</summary>
-        Friend ReadOnly Property hex_grass() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("hex_grass", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  查找 System.Drawing.Bitmap 类型的本地化资源。
-        '''</summary>
-        Friend ReadOnly Property hex_grass1() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("hex_grass1", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
-        '''  查找 System.Drawing.Bitmap 类型的本地化资源。
-        '''</summary>
-        Friend ReadOnly Property hex_mountain() As System.Drawing.Bitmap
-            Get
-                Dim obj As Object = ResourceManager.GetObject("hex_mountain", resourceCulture)
-                Return CType(obj,System.Drawing.Bitmap)
-            End Get
-        End Property
-        
-        '''<summary>
         '''  查找类似 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
         '''&lt;content&gt;
         '''  &lt;side value=&quot;0&quot; name=&quot;Remilia&quot; type=&quot;Player&quot; team=&quot;0&quot;&gt;

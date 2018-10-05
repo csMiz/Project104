@@ -91,7 +91,7 @@ Public Class UnitDetailDialog
     ''' <summary>
     ''' 绘制对话框
     ''' </summary>
-    Public Overrides Sub PaintDialog(ByRef rt As RenderTarget, ByRef spec As SpectatorCamera)
+    Public Overrides Sub PaintDialog(ByRef rt As SharpDX.Direct2D1.DeviceContext, ByRef spec As SpectatorCamera)
         If Me.Camera Is Nothing AndAlso spec IsNot Nothing Then
             Me.Camera = spec
             Me.InitializeConetentBox()
