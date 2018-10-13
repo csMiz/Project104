@@ -46,7 +46,7 @@ Public Class UnitDetailDialog
         Dim top_left_x As Integer = Camera.Resolve.X / 2 - Me.Width / 2
         Dim top_left_y As Integer = Camera.Resolve.Y / 2 - Me.Height / 2
         '背景
-        Rect_BG = New RawRectangleF(top_left_x, top_left_y, Me.Width, Me.Height)
+        Rect_BG = New RawRectangleF(top_left_x, top_left_y, top_left_x + Me.Width, top_left_y + Me.Height)
 
         Dim leftBar_width As Single = Me.Height * 0.382
         '人物立绘区
@@ -91,14 +91,46 @@ Public Class UnitDetailDialog
     ''' <summary>
     ''' 绘制对话框
     ''' </summary>
-    Public Overrides Sub PaintDialog(ByRef rt As SharpDX.Direct2D1.DeviceContext, ByRef spec As SpectatorCamera)
+    Public Overrides Sub PaintDialog(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
         If Me.Camera Is Nothing AndAlso spec IsNot Nothing Then
             Me.Camera = spec
             Me.InitializeConetentBox()
         End If
 
+        'context.EndDraw()
+        '不要频繁创建bitmap，会蓝屏
+        'Dim tmpBitmap As New Bitmap1(context, New SharpDX.Size2(spec.Resolve.X, spec.Resolve.Y), New BitmapProperties1() With {
+        '                      .PixelFormat = New SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied),
+        '                      .BitmapOptions = BitmapOptions.Target})
 
-        rt.FillRectangle(Rect_BG, UsingColorSet.LightColor)
+        'context.Target = tmpBitmap
+        'context.BeginDraw()
+        'context.DrawImage(canvasBitmap)
+        'context.EndDraw()
+
+        'Dim eff As New Effects.GaussianBlur(context)
+        'eff.SetInput(0, tmpBitmap, True)
+        'eff.StandardDeviation = 5.0F
+
+        'Dim tmpBitmap2 As New Bitmap1(context, New SharpDX.Size2(spec.Resolve.X, spec.Resolve.Y), New BitmapProperties1() With {
+        '                      .PixelFormat = New SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied),
+        '                      .BitmapOptions = BitmapOptions.Target})
+
+        'context.Target = tmpBitmap2
+        'context.BeginDraw()
+        'context.DrawImage(eff)
+        'context.EndDraw()
+
+        'Dim bru As New BitmapBrush1(context, tmpBitmap2)
+
+        'context.Target = canvasBitmap
+        'context.BeginDraw()
+        'context.FillRectangle(Rect_BG, bru)
+
+        'tmpBitmap.Dispose()
+        'tmpBitmap2.Dispose()
+
+        context.FillRectangle(Rect_BG, GREY_COLOUR(0))
         'rt.FillRectangle(UsingColorSet.BaseColor, Rect_LeftBar)
         'rt.FillRectangle(UsingColorSet.LightD1Color, Rect_AtkBar)
         'rt.FillRectangle(UsingColorSet.LightD1Color, Rect_DefBar)
@@ -116,8 +148,9 @@ Public Class UnitDetailDialog
 
         Dim testText As New TextItem("Remilia Scarlet", New PointI(350, 200))
         testText.LoadFont(GameFontHelper.GetFontFamily(0), 36, Brushes.Red)
-        testText.GenerateImage(rt)
-        rt.DrawBitmap(testText.GetImage, New RawRectangleF(300, 300, 350, 200), 1.0F, BitmapInterpolationMode.Linear)
+        testText.GenerateImage(context)
+        context.DrawBitmap(testText.GetImage, New RawRectangleF(300, 300, 650, 500), 1.0F, BitmapInterpolationMode.Linear)
+
 
     End Sub
 

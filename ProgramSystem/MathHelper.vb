@@ -4,6 +4,9 @@
 ''' 数学助手类
 ''' </summary>
 Public Class MathHelper
+
+    Private Shared Rnd As Random = New Random()
+
     ''' <summary>
     ''' 计算两点间距离
     ''' </summary>
@@ -11,6 +14,9 @@ Public Class MathHelper
         Return Sqrt((a.X - b.X) ^ 2 + (a.Y - b.Y) ^ 2)
     End Function
 
+    Public Shared Function GetRandom() As Double
+        Return Rnd.NextDouble
+    End Function
 
 End Class
 

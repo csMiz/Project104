@@ -1,4 +1,5 @@
-﻿Imports SharpDX.Mathematics.Interop
+﻿Imports SharpDX.Direct2D1
+Imports SharpDX.Mathematics.Interop
 
 ''' <summary>
 ''' 单个六边形地图块类
@@ -9,6 +10,9 @@ Public Class SkirmishMapBlock
 
     Public Property Altitude As Short = 0
     Public Property Terrain As TerrainType
+    Private Accessories As New List(Of SkirmishMapBlockAccessory)
+    Private AccessoryImage As Bitmap1
+    Private Shared AccessoryCompare As New Comparison(Of SkirmishMapBlockAccessory)(AddressOf CompareAccessory)
 
     Public V_O As New RawVector2
     Public V_L As New RawVector2
@@ -27,11 +31,13 @@ Public Class SkirmishMapBlock
     ''' 贴图顶端
     ''' </summary>
     Public ImgTop As Single
+    Public ImgSideLength As Single
 
     Public DrawingBaseStartPoint As RawVector2
     Public DrawingBasePoints As New List(Of RawVector2)
 
     Public Sub UpdateVertices(focus As PointF2, resolve As PointI, zoom As Single)
+        ImgSideLength = FIVE_HUNDRED * zoom
         Dim halfSide As Single = TWO_FIFTY * zoom
         Dim blockCentreX As Single = X * THREE_SEVEN_FIVE * zoom + halfSide
         Dim blockCentreY As Single = Y * TWO_FIFTY_ROOT3 * zoom + ONE_TWO_FIVE_ROOT3 * zoom + ONE_TWO_FIVE_ROOT3 * zoom * (X Mod 2)
@@ -72,14 +78,74 @@ Public Class SkirmishMapBlock
         'Dim baseBLPoint As New RawVector2(fake3dBLPoint.X - fake3dHorizontalOffset, fake3dBLPoint.Y - fake3dVerticalOffset)
 
         DrawingBaseStartPoint = V_L
-        DrawingBasePoints.Clear()
-        DrawingBasePoints.Add(V_BL)
-        DrawingBasePoints.Add(V_BR)
-        DrawingBasePoints.Add(V_R)
-        DrawingBasePoints.Add(V3D_R)
-        DrawingBasePoints.Add(V3D_BR)
-        DrawingBasePoints.Add(V3D_BL)
-        DrawingBasePoints.Add(V3D_L)
+        With DrawingBasePoints
+            .Clear()
+            .Add(V_BL)
+            .Add(V_BR)
+            .Add(V_R)
+            .Add(V3D_R)
+            .Add(V3D_BR)
+            .Add(V3D_BL)
+            .Add(V3D_L)
+        End With
+
+    End Sub
+
+    Public Sub InitializeAccessories(context As DeviceContext, zoom As Single)
+        Dim SideLength As Single = FIVE_HUNDRED * zoom
+        Accessories.Clear()
+        AccessoryImage = New Bitmap1(context, New SharpDX.Size2(SideLength, 1.5 * SideLength), NORMAL_BITMAP_PROPERTY)
+        Dim center As New PointF2(0.5 * SideLength, SideLength)
+        Dim accessoryImageSize As Single = 50
+        If Me.Terrain = TerrainType.Forest Then
+            Dim treeCount As Short = CInt(MathHelper.GetRandom * 4 + 6)
+            For i = 0 To treeCount - 1
+                Dim distanceToCenter As Single = MathHelper.GetRandom * 0.5 * SideLength * HALF_ROOT3
+                Dim angle As Single = 2 * Math.PI * MathHelper.GetRandom
+                Dim position As New PointF2(center.X + distanceToCenter * Math.Cos(angle), center.Y - distanceToCenter * Math.Sin(angle))
+                Dim rect As New RawRectangleF(position.X - 0.5 * accessoryImageSize, position.Y - accessoryImageSize, position.X + 0.5 * accessoryImageSize, position.Y)
+                Dim tmpAccessory As New SkirmishMapBlockAccessory(ACCESSORY_TREE(0), rect)
+                Accessories.Add(tmpAccessory)
+            Next
+        End If
+
+        Accessories.Sort(SkirmishMapBlock.AccessoryCompare)
+
+        context.Target = AccessoryImage
+        context.BeginDraw()
+        For i = 0 To Accessories.Count - 1
+            Accessories(i).PaintSourceImage(context)
+        Next
+        context.EndDraw()
+
+    End Sub
+
+    Private Shared Function CompareAccessory(a As SkirmishMapBlockAccessory, b As SkirmishMapBlockAccessory) As Single
+        Return (a.GetSourceY - b.GetSourceY)
+    End Function
+
+    Public Sub PaintMapBlock(context As DeviceContext)
+        With context
+            '画基底
+            Dim geometry As New PathGeometry(.Factory)
+            Dim sink As GeometrySink = geometry.Open
+            With sink
+                .SetFillMode(FillMode.Winding)
+                .BeginFigure(Me.DrawingBaseStartPoint, FigureBegin.Filled)
+                Dim sinkPoints() As RawVector2 = Me.DrawingBasePoints.ToArray
+                .AddLines(sinkPoints)
+                .EndFigure(FigureEnd.Closed)
+                .Close()
+            End With
+            .FillGeometry(geometry, TERRAIN_BASECOLOUR(Me.Terrain))
+            '画六角地图
+            Dim rect As New RawRectangleF(Me.ImgLeft, Me.ImgTop, Me.ImgLeft + ImgSideLength, Me.ImgTop + ImgSideLength)
+            .DrawBitmap(TERRAIN_BITMAP(Me.Terrain), rect, NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
+            '画装饰物
+            Dim rect2 As New RawRectangleF(rect.Left, rect.Top - 0.5 * ImgSideLength, rect.Right, rect.Bottom)
+            .DrawBitmap(AccessoryImage, rect2, NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
+
+        End With
 
     End Sub
 

@@ -53,6 +53,18 @@ Public Class GameHero
         Me.LevelUpItems = list
     End Sub
 
+    Public Overrides Function GlobalSaveUnit() As String
+        Dim result As String = ""
+        result = "{" & Me.TemplateId & COMMA
+        result = result & Me.Level.GetValue & COMMA
+        result = result & Me.EXP.GetValue & COMMA
+        result = result & Me.FullHP.GetValue & COMMA
+        result = result & Me.MovementType & COMMA
+
+        '...
+
+    End Function
+
 End Class
 
 Public Class LevelUpItem

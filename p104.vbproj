@@ -119,6 +119,7 @@
     <Compile Include="MapObject\MapBlock.vb" />
     <Compile Include="MapObject\SkirmishMap.vb" />
     <Compile Include="MapObject\SkirmishMapBlock.vb" />
+    <Compile Include="MapObject\SkirmishMapBlockAccessory.vb" />
     <Compile Include="MapObject\SkirmishTerrain.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -138,10 +139,13 @@
     <Compile Include="ProgramSystem\CircleArea.vb" />
     <Compile Include="ProgramSystem\FontHelper.vb" />
     <Compile Include="ProgramSystem\GameIconRepository.vb" />
+    <Compile Include="ProgramSystem\GameLive2dAnimation.vb" />
     <Compile Include="ProgramSystem\GameLive2dImage.vb" />
     <Compile Include="ProgramSystem\GameResources.vb" />
+    <Compile Include="ProgramSystem\GameStaticImage.vb" />
     <Compile Include="ProgramSystem\GameTest.vb" />
     <Compile Include="ProgramSystem\GameDialog.vb" />
+    <Compile Include="ProgramSystem\IGameImage.vb" />
     <Compile Include="ProgramSystem\IMouseArea.vb" />
     <Compile Include="ProgramSystem\IntegerProperty.vb" />
     <Compile Include="ProgramSystem\LoggingService.vb" />

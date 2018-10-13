@@ -190,6 +190,12 @@ p104
  单位唯一id
  </summary>
 </member>
+<member name="P:p104.GameUnit.TemplateId">
+ <summary>
+ 模板id,128以下是unit，128以上是hero
+ </summary>
+ <returns></returns>
+</member>
 <member name="P:p104.GameUnit.ShownName">
  <summary>
  显示的名字
@@ -507,6 +513,11 @@ p104
  贴图顶端
  </summary>
 </member>
+<member name="T:p104.SkirmishMapBlockAccessory">
+ <summary>
+ 六角地图装饰物类，用于树木、岩石等
+ </summary>
+</member>
 <member name="T:p104.FontHelper">
  <summary>
  字体助手类
@@ -537,9 +548,39 @@ p104
  从程序根目录下加载资源
  </summary>
 </member>
+<member name="T:p104.GameLive2dAnimation">
+ <summary>
+ Live2d动画类
+ </summary>
+</member>
 <member name="T:p104.GameLive2dImage">
  <summary>
  Live2d图像，用于立绘等
+ </summary>
+</member>
+<member name="F:p104.GameLive2dImage.FullImage">
+ <summary>
+ 原始图像
+ </summary>
+</member>
+<member name="F:p104.GameLive2dImage.FullPos">
+ <summary>
+ 原始坐标
+ </summary>
+</member>
+<member name="F:p104.GameLive2dImage.MeshAtlas">
+ <summary>
+ 分割后的所有图片素材
+ </summary>
+</member>
+<member name="T:p104.SpriteLive2dImage">
+ <summary>
+ Live2d精灵图片类
+ </summary>
+</member>
+<member name="M:p104.SpriteLive2dImage.CalculateRect">
+ <summary>
+ 通过三个顶点计算外围矩形
  </summary>
 </member>
 <member name="T:p104.GameResources">
@@ -605,6 +646,18 @@ p104
  游戏阵营颜色预设
  </summary>
 </member>
+<member name="T:p104.GameStaticImage">
+ <summary>
+ 静止图像资源（相对于Live2d）
+ </summary>
+</member>
+<member name="M:p104.GameStaticImage.Initialize(SharpDX.Direct2D1.Bitmap1,SharpDX.Mathematics.Interop.RawRectangleF)">
+ <summary>
+ 初始化
+ </summary>
+ <param name="sourceBitmap">图像</param>
+ <param name="sourceRect">原始矩形</param>
+</member>
 <member name="T:p104.GameTest">
  <summary>
  游戏测试类
@@ -623,6 +676,27 @@ p104
  <param name="inputHeight">长度</param>
  <param name="spec">Spectator</param>
 </member>
+<member name="T:p104.IGameImage">
+ <summary>
+ 游戏图片素材类，包括静态图片和动态Live2d，仅用于立绘等，不用于UI
+ </summary>
+</member>
+<member name="M:p104.IGameImage.GetImage">
+ <summary>
+ 获取图像
+ </summary>
+</member>
+<member name="M:p104.IGameImage.GetDrawRect">
+ <summary>
+ 获取绘图时的默认正确位置
+ </summary>
+</member>
+<member name="M:p104.IGameImage.PaintFullImage(SharpDX.Direct2D1.DeviceContext@)">
+ <summary>
+ 直接绘图
+ </summary>
+ <param name="context"></param>
+</member>
 <member name="T:p104.IMouseArea">
  <summary>
  鼠标判定区接口
@@ -630,7 +704,7 @@ p104
 </member>
 <member name="T:p104.LoggingService">
  <summary>
- 对程序内各属性的监听服务类
+ 监听服务类
  </summary>
 </member>
 <member name="M:p104.LoggingService.Log(p104.LogSenderType,System.Int32,p104.LogMessageType,System.Object)">
@@ -650,6 +724,16 @@ p104
 <member name="T:p104.LogMessageType">
  <summary>
  记录日志内容类型枚举
+ </summary>
+</member>
+<member name="T:p104.LogMatchResult">
+ <summary>
+ 校验数值结果枚举
+ </summary>
+</member>
+<member name="T:p104.GameRecord">
+ <summary>
+ 数值记录类
  </summary>
 </member>
 <member name="T:p104.MathHelper">
@@ -777,7 +861,7 @@ p104
  Skirmish模式下的单位详细信息面板类
  </summary>
 </member>
-<member name="M:p104.UnitDetailDialog.PaintDialog(SharpDX.Direct2D1.DeviceContext@,p104.SpectatorCamera@)">
+<member name="M:p104.UnitDetailDialog.PaintDialog(SharpDX.Direct2D1.DeviceContext@,p104.SpectatorCamera@,SharpDX.Direct2D1.Bitmap1)">
  <summary>
  绘制对话框
  </summary>

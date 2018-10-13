@@ -41,6 +41,8 @@ Module GameResources
     ''' </summary>
     Public TERRAIN_BASECOLOUR As New List(Of SolidColorBrush)
 
+    Public ACCESSORY_TREE As New List(Of Bitmap1)
+
     Public Const SIX_TWO_FIVE As Single = 62.5
     Public Const THREE_SEVEN_FIVE As Single = 375
     Public ReadOnly SIX_TWO_FIVE_ROOT3 As Single = 62.5 * Sqrt(3)
@@ -50,11 +52,23 @@ Module GameResources
     Public Const FIVE_HUNDRED As Single = 500
     Public Const TWO_FIFTY As Single = 250
     Public Const ONE_TWO_FIVE As Single = 125
+    Public Const COMMA As String = ","
+    Public Const THIRTY_THOUSAND As Integer = 30000
+    Public ReadOnly HALF_ROOT3 As Single = Sqrt(3) / 2
+
+    Public Const NOT_TRANSPARENT As Single = 1.0F
 
     ''' <summary>
     ''' 阵营颜色预设列表
     ''' </summary>
     Public SIDE_COLOUR As List(Of SolidColorBrushSet) = Nothing
+
+    Public GREY_COLOUR As New List(Of SolidColorBrush)
+    Public WHITE_COLOUR As New RawColor4(1, 1, 1, 1)
+
+    Public NORMAL_BITMAP_PROPERTY As BitmapProperties1 = New BitmapProperties1() With {
+                              .PixelFormat = New SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied),
+                              .BitmapOptions = BitmapOptions.Target}
 
     Public ReadOnly ALL_GAME_STAGES As New List(Of SingleGameLoopStage) From {0, 1, 2, 3, 4, 5}
 
@@ -62,17 +76,17 @@ Module GameResources
     ''' 加载资源
     ''' </summary>
     Public Sub LoadResources(context As SharpDX.Direct2D1.DeviceContext)
-        Dim BITMAP_HEX_GRASS As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\hex_grass.png")
-        Dim BITMAP_HEX_FOREST As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\hex_forest.png")
-        Dim BITMAP_HEX_MOUNTAIN As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\hex_mountain.png")
+        Dim bitmap_hex_grass As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\hex_grass.png")
+        Dim bitmap_hex_forest As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\hex_forest.png")
+        Dim bitmap_hex_mountain As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\hex_mountain.png")
 
         With TERRAIN_BITMAP
             .Add(Nothing) 'none
             .Add(Nothing)
-            .Add(BITMAP_HEX_MOUNTAIN)
-            .Add(BITMAP_HEX_FOREST)
+            .Add(bitmap_hex_mountain)
+            .Add(bitmap_hex_forest)
             .Add(Nothing)
-            .Add(BITMAP_HEX_GRASS)
+            .Add(bitmap_hex_grass)
         End With
 
         With TERRAIN_BASECOLOUR
@@ -84,6 +98,9 @@ Module GameResources
             .Add(New SolidColorBrush(context, New RawColor4(90 / 255, 149 / 255, 103 / 255, 1)))
         End With
 
+        Dim bitmap_tree2 As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\tree2.png")
+        ACCESSORY_TREE.Add(bitmap_tree2)
+
         Dim unitTemplatesString As String = My.Resources.UnitTemplates
         UnitTemplates.LoadTemplates(unitTemplatesString)
 
@@ -91,6 +108,7 @@ Module GameResources
         GameIcons.LoadFromFiles(context)
 
         SIDE_COLOUR = SolidColorBrushSet.LoadFromXml(context, My.Resources.Colours)
+        GREY_COLOUR.Add(New SolidColorBrush(context, New RawColor4(0, 0, 0, 0.5)))
 
         GameFontHelper.AddFontFile(Application.StartupPath & "\P104_Font1.ttf", "P104_Font1")
 
@@ -125,8 +143,6 @@ Module GameResources
         Dim newBitmap As Bitmap1 = SharpDX.Direct2D1.Bitmap1.FromWicBitmap(context, Converter)
         Return newBitmap
     End Function
-
-
 
 
 End Module

@@ -54,6 +54,14 @@ Public Class SkirmishMap
 
     End Sub
 
+    Public Sub LoadAccessories(context As DeviceContext, zoom As Single)
+        For i = 0 To 49
+            For j = 0 To 49
+                Blocks(i, j).InitializeAccessories(context, zoom)
+            Next
+        Next
+    End Sub
+
     ''' <summary>
     ''' 按高度分层
     ''' </summary>
@@ -112,14 +120,13 @@ Public Class SkirmishMap
         Next
     End Sub
 
-    Public Sub DrawHexMap(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera)
+    Public Sub DrawHexMap(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As Bitmap1)
         Dim brush1 As New SolidColorBrush(context, New RawColor4(0.9, 0.2, 0.2, 1.0))
         Dim cameraX As Single = spectator.CameraFocus.X
         Dim cameraY As Single = spectator.CameraFocus.Y
         Dim centreX As Single = spectator.Resolve.X / 2
         Dim centreY As Single = spectator.Resolve.Y / 2
         Dim zoom As Single = spectator.Zoom
-        Dim bitmap_side_length As Single = FIVE_HUNDRED * zoom
 
         Dim drawRangeX As Short = Truncate((cameraX - SIX_TWO_FIVE * zoom) / (THREE_SEVEN_FIVE * zoom))
         Dim drawRangeY As Short = Truncate((cameraY - SIX_TWO_FIVE_ROOT3 * zoom) / (TWO_FIFTY_ROOT3 * zoom))
@@ -130,20 +137,7 @@ Public Class SkirmishMap
             For j = 0 To PaintOrderList.Count - 1
                 '画地图块
                 Dim block As SkirmishMapBlock = PaintOrderList(j)
-                Dim rect As New RawRectangleF(block.ImgLeft, block.ImgTop, block.ImgLeft + bitmap_side_length, block.ImgTop + bitmap_side_length)
-                .DrawBitmap(TERRAIN_BITMAP(block.Terrain), rect, 1.0F, BitmapInterpolationMode.Linear)
-                '画基底
-                Dim geometry As New PathGeometry(.Factory)
-                Dim sink As GeometrySink = geometry.Open
-                With sink
-                    .SetFillMode(FillMode.Winding)
-                    .BeginFigure(block.DrawingBaseStartPoint, FigureBegin.Filled)
-                    Dim sinkPoints() As RawVector2 = block.DrawingBasePoints.ToArray
-                    .AddLines(sinkPoints)
-                    .EndFigure(FigureEnd.Closed)
-                    .Close()
-                End With
-                .FillGeometry(geometry, TERRAIN_BASECOLOUR(block.Terrain))
+                block.PaintMapBlock(context)
             Next
 
             '画参考中央圈
@@ -155,5 +149,8 @@ Public Class SkirmishMap
         End With
     End Sub
 
+    Public Sub LoadUnitsFromXMLAndTemplates(xml As String)
+
+    End Sub
 
 End Class

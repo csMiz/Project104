@@ -7,7 +7,12 @@ Public Class GameUnit
     ''' <summary>
     ''' 单位唯一id
     ''' </summary>
-    Private Property UnitId As Integer
+    Protected Property UnitId As Integer
+    ''' <summary>
+    ''' 模板id,128以下是unit，128以上是hero
+    ''' </summary>
+    ''' <returns></returns>
+    Protected Property TemplateId As Integer
     ''' <summary>
     ''' 显示的名字
     ''' </summary>
@@ -127,6 +132,12 @@ Public Class GameUnit
 
     Public Function GetSideColorSet() As SolidColorBrushSet
         Return SIDE_COLOUR(Me.Player)
+    End Function
+
+    Public Overridable Function GlobalSaveUnit() As String
+        Dim result As String = ""
+        result = "{" & Me.TemplateId & COMMA
+
     End Function
 
 End Class

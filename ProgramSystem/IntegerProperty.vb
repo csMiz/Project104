@@ -15,6 +15,9 @@
     End Sub
 
     Public Function GetValue() As Integer
+        If Not CBool(LoggingService.Match(Me.GetId, Value)) Then
+            Value = CInt(LoggingService.GetValueFromRecord(Me.GetId))
+        End If
         Return Value
     End Function
 

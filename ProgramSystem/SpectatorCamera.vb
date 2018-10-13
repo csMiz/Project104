@@ -22,7 +22,7 @@ Public Class SpectatorCamera
     ''' <summary>
     ''' 定义绘图委托
     ''' </summary>
-    Public Delegate Sub Draw(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera)
+    Public Delegate Sub Draw(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As Bitmap1)
 
     ''' <summary>
     ''' 分层绘图，不考虑小窗口穿透的模式
@@ -36,7 +36,7 @@ Public Class SpectatorCamera
     ''' d2d画布对象
     ''' </summary>
     <Obsolete("升级d2d1.1后不再使用，改用d2dContext（D2D.DeviceContext继承了RenderTarget）", True)>
-    Private RT As WindowRenderTarget
+    Private RT As WindowRenderTarget = Nothing
 
     Private device As SharpDX.Direct3D11.Device1
     Private d3dContext As SharpDX.Direct3D11.DeviceContext1
@@ -46,6 +46,9 @@ Public Class SpectatorCamera
     ''' </summary>
     Private d2dContext As SharpDX.Direct2D1.DeviceContext
     Private d2dTarget As SharpDX.Direct2D1.Bitmap1
+
+    Private BitmapForOriginalSkirmishMap As Bitmap1
+    Private BitmapForBlurDialog As Bitmap1
 
     Public Sub InitializeDirect2d()
         '-------d2d1.0初始化方法---------
@@ -93,23 +96,51 @@ Public Class SpectatorCamera
         Dim backBuffer As DXGI.Surface = swapChain.GetBackBuffer(Of DXGI.Surface)(0)
         d2dTarget = New Bitmap1(d2dContext, backBuffer, Properties)
 
-
+        BitmapForOriginalSkirmishMap = New Bitmap1(d2dContext, New Size2(Resolve.X, Resolve.Y), New BitmapProperties1() With {
+                              .PixelFormat = New SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied),
+                              .BitmapOptions = BitmapOptions.Target})
+        BitmapForBlurDialog = New Bitmap1(d2dContext, New Size2(Resolve.X, Resolve.Y), New BitmapProperties1() With {
+                              .PixelFormat = New SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied),
+                              .BitmapOptions = BitmapOptions.Target})
 
         Call GameResources.LoadResources(d2dContext)
     End Sub
 
     Public Sub PaintImage()
         If CBool(PaintingLayers.Count) Then
-            d2dContext.Target = d2dTarget
+            d2dContext.Target = BitmapForOriginalSkirmishMap
             d2dContext.BeginDraw()
+            d2dContext.Clear(WHITE_COLOUR)
             For i = PaintingLayers.Count - 1 To 0 Step -1
-                PaintingLayers(i).Invoke(d2dContext, Me)
+                PaintingLayers(i).Invoke(d2dContext, Me, BitmapForOriginalSkirmishMap)
             Next
 
             d2dContext.EndDraw()
+
+            'Dim bru As New BitmapBrush1(d2dContext, BitmapForOriginalSkirmishMap)
+            'd2dContext.Target = BitmapForBlurDialog
+            'd2dContext.BeginDraw()
+            'd2dContext.FillRectangle(New Mathematics.Interop.RawRectangleF(200, 200, 800, 550), bru)
+            'd2dContext.EndDraw()
+
+
+            'Dim eff As New Effects.GaussianBlur(d2dContext)
+            'eff.SetInput(0, BitmapForBlurDialog, True)
+            'eff.StandardDeviation = 5.0F
+
+            d2dContext.Target = d2dTarget
+            d2dContext.BeginDraw()
+            d2dContext.DrawImage(BitmapForOriginalSkirmishMap)
+            'd2dContext.DrawImage(eff)
+            d2dContext.EndDraw()
+
             swapChain.Present(0, DXGI.PresentFlags.None)    '0 or 1, I don't know
         End If
     End Sub
+
+    Public Function GetDevceContext() As DeviceContext
+        Return d2dContext
+    End Function
 
     Public Sub Dispose() Implements IDisposable.Dispose
         'RT.Dispose()

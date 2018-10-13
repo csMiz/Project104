@@ -17,6 +17,11 @@ Public Class GameTest
 
     End Sub
 
+    Public Sub SkirmishMapAccessoryTest()
+        TestMap.LoadAccessories(User.GetDevceContext, User.Zoom)
+
+    End Sub
+
     Public Sub AreaTest()
         Dim area As New PolygonArea
         With area.Points
@@ -53,6 +58,9 @@ Public Class GameTest
         User.Zoom = 0.25
 
         User.InitializeDirect2d()
+
+        SkirmishMapAccessoryTest()
+
         User.PaintingLayers.Push(AddressOf TestMap.DrawHexMap)
         User.PaintingLayersDescription.Push(GameImageLayer.SkirmishMap)
 
@@ -64,7 +72,7 @@ Public Class GameTest
     End Sub
 
     Public Sub DialogTest()
-        Dialog.InitializeDialog(900, 600, User)
+        Dialog.InitializeDialog(900, 400, User)
         Dialog.BindUnit(UnitTemplates.GetHeroTemplate(0))
         Dialog.InitializeColor()
         Dialog.InitializeConetentBox()

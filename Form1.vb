@@ -17,8 +17,8 @@ Public Class Form1
         PaintThread = New Thread(AddressOf d2dPaint)
         PaintThread.Start()
 
-        Device.RegisterDevice(SharpDX.Multimedia.UsagePage.Generic, SharpDX.Multimedia.UsageId.GenericKeyboard, DeviceFlags.None)
-        AddHandler Device.KeyboardInput, AddressOf test_keydown
+        'Device.RegisterDevice(SharpDX.Multimedia.UsagePage.Generic, SharpDX.Multimedia.UsageId.GenericKeyboard, DeviceFlags.None)
+        'AddHandler Device.KeyboardInput, AddressOf test_keydown
 
     End Sub
 
@@ -45,12 +45,21 @@ L1:
 
         'Dim controller As Controller = New Controller(UserIndex.One)
         'Dim gamePad As Gamepad = controller.GetState().Gamepad  'xinput->手柄
-
-
-    End Sub
-
-    Public Sub test_keydown(sender As Object, args As KeyboardInputEventArgs)
-        'MsgBox(args.Key)    '为什么不断变化的？
+        MsgBox(LoggingService.GetRecordCount)
 
     End Sub
+
+    Private Sub Form1_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        If e.KeyCode = Keys.S Then
+            test.User.CameraFocus.Y += 20
+        End If
+    End Sub
+
+    'Public Sub test_keydown(sender As Object, args As KeyboardInputEventArgs)
+
+    '    If (args.Key = Keys.W) Then
+    '        MsgBox("match!")
+    '    End If   '为什么不断变化的？
+
+    'End Sub
 End Class
