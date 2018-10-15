@@ -1,7 +1,10 @@
-﻿''' <summary>
+﻿Imports p104
+''' <summary>
 ''' 英雄技能类
 ''' </summary>
 Public MustInherit Class HeroSkill
+    Implements ISaveProperty
+
     ''' <summary>
     ''' 技能id
     ''' </summary>
@@ -28,7 +31,9 @@ Public MustInherit Class HeroSkill
     ''' </summary>
     Public MustOverride Sub Activate()
 
-
+    Public Overridable Function GetSaveString() As String Implements ISaveProperty.GetSaveString
+        Throw New NotImplementedException()
+    End Function
 End Class
 
 Public Enum HeroSkillType As Byte

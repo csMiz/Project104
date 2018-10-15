@@ -1,8 +1,23 @@
-﻿''' <summary>
+﻿Imports p104
+''' <summary>
 ''' 英雄技能树类
 ''' </summary>
 Public Class HeroSkillTree
-    Public BaseSkills As List(Of HeroSkillTreeItem)
+    Implements ISaveProperty
+
+    Public BaseSkills As New List(Of HeroSkillTreeItem)
+
+    Public Function GetSaveString() As String Implements ISaveProperty.GetSaveString
+        Throw New NotImplementedException()
+    End Function
+
+    Public Function Copy() As HeroSkillTree
+        Dim result As New HeroSkillTree
+        For Each item In Me.BaseSkills
+            result.BaseSkills.Add(item.copy)
+        Next
+        Return result
+    End Function
 
 End Class
 
@@ -24,6 +39,19 @@ Public Class HeroSkillTreeItem
 
     End Function
 
+    Public Function Copy() As HeroSkillTreeItem
+        Dim result As New HeroSkillTreeItem
+        With result
+            .LinkId = Me.LinkId
+            .Name = Me.Name
+            .Description = Me.Description
+            For Each item In Me.Children
+                .Children.Add(item.Copy)
+            Next
+            .Status = Me.Status
+        End With
+        Return result
+    End Function
 End Class
 
 Public Enum SkillTreeItemStatus As Byte

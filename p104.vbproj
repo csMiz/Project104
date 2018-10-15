@@ -138,16 +138,20 @@
     </Compile>
     <Compile Include="ProgramSystem\CircleArea.vb" />
     <Compile Include="ProgramSystem\FontHelper.vb" />
+    <Compile Include="ProgramSystem\GameEndInfo.vb" />
     <Compile Include="ProgramSystem\GameIconRepository.vb" />
     <Compile Include="ProgramSystem\GameLive2dAnimation.vb" />
     <Compile Include="ProgramSystem\GameLive2dImage.vb" />
     <Compile Include="ProgramSystem\GameResources.vb" />
+    <Compile Include="ProgramSystem\GameSideInfo.vb" />
     <Compile Include="ProgramSystem\GameStaticImage.vb" />
+    <Compile Include="ProgramSystem\GameTeamInfo.vb" />
     <Compile Include="ProgramSystem\GameTest.vb" />
     <Compile Include="ProgramSystem\GameDialog.vb" />
     <Compile Include="ProgramSystem\IGameImage.vb" />
     <Compile Include="ProgramSystem\IMouseArea.vb" />
     <Compile Include="ProgramSystem\IntegerProperty.vb" />
+    <Compile Include="ProgramSystem\ISaveProperty.vb" />
     <Compile Include="ProgramSystem\LoggingService.vb" />
     <Compile Include="ProgramSystem\MathHelper.vb" />
     <Compile Include="ProgramSystem\MonitoredProperty.vb" />
@@ -190,7 +194,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\MapScriptTest.xml" />
+    <None Include="Assets\MapScriptTest.xml">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Skill.xml">
@@ -201,6 +207,11 @@
     <None Include="Assets\Colours.xml">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\AllUnits.xml">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

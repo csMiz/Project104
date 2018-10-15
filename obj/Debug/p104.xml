@@ -155,6 +155,11 @@ p104
  基础升级所需经验：EXPNeeded = Level * BaseEXPNeeded
  </summary>
 </member>
+<member name="F:p104.GameHero.LevelUpItems">
+ <summary>
+ 升级影响参数
+ </summary>
+</member>
 <member name="F:p104.GameHero.SkillPoint">
  <summary>
  技能点
@@ -167,12 +172,17 @@ p104
 </member>
 <member name="F:p104.GameHero.MySkills">
  <summary>
- 已习得的技能
+ 已选中的技能
  </summary>
 </member>
 <member name="F:p104.GameHero.MyEquipments">
  <summary>
  装备栏
+ </summary>
+</member>
+<member name="F:p104.GameHero.LockStatus">
+ <summary>
+ 是否已解锁
  </summary>
 </member>
 <member name="T:p104.GameItem">
@@ -187,12 +197,12 @@ p104
 </member>
 <member name="P:p104.GameUnit.UnitId">
  <summary>
- 单位唯一id
+ 一场游戏内单位唯一id，游戏外则为-1
  </summary>
 </member>
-<member name="P:p104.GameUnit.TemplateId">
+<member name="P:p104.GameUnit.WrappedTemplateId">
  <summary>
- 模板id,128以下是unit，128以上是hero
+ 存储模板对应id
  </summary>
  <returns></returns>
 </member>
@@ -498,6 +508,12 @@ p104
  按高度分层
  </summary>
 </member>
+<member name="M:p104.SkirmishMap.LoadUnitsFromXMLAndTemplates(System.String)">
+ <summary>
+ 从存档文件和wrapped模板生成Skirmish初始单位
+ </summary>
+ <param name="xml">存档文件xml</param>
+</member>
 <member name="T:p104.SkirmishMapBlock">
  <summary>
  单个六边形地图块类
@@ -531,6 +547,11 @@ p104
 <member name="T:p104.TextResource">
  <summary>
  多语言文字资源类
+ </summary>
+</member>
+<member name="T:p104.GameEndInfo">
+ <summary>
+ 游戏结束信息类
  </summary>
 </member>
 <member name="T:p104.GameIconRepository">

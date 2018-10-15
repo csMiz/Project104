@@ -1,22 +1,15 @@
 ﻿Imports System.IO
 Imports SharpDX.Direct2D1
 Imports System.Math
-Imports SharpDX.Mathematics.Interop
 
 Public Class SkirmishMap
     Private Blocks(49, 49) As SkirmishMapBlock
-    Private Property MapSizeXMax As Short = 49
-    Private Property MapSizeYMax As Short = 49
-    Public Property SideCount As Short = 2
-    Public Property NowTurn As Short = 0
-
-    Public UnitList As New List(Of GameUnit)
-
-    Public FlagList As New List(Of GameFlag)
-
-    Public BuildingFlag As New List(Of GameBuilding)
+    Private MapSizeXMax As Short = 49
+    Private MapSizeYMax As Short = 49
 
     Private PaintOrderList As New List(Of SkirmishMapBlock)
+
+    Public Property ResourcesLoaded As Boolean = False
 
     Public Sub New()
         For i = 0 To 49
@@ -109,6 +102,9 @@ Public Class SkirmishMap
 
     End Sub
 
+    ''' <summary>
+    ''' 更新基底绘制参数
+    ''' </summary>
     Public Sub UpdateBlocksInCamera(X1 As Short, X2 As Short, Y1 As Short, Y2 As Short, cameraFocus As PointF2, resolve As PointI, zoom As Single)
         For i = X1 To X2
             For j = Y1 To Y2
@@ -120,8 +116,16 @@ Public Class SkirmishMap
         Next
     End Sub
 
+    ''' <summary>
+    ''' 画遭遇战地图
+    ''' </summary>
+    ''' <param name="context">d2dContext对象</param>
+    ''' <param name="spectator">观察者对象</param>
+    ''' <param name="canvasBitmap">传入的原始Bitmap1对象</param>
     Public Sub DrawHexMap(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As Bitmap1)
-        Dim brush1 As New SolidColorBrush(context, New RawColor4(0.9, 0.2, 0.2, 1.0))
+        'Dim brush1 As New SolidColorBrush(context, New RawColor4(0.9, 0.2, 0.2, 1.0))
+        If Not ResourcesLoaded Then Exit Sub
+
         Dim cameraX As Single = spectator.CameraFocus.X
         Dim cameraY As Single = spectator.CameraFocus.Y
         Dim centreX As Single = spectator.Resolve.X / 2
@@ -141,15 +145,15 @@ Public Class SkirmishMap
             Next
 
             '画参考中央圈
-            .DrawEllipse(New Ellipse With {
-                         .Point = New RawVector2(spectator.Resolve.X / 2, spectator.Resolve.Y / 2),
-                         .RadiusX = 25,
-                         .RadiusY = 25}, brush1)
+            '.DrawEllipse(New Ellipse With {
+            '             .Point = New RawVector2(spectator.Resolve.X / 2, spectator.Resolve.Y / 2),
+            '             .RadiusX = 25,
+            '             .RadiusY = 25}, brush1)
 
         End With
     End Sub
 
-    Public Sub LoadUnitsFromXMLAndTemplates(xml As String)
+    Public Sub Dispose()
 
     End Sub
 

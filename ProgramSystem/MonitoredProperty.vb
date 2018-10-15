@@ -4,7 +4,7 @@
 Public MustInherit Class MonitoredProperty
     Private Shared ObjectCounter As Integer = 0
 
-    Private Property Id As Integer
+    Private Id As Integer
 
     Protected Sub RegisterId()
         MonitoredProperty.ObjectCounter += 1

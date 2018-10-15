@@ -61,6 +61,25 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  查找类似 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
+        '''&lt;content&gt;
+        '''  &lt;h id=&quot;0&quot; template=&quot;0&quot;&gt;
+        '''    &lt;level value=&quot;1&quot; /&gt;
+        '''    &lt;lock value=&quot;Unlocked&quot; /&gt;
+        '''  &lt;/h&gt;
+        '''  &lt;h id=&quot;1&quot; template=&quot;1&quot; &gt;
+        '''    &lt;level value=&quot;1&quot; /&gt;
+        '''    &lt;lock value=&quot;Unlocked&quot; /&gt;
+        '''  &lt;/h&gt;
+        '''&lt;/content&gt; 的本地化字符串。
+        '''</summary>
+        Friend ReadOnly Property AllUnits() As String
+            Get
+                Return ResourceManager.GetString("AllUnits", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  查找类似 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
         '''&lt;content&gt;
         '''  &lt;set index=&quot;0&quot;&gt;
@@ -87,9 +106,10 @@ Namespace My.Resources
         '''&lt;content&gt;
         '''  &lt;side value=&quot;0&quot; name=&quot;Remilia&quot; type=&quot;Player&quot; team=&quot;0&quot;&gt;
         '''    &lt;character&gt;
-        '''      &lt;unit template=&quot;0&quot; /&gt;
-        '''      &lt;unit template=&quot;0&quot; /&gt;
-        '''      &lt;unit template=&quot;1&quot; /&gt;
+        '''      &lt;hero w_index=&quot;1&quot;&gt;
+        '''        &lt;startpos value=&quot;0,0&quot;/&gt;
+        '''      &lt;/hero&gt;
+        '''      
         '''    &lt;/character&gt;
         '''    &lt;building&gt;
         '''      
@@ -97,15 +117,14 @@ Namespace My.Resources
         '''    &lt;giventech&gt;
         '''      
         '''    &lt;/giventech&gt;
-        '''    &lt;startpos&gt;
-        '''      &lt;pos value=&quot;0,0&quot; /&gt;
-        '''      &lt;pos value=&quot;1,0&quot; /&gt;
-        '''      &lt;pos value=&quot;0,1&quot; /&gt;
-        '''    &lt;/startpos&gt;
         '''    &lt;endgame&gt;
         '''      &lt;win&gt;
         '''        &lt;winevent name=&quot;Clean&quot; value=&quot;0&quot;/&gt;
-        '''      &lt;/win [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        '''      &lt;/win&gt;
+        '''      &lt;lose&gt;
+        '''        &lt;loseevent name=&quot;Clean&quot; value=&quot;0&quot;/&gt;
+        '''        &lt;loseevent name=&quot;Turn&quot; value=&quot;20&quot; /&gt;
+        '''      &lt;/los [字符串的其余部分被截断]&quot;; 的本地化字符串。
         '''</summary>
         Friend ReadOnly Property MapScriptTest() As String
             Get
@@ -136,15 +155,14 @@ Namespace My.Resources
         '''  查找类似 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
         '''
         '''&lt;content&gt;
-        '''  &lt;ut index=&quot;0&quot; name=&quot;毛玉&quot; unittype=&quot;Kedama&quot; hp=&quot;10&quot; move=&quot;LandAndWater,5&quot; burden=&quot;1&quot; view=&quot;2&quot;&gt;
+        '''  &lt;ut index=&quot;0&quot; name=&quot;毛玉&quot; unittype=&quot;Kedama&quot; hp=&quot;10&quot; move=&quot;LandAndWater,5&quot; burden=&quot;1&quot; view=&quot;2&quot; hide=&quot;14&quot;&gt;
         '''    &lt;attack damage=&quot;Physical&quot; value=&quot;5,7&quot; atkrange=&quot;1,1&quot; hitrange=&quot;1,1&quot; /&gt;
         '''    &lt;defend value=&quot;0&quot; resistance=&quot;0.1,0.1,0&quot;/&gt;
         '''  &lt;/ut&gt;
         '''  
-        '''  &lt;ut index=&quot;1&quot; name=&quot;妖精&quot; unittype=&quot;Yousei&quot; hp=&quot;20&quot; move=&quot;LandAndWater,5&quot; burden=&quot;2&quot; view=&quot;2&quot;&gt;
+        '''  &lt;ut index=&quot;1&quot; name=&quot;妖精&quot; unittype=&quot;Yousei&quot; hp=&quot;20&quot; move=&quot;LandAndWater,5&quot; burden=&quot;2&quot; view=&quot;2&quot; hide=&quot;12&quot;&gt;
         '''    &lt;attack damage=&quot;Physical&quot; value=&quot;9,13&quot; atkrange=&quot;1,1&quot; hitrange=&quot;1,1&quot; /&gt;
-        '''    &lt;defend value=&quot;2&quot; resistance=&quot;0.2,0.2,0.05&quot;/&gt;
-        '''   [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        '''    &lt;defend value=&quot;2&quot; resistance= [字符串的其余部分被截断]&quot;; 的本地化字符串。
         '''</summary>
         Friend ReadOnly Property UnitTemplates() As String
             Get

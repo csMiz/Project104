@@ -55,7 +55,7 @@ Module GameResources
     Public Const COMMA As String = ","
     Public Const THIRTY_THOUSAND As Integer = 30000
     Public ReadOnly HALF_ROOT3 As Single = Sqrt(3) / 2
-
+    Public Const DEFAULT_STRING As String = "Default"
     Public Const NOT_TRANSPARENT As Single = 1.0F
 
     ''' <summary>
@@ -144,7 +144,12 @@ Module GameResources
         Return newBitmap
     End Function
 
-
+    Public Function GetCampaignScript(index As Short) As String
+        If index = 0 Then
+            Return My.Resources.MapScriptTest
+        End If
+        Return ""
+    End Function
 End Module
 
 ''' <summary>

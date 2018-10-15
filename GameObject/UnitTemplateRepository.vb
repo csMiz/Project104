@@ -4,10 +4,13 @@ Imports System.Xml
 ''' 单位模板仓库类
 ''' </summary>
 Public Class UnitTemplateRepository
-    Private Shared My_Instance As UnitTemplateRepository = Nothing
+    Private Shared me_instance As UnitTemplateRepository = Nothing
 
     Private unit_templates As New List(Of GameUnit)
     Private hero_templates As New List(Of GameHero)
+
+    'Private wrapped_unit_templates As New List(Of GameUnit)
+    Private wrapped_hero_templates As New List(Of GameHero)
 
     Private Sub New()
     End Sub
@@ -16,10 +19,10 @@ Public Class UnitTemplateRepository
     ''' 单例模式
     ''' </summary>
     Public Shared Function Instance()
-        If My_Instance Is Nothing Then
-            My_Instance = New UnitTemplateRepository
+        If me_instance Is Nothing Then
+            me_instance = New UnitTemplateRepository
         End If
-        Return My_Instance
+        Return me_instance
     End Function
 
     ''' <summary>
@@ -69,7 +72,8 @@ Public Class UnitTemplateRepository
                     .InitializeHP(CShort(element.GetAttribute("hp")))
                     .InitializeMove(element.GetAttribute("move"))
                     .InitializeBurden(CShort(element.GetAttribute("burden")))
-                    .InitializeView(CShort(element.GetAttribute("view")))
+                    .InitializeView(CSng(element.GetAttribute("view")))
+                    .InitializeHide(CSng(element.GetAttribute("hide")))
                     .InitializeAttackPoint(atk)
                     .InitializeSubAttack(subatk)
                     .InitializeDefendPoint(def)
@@ -100,12 +104,14 @@ Public Class UnitTemplateRepository
                     .InitializeHP(CShort(element.GetAttribute("hp")))
                     .InitializeMove(element.GetAttribute("move"))
                     .InitializeBurden(CShort(element.GetAttribute("burden")))
-                    .InitializeView(CShort(element.GetAttribute("view")))
+                    .InitializeView(CSng(element.GetAttribute("view")))
+                    .InitializeHide(CSng(element.GetAttribute("hide")))
                     .InitializeBaseEXPNeeded(CInt(element.GetAttribute("lvupexp")))
                     .InitializeAttackPoint(atk)
                     .InitializeSubAttack(subatk)
                     .InitializeDefendPoint(def)
                     .InitializeLVUpItems(lvupItemList)
+                    .InitializeSkillTree(New HeroSkillTree)
                 End With
                 hero_templates.Add(heroTemplate)
             End If
@@ -125,6 +131,37 @@ Public Class UnitTemplateRepository
     ''' </summary>
     Public Function GetHeroTemplate(templateIndex As Short) As GameHero
         Return hero_templates(templateIndex)
+    End Function
+
+    Public Sub WrapUnits(xml As String)
+        Dim xmlDoc As New XmlDocument()
+        xmlDoc.LoadXml(xml)
+        Dim root As XmlNode = xmlDoc.SelectSingleNode("content")
+        Dim xnl As XmlNodeList = root.ChildNodes
+        For Each item As XmlNode In xnl
+            Dim element As XmlElement = CType(item, XmlElement)
+            If element.Name = "h" Then
+                Dim tmpHero As GameHero = Nothing
+                tmpHero = Me.GetHeroTemplate(element.GetAttribute("template")).Copy
+                tmpHero.SetTemplateId(element.GetAttribute("template"))
+                Dim children As XmlNodeList = element.ChildNodes
+                For Each child As XmlNode In children
+                    Dim childElement As XmlElement = CType(child, XmlElement)
+                    If childElement.Name = "level" Then
+                        tmpHero.SetLevel(childElement.GetAttribute("value"), LogSenderType.Change_Load)
+                    ElseIf childElement.Name = "lock" Then
+                        tmpHero.SetLockStatus(childElement.GetAttribute("value"))
+                    End If
+                Next
+                wrapped_hero_templates.Add(tmpHero)
+
+            End If
+        Next
+
+    End Sub
+
+    Public Function GetWrappedHeroTemplate(index As Short) As GameHero
+        Return wrapped_hero_templates(index)
     End Function
 
     '''' <summary>

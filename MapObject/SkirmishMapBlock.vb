@@ -145,6 +145,9 @@ Public Class SkirmishMapBlock
             Dim rect2 As New RawRectangleF(rect.Left, rect.Top - 0.5 * ImgSideLength, rect.Right, rect.Bottom)
             .DrawBitmap(AccessoryImage, rect2, NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
 
+            sink.Dispose()
+            geometry.Dispose()
+
         End With
 
     End Sub

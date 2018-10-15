@@ -5,14 +5,14 @@ Imports System.Text.RegularExpressions
 ''' </summary>
 Public Class GameUnit
     ''' <summary>
-    ''' 单位唯一id
+    ''' 一场游戏内单位唯一id，游戏外则为-1
     ''' </summary>
-    Protected Property UnitId As Integer
+    Protected Property UnitId As Short = -1
     ''' <summary>
-    ''' 模板id,128以下是unit，128以上是hero
+    ''' 存储模板对应id
     ''' </summary>
     ''' <returns></returns>
-    Protected Property TemplateId As Integer
+    Protected Property WrappedTemplateId As Short = -1
     ''' <summary>
     ''' 显示的名字
     ''' </summary>
@@ -56,7 +56,7 @@ Public Class GameUnit
     ''' <summary>
     ''' 士气
     ''' </summary>
-    Protected Spirit As SingleProperty
+    Protected Spirit As SingleProperty = New SingleProperty(100)
     ''' <summary>
     ''' 状态
     ''' </summary>
@@ -70,7 +70,9 @@ Public Class GameUnit
 
     Protected UnitBurden As IntegerProperty
 
-    Protected View As IntegerProperty
+    Protected View As SingleProperty
+
+    Protected Hide As SingleProperty
 
     Public Sub InitializeUnitType(input As String)
         Me.UnitType.Clear()
@@ -123,8 +125,29 @@ Public Class GameUnit
 
     Public Sub InitializeView(value As Short)
         If Me.View IsNot Nothing Then Throw New Exception("view has been initialized!")
-        Me.View = New IntegerProperty(value)
+        Me.View = New SingleProperty(value)
     End Sub
+
+    Public Sub InitializeHide(value As Short)
+        If Me.Hide IsNot Nothing Then Throw New Exception("hide has been initialized!")
+        Me.Hide = New SingleProperty(value)
+    End Sub
+
+    Public Sub InitializeUnitId(skirmishLoadingIndex As Short)
+        Me.UnitId = skirmishLoadingIndex
+    End Sub
+
+    Public Sub SetTemplateId(value As Short)
+        If Me.WrappedTemplateId = -1 Then
+            Me.WrappedTemplateId = value
+        Else
+            Throw New Exception("illegal template")
+        End If
+    End Sub
+
+    Public Function GetTemplateId() As Short
+        Return Me.WrappedTemplateId
+    End Function
 
     Public Sub AddBuff(buff As GameUnitBuff)
 
@@ -136,7 +159,13 @@ Public Class GameUnit
 
     Public Overridable Function GlobalSaveUnit() As String
         Dim result As String = ""
-        result = "{" & Me.TemplateId & COMMA
+        result = "{" & Me.WrappedTemplateId & COMMA
+
+        '...
+
+    End Function
+
+    Public Function Copy() As GameUnit
 
     End Function
 

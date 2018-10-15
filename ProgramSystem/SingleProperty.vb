@@ -9,13 +9,18 @@
         Value = input
     End Sub
 
-    Public Sub SetValue(input As Single)
-        LoggingService.Log(LogSenderType.Change, Me.GetId, LogMessageType.SingleValue, input)
+    Public Sub SetValue(input As Single， method As LogSenderType)
+        If method = LogSenderType.Initialize Then Throw New Exception("rejected")
+        LoggingService.Log(method, Me.GetId, LogMessageType.SingleValue, input)
         Value = input
     End Sub
 
     Public Function GetValue() As Single
-        Return Value
+        Dim result As Single = Me.Value
+        If Not CBool(LoggingService.Match(Me.GetId, Value)) Then
+            result = CSng(LoggingService.GetValueFromRecord(Me.GetId))
+        End If
+        Return result
     End Function
 
 End Class

@@ -8,14 +8,19 @@ Public Class Form1
     Private PaintThread As Thread
     Private Delegate Sub paintGame()
 
-    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles Me.Load
+    Private Async Sub Form1_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.Show()
         Call test.SpectatorTest()
         Call test.UnitTest()
+        Call test.CopyHeroTest()
         'Call test.DialogTest()
 
         PaintThread = New Thread(AddressOf d2dPaint)
+
+        Dim waitResult As Integer = Await test.TestGameLoop.WaitForLoad()
         PaintThread.Start()
+
+
 
         'Device.RegisterDevice(SharpDX.Multimedia.UsagePage.Generic, SharpDX.Multimedia.UsageId.GenericKeyboard, DeviceFlags.None)
         'AddHandler Device.KeyboardInput, AddressOf test_keydown
@@ -24,8 +29,8 @@ Public Class Form1
 
     Public Sub d2dPaint()
         Dim paintGame As New paintGame(AddressOf test.User.PaintImage)
-        Dim starttime
-        Dim endtime
+        Dim starttime As Date
+        Dim endtime As Date
         Dim a1 As TimeSpan
         Do
             starttime = DateTime.Now

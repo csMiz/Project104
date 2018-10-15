@@ -1,6 +1,9 @@
 ﻿Imports System.Text.RegularExpressions
+Imports p104
 
 Public Class DefendType
+    Implements ISaveProperty
+
     Public Property BaseDefend As IntegerProperty
     ''' <summary>
     ''' 分别对应物理抗性，弹幕抗性，镭射抗性
@@ -24,5 +27,20 @@ Public Class DefendType
         If Me.Resistance(2) IsNot Nothing Then Throw New Exception("resistance2 has been initialized!")
         Me.Resistance(2) = New SingleProperty(laser)
     End Sub
+
+    Public Function GetSaveString() As String Implements ISaveProperty.GetSaveString
+        Throw New NotImplementedException()
+    End Function
+
+    Public Function Copy() As DefendType
+        Dim result As New DefendType
+        With result
+            .BaseDefend = New IntegerProperty(Me.BaseDefend.GetValue)
+            For i = 0 To 2
+                .Resistance(i) = New SingleProperty(Me.Resistance(i).GetValue)
+            Next
+        End With
+        Return result
+    End Function
 
 End Class

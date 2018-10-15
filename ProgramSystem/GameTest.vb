@@ -5,20 +5,30 @@ Imports Sharpdx.Direct2d1
 ''' 游戏测试类
 ''' </summary>
 Public Class GameTest
-
+    <Obsolete("use SkirmishGameloop", True)>
     Public TestMap As New SkirmishMap
     Public User As New SpectatorCamera
     Public Dialog As UnitDetailDialog = UnitDetailDialog.Instance
+    Public TestGameLoop As New SkirmishGameLoop
 
 
+    <Obsolete("此部分已经封装在SkirmishGameLoop里了->SkirmishGameLoopTest()", False)>
     Public Sub LoadMapTest()
         Dim stream As FileStream = New FileStream(Application.StartupPath & "\newmap.txt", FileMode.Open)
         TestMap.LoadFromFile(stream)
 
     End Sub
 
+    Public Sub SkirmishGameLoopTest()
+        TestGameLoop.BindingCamera = User
+        TestGameLoop.StartLoadSkirmishMapResources(0)
+
+    End Sub
+
+    <Obsolete("已经集成在SkirmishGameloop里了", True)>
     Public Sub SkirmishMapAccessoryTest()
-        TestMap.LoadAccessories(User.GetDevceContext, User.Zoom)
+        'TestMap.LoadAccessories(User.GetDevceContext, User.Zoom)
+        TestGameLoop.SkirmishGameMap.LoadAccessories(User.GetDevceContext, User.Zoom)
 
     End Sub
 
@@ -50,18 +60,34 @@ Public Class GameTest
 
     End Sub
 
+    Public Sub CopyHeroTest()
+        Dim testReimu As GameHero = UnitTemplates.GetHeroTemplate(0)
+        Dim testReimu2 As GameHero = testReimu.Copy
+        testReimu.SetLevel(5, LogSenderType.Change_Program)
+        testReimu2.SetLevel(2, LogSenderType.Change_Program)
+        If (testReimu.GetLevel = testReimu2.GetLevel) Then
+            Throw New Exception("assertion failed")
+        End If
+
+    End Sub
+
     Public Sub SpectatorTest()
-        LoadMapTest()
+        'LoadMapTest()
+
 
         User.Resolve = New PointI(1024, 768)
         User.CameraFocus = New PointF2(300, 300)
         User.Zoom = 0.25
 
+
         User.InitializeDirect2d()
 
-        SkirmishMapAccessoryTest()
+        SkirmishGameLoopTest()
 
-        User.PaintingLayers.Push(AddressOf TestMap.DrawHexMap)
+        'SkirmishMapAccessoryTest()
+
+        'User.PaintingLayers.Push(AddressOf TestMap.DrawHexMap)
+        User.PaintingLayers.Push(AddressOf TestGameLoop.SkirmishGameMap.DrawHexMap)
         User.PaintingLayersDescription.Push(GameImageLayer.SkirmishMap)
 
         'user.PaintImage()

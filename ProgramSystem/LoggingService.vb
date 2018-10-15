@@ -85,7 +85,8 @@ End Class
 ''' </summary>
 Public Enum LogSenderType As Byte
     Initialize = 0
-    Change = 1
+    Change_Load = 1
+    Change_Program = 2
 End Enum
 
 ''' <summary>
@@ -109,10 +110,10 @@ End Enum
 ''' 数值记录类
 ''' </summary>
 Public Class GameRecord
-    Private Property RecordType As LogSenderType
-    Private Property PropertyId As Integer
-    Private Property RecordMessage As LogMessageType
-    Private Property RecordValue As String
+    Private RecordType As LogSenderType
+    Private PropertyId As Integer
+    Private RecordMessage As LogMessageType
+    Private RecordValue As String
 
     Public Sub New(senderType As LogSenderType, senderId As Integer, message As LogMessageType, stringValue As String)
         RecordType = senderType

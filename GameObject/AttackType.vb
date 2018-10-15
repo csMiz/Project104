@@ -1,6 +1,9 @@
 ﻿Imports System.Text.RegularExpressions
+Imports p104
 
 Public Class AttackType
+    Implements ISaveProperty
+
     Public Property DamageType As UnitDamageType
     Private AttackValue As PointF2M
     Public AttackRange As PointI
@@ -31,6 +34,21 @@ Public Class AttackType
         Dim high As Short = CShort(values(1))
         Me.HitRange = New PointI(low, high)
     End Sub
+
+    Public Function GetSaveString() As String Implements ISaveProperty.GetSaveString
+        Throw New NotImplementedException()
+    End Function
+
+    Public Function Copy() As AttackType
+        Dim result As New AttackType
+        With result
+            .DamageType = Me.DamageType
+            .AttackValue = New PointF2M(Me.AttackValue.X.GetValue, Me.AttackValue.Y.GetValue)
+            .AttackRange = New PointI(Me.AttackRange.X, Me.AttackRange.Y)
+            .HitRange = New PointI(Me.HitRange.X, Me.HitRange.Y)
+        End With
+        Return result
+    End Function
 
 End Class
 
