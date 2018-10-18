@@ -23,7 +23,11 @@ Public Class SkirmishMap
         Next
     End Sub
 
-    Public Sub LoadFromFile(stream As FileStream)
+    ''' <summary>
+    ''' 载入地图二进制文件并销毁stream对象
+    ''' </summary>
+    ''' <param name="stream">文件流</param>
+    Public Sub LoadFromFile(ByRef stream As FileStream)
         Dim content() As Byte
         Using br As New BinaryReader(stream)
             content = br.ReadBytes(5000)

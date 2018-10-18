@@ -22,6 +22,21 @@ p104
   重写当前线程的 CurrentUICulture 属性。
 </summary>
 </member>
+<member name="P:p104.My.Resources.Resources.AllUnits">
+<summary>
+  查找类似 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
+&lt;content&gt;
+  &lt;h id=&quot;0&quot; template=&quot;0&quot;&gt;
+    &lt;level value=&quot;1&quot; /&gt;
+    &lt;lock value=&quot;Unlocked&quot; /&gt;
+  &lt;/h&gt;
+  &lt;h id=&quot;1&quot; template=&quot;1&quot; &gt;
+    &lt;level value=&quot;1&quot; /&gt;
+    &lt;lock value=&quot;Unlocked&quot; /&gt;
+  &lt;/h&gt;
+&lt;/content&gt; 的本地化字符串。
+</summary>
+</member>
 <member name="P:p104.My.Resources.Resources.Colours">
 <summary>
   查找类似 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
@@ -46,9 +61,10 @@ p104
 &lt;content&gt;
   &lt;side value=&quot;0&quot; name=&quot;Remilia&quot; type=&quot;Player&quot; team=&quot;0&quot;&gt;
     &lt;character&gt;
-      &lt;unit template=&quot;0&quot; /&gt;
-      &lt;unit template=&quot;0&quot; /&gt;
-      &lt;unit template=&quot;1&quot; /&gt;
+      &lt;hero w_index=&quot;1&quot;&gt;
+        &lt;startpos value=&quot;0,0&quot;/&gt;
+      &lt;/hero&gt;
+      
     &lt;/character&gt;
     &lt;building&gt;
       
@@ -56,15 +72,14 @@ p104
     &lt;giventech&gt;
       
     &lt;/giventech&gt;
-    &lt;startpos&gt;
-      &lt;pos value=&quot;0,0&quot; /&gt;
-      &lt;pos value=&quot;1,0&quot; /&gt;
-      &lt;pos value=&quot;0,1&quot; /&gt;
-    &lt;/startpos&gt;
     &lt;endgame&gt;
       &lt;win&gt;
         &lt;winevent name=&quot;Clean&quot; value=&quot;0&quot;/&gt;
-      &lt;/win [字符串的其余部分被截断]&quot;; 的本地化字符串。
+      &lt;/win&gt;
+      &lt;lose&gt;
+        &lt;loseevent name=&quot;Clean&quot; value=&quot;0&quot;/&gt;
+        &lt;loseevent name=&quot;Turn&quot; value=&quot;20&quot; /&gt;
+      &lt;/los [字符串的其余部分被截断]&quot;; 的本地化字符串。
 </summary>
 </member>
 <member name="P:p104.My.Resources.Resources.Skill">
@@ -87,15 +102,14 @@ p104
   查找类似 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
 
 &lt;content&gt;
-  &lt;ut index=&quot;0&quot; name=&quot;毛玉&quot; unittype=&quot;Kedama&quot; hp=&quot;10&quot; move=&quot;LandAndWater,5&quot; burden=&quot;1&quot; view=&quot;2&quot;&gt;
+  &lt;ut index=&quot;0&quot; name=&quot;毛玉&quot; unittype=&quot;Kedama&quot; hp=&quot;10&quot; move=&quot;LandAndWater,5&quot; burden=&quot;1&quot; view=&quot;2&quot; hide=&quot;14&quot;&gt;
     &lt;attack damage=&quot;Physical&quot; value=&quot;5,7&quot; atkrange=&quot;1,1&quot; hitrange=&quot;1,1&quot; /&gt;
     &lt;defend value=&quot;0&quot; resistance=&quot;0.1,0.1,0&quot;/&gt;
   &lt;/ut&gt;
   
-  &lt;ut index=&quot;1&quot; name=&quot;妖精&quot; unittype=&quot;Yousei&quot; hp=&quot;20&quot; move=&quot;LandAndWater,5&quot; burden=&quot;2&quot; view=&quot;2&quot;&gt;
+  &lt;ut index=&quot;1&quot; name=&quot;妖精&quot; unittype=&quot;Yousei&quot; hp=&quot;20&quot; move=&quot;LandAndWater,5&quot; burden=&quot;2&quot; view=&quot;2&quot; hide=&quot;12&quot;&gt;
     &lt;attack damage=&quot;Physical&quot; value=&quot;9,13&quot; atkrange=&quot;1,1&quot; hitrange=&quot;1,1&quot; /&gt;
-    &lt;defend value=&quot;2&quot; resistance=&quot;0.2,0.2,0.05&quot;/&gt;
-   [字符串的其余部分被截断]&quot;; 的本地化字符串。
+    &lt;defend value=&quot;2&quot; resistance= [字符串的其余部分被截断]&quot;; 的本地化字符串。
 </summary>
 </member>
 <member name="T:p104.GameUnitBuff.EffectActivate">
@@ -440,17 +454,12 @@ p104
 </member>
 <member name="M:p104.UnitImageRepository.LoadFromFiles(SharpDX.Direct2D1.DeviceContext)">
  <summary>
- 从程序根目录下加载资源
- </summary>
-</member>
-<member name="M:p104.UnitImageRepository.GetHeroLeftPanelArtwork(System.Int16)">
- <summary>
- 获取英雄立绘组
+ 从xml读取数据并依此组装FragmentImage为IGameImage
  </summary>
 </member>
 <member name="M:p104.UnitImageRepository.GetUnitLeftPanelArtwork(System.Int16)">
  <summary>
- 获取普通单位立绘组
+ 获取单位立绘组
  </summary>
 </member>
 <member name="T:p104.LeftPanelImageSet">
@@ -503,16 +512,29 @@ p104
  世界大地图的地图块类
  </summary>
 </member>
+<member name="M:p104.SkirmishMap.LoadFromFile(System.IO.FileStream@)">
+ <summary>
+ 载入地图二进制文件并销毁stream对象
+ </summary>
+ <param name="stream">文件流</param>
+</member>
 <member name="M:p104.SkirmishMap.DivideLayers(System.Int16,System.Int16,System.Int16,System.Int16)">
  <summary>
  按高度分层
  </summary>
 </member>
-<member name="M:p104.SkirmishMap.LoadUnitsFromXMLAndTemplates(System.String)">
+<member name="M:p104.SkirmishMap.UpdateBlocksInCamera(System.Int16,System.Int16,System.Int16,System.Int16,p104.PointF2,p104.PointI,System.Single)">
  <summary>
- 从存档文件和wrapped模板生成Skirmish初始单位
+ 更新基底绘制参数
  </summary>
- <param name="xml">存档文件xml</param>
+</member>
+<member name="M:p104.SkirmishMap.DrawHexMap(SharpDX.Direct2D1.DeviceContext@,p104.SpectatorCamera@,SharpDX.Direct2D1.Bitmap1)">
+ <summary>
+ 画遭遇战地图
+ </summary>
+ <param name="context">d2dContext对象</param>
+ <param name="spectator">观察者对象</param>
+ <param name="canvasBitmap">传入的原始Bitmap1对象</param>
 </member>
 <member name="T:p104.SkirmishMapBlock">
  <summary>
@@ -594,16 +616,6 @@ p104
  分割后的所有图片素材
  </summary>
 </member>
-<member name="T:p104.SpriteLive2dImage">
- <summary>
- Live2d精灵图片类
- </summary>
-</member>
-<member name="M:p104.SpriteLive2dImage.CalculateRect">
- <summary>
- 通过三个顶点计算外围矩形
- </summary>
-</member>
 <member name="T:p104.GameResources">
  <summary>
  游戏资源模块
@@ -660,11 +672,32 @@ p104
  </summary>
  <param name="context">d2dContext对象</param>
  <param name="filePath">图片路径</param>
- <returns></returns>
+</member>
+<member name="M:p104.GameResources.LoadBitmapUsingWIC(SharpDX.Direct2D1.DeviceContext,System.IO.FileStream)">
+ <summary>
+ 使用WIC载入图片资源
+ </summary>
+ <param name="context">d2dContext对象</param>
+ <param name="readStream">文件流</param>
 </member>
 <member name="T:p104.SolidColorBrushSet">
  <summary>
  游戏阵营颜色预设
+ </summary>
+</member>
+<member name="T:p104.GameSideInfo">
+ <summary>
+ 遭遇战势力信息类
+ </summary>
+</member>
+<member name="P:p104.GameSideInfo.SideName">
+ <summary>
+ 势力名
+ </summary>
+</member>
+<member name="P:p104.GameSideInfo.Control">
+ <summary>
+ 操作者类型
  </summary>
 </member>
 <member name="T:p104.GameStaticImage">
@@ -757,6 +790,31 @@ p104
  数值记录类
  </summary>
 </member>
+<member name="T:p104.MainGameLoop">
+ <summary>
+ 游戏主流程
+ </summary>
+</member>
+<member name="M:p104.MainGameLoop.StartLoadGlobalResources">
+ <summary>
+ 加载全局资源，用户设置，不载入存档
+ </summary>
+</member>
+<member name="M:p104.MainGameLoop.StartLoadSave(System.Int16)">
+ <summary>
+ 载入存档
+ </summary>
+</member>
+<member name="M:p104.MainGameLoop.InitializeCamera(p104.SpectatorCamera)">
+ <summary>
+ 初始化camera
+ </summary>
+</member>
+<member name="M:p104.MainGameLoop.StartLoadSkirmish">
+ <summary>
+ 载入遭遇战资源
+ </summary>
+</member>
 <member name="T:p104.MathHelper">
  <summary>
  数学助手类
@@ -791,6 +849,37 @@ p104
  <summary>
  遭遇战GameLoop
  </summary>
+</member>
+<member name="P:p104.SkirmishGameLoop.Sides">
+ <summary>
+ 势力
+ </summary>
+</member>
+<member name="P:p104.SkirmishGameLoop.NowTurn">
+ <summary>
+ 当前回合数
+ </summary>
+</member>
+<member name="F:p104.SkirmishGameLoop.UnitList">
+ <summary>
+ 此游戏中的单位列表
+ </summary>
+</member>
+<member name="F:p104.SkirmishGameLoop.FlagList">
+ <summary>
+ 此游戏中的Flag列表
+ </summary>
+</member>
+<member name="F:p104.SkirmishGameLoop.BuildingList">
+ <summary>
+ 此游戏中的建筑物列表
+ </summary>
+</member>
+<member name="M:p104.SkirmishGameLoop.LoadUnitsFromXMLAndTemplates(System.String)">
+ <summary>
+ 从关卡脚本文件和wrapped模板生成Skirmish初始单位
+ </summary>
+ <param name="xml">关卡脚本文件xml</param>
 </member>
 <member name="T:p104.SingleGameLoopStage">
  <summary>
@@ -875,6 +964,21 @@ p104
 <member name="T:p104.GameImageLayer">
  <summary>
  图层分类枚举
+ </summary>
+</member>
+<member name="T:p104.BasicImageRepository">
+ <summary>
+ 图片素材碎片仓库
+ </summary>
+</member>
+<member name="T:p104.SpriteLive2dImage">
+ <summary>
+ Live2d精灵图片类
+ </summary>
+</member>
+<member name="M:p104.SpriteLive2dImage.CalculateRect">
+ <summary>
+ 通过三个顶点计算外围矩形
  </summary>
 </member>
 <member name="T:p104.UnitDetailDialog">

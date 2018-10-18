@@ -5,6 +5,7 @@
 ''' </summary>
 Public Class UnitImageRepository
     Private Shared me_instance As UnitImageRepository = Nothing
+    Private FragmentImages As BasicImageRepository = BasicImageRepository.Instance
 
     ''' <summary>
     ''' 详情面板左侧立绘
@@ -25,24 +26,18 @@ Public Class UnitImageRepository
     End Function
 
     ''' <summary>
-    ''' 从程序根目录下加载资源
+    ''' 从xml读取数据并依此组装FragmentImage为IGameImage
     ''' </summary>
-    Public Sub LoadFromFiles(rt As SharpDX.Direct2D1.DeviceContext)
+    Public Sub LoadFromFiles(context As SharpDX.Direct2D1.DeviceContext)
+
 
     End Sub
 
     ''' <summary>
-    ''' 获取英雄立绘组
-    ''' </summary>
-    Public Function GetHeroLeftPanelArtwork(heroId As Short) As LeftPanelImageSet
-        Return DetailLeftPanel(heroId)
-    End Function
-
-    ''' <summary>
-    ''' 获取普通单位立绘组
+    ''' 获取单位立绘组
     ''' </summary>
     Public Function GetUnitLeftPanelArtwork(unitId As Short) As LeftPanelImageSet
-        Return DetailLeftPanel(unitId + 256)
+        Return DetailLeftPanel(unitId)
     End Function
 
 End Class
@@ -51,8 +46,8 @@ End Class
 ''' 立绘图片组类
 ''' </summary>
 Public Class LeftPanelImageSet
-    Public Fine As GameLive2dImage
-    Public Normal As GameLive2dImage
-    Public Injured As GameLive2dImage
+    Public Fine As New List(Of IGameImage)
+    Public Normal As New List(Of IGameImage)
+    Public Injured As New List(Of IGameImage)
 
 End Class

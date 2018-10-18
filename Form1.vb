@@ -10,16 +10,17 @@ Public Class Form1
 
     Private Async Sub Form1_Load(sender As Object, e As EventArgs) Handles Me.Load
         Me.Show()
-        Call test.SpectatorTest()
-        Call test.UnitTest()
-        Call test.CopyHeroTest()
-        'Call test.DialogTest()
+        'Call test.SpectatorTest()
+        'Call test.UnitTest()
+        'Call test.CopyHeroTest()
+        ''Call test.DialogTest()
 
-        PaintThread = New Thread(AddressOf d2dPaint)
+        'PaintThread = New Thread(AddressOf d2dPaint)
 
-        Dim waitResult As Integer = Await test.TestGameLoop.WaitForLoad()
-        PaintThread.Start()
+        'Dim waitResult As Integer = Await test.TestGameLoop.WaitForLoad()
+        'PaintThread.Start()
 
+        Await test.MainGameLoopTest()
 
 
         'Device.RegisterDevice(SharpDX.Multimedia.UsagePage.Generic, SharpDX.Multimedia.UsageId.GenericKeyboard, DeviceFlags.None)
@@ -43,14 +44,15 @@ L1:
     End Sub
 
     Private Sub Form1_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        PaintThread.Abort()
+        'PaintThread.Abort()
+        test.MainGame.EndPaint()
     End Sub
 
     Private Sub Form1_MouseDown(sender As Object, e As MouseEventArgs) Handles Me.MouseDown
 
         'Dim controller As Controller = New Controller(UserIndex.One)
         'Dim gamePad As Gamepad = controller.GetState().Gamepad  'xinput->手柄
-        MsgBox(LoggingService.GetRecordCount)
+        MsgBox(LoggingService.GetRecordCount & vbCrLf & test.MainGame.GetFPS)
 
     End Sub
 

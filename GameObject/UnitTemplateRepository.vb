@@ -150,7 +150,8 @@ Public Class UnitTemplateRepository
                     If childElement.Name = "level" Then
                         tmpHero.SetLevel(childElement.GetAttribute("value"), LogSenderType.Change_Load)
                     ElseIf childElement.Name = "lock" Then
-                        tmpHero.SetLockStatus(childElement.GetAttribute("value"))
+                        Dim tmpLockStatus As HeroLockStatus = [Enum].Parse(tmpLockStatus.GetType, childElement.GetAttribute("value"))
+                        tmpHero.SetLockStatus(tmpLockStatus)
                     End If
                 Next
                 wrapped_hero_templates.Add(tmpHero)
@@ -164,31 +165,6 @@ Public Class UnitTemplateRepository
         Return wrapped_hero_templates(index)
     End Function
 
-    '''' <summary>
-    '''' 毛玉
-    '''' </summary>
-    'Public Class UnitL1
-    '    Inherits GameUnit
-
-    '    Public Sub New()
-    '        With Me
-    '            .UnitType.Add(GameUnitType.Kedama)
-    '            .FullHP = New IntegerProperty(10)
-    '            .MovementType = UnitMoveMentType.LandAndWater
-    '            .AttackPoint = New AttackType With {
-    '            .DamageType = UnitDamageType.Physical,
-    '            .AttackValue = New PointF2M(5, 7),
-    '            .AttackRange = New PointI(1, 1),
-    '            .HitRange = New PointI(1, 1)}
-    '            .DefendPoint = New DefendType With {
-    '            .BaseDefend = New IntegerProperty(0),
-    '            .Resistance = {New SingleProperty(0.3), New SingleProperty(0), New SingleProperty(0)}}
-    '            .Status = UnitStatus.NotAvailable
-    '        End With
-
-    '    End Sub
-
-    'End Class
 
 
 End Class

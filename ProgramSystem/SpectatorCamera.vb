@@ -103,7 +103,7 @@ Public Class SpectatorCamera
                               .PixelFormat = New SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied),
                               .BitmapOptions = BitmapOptions.Target})
 
-        Call GameResources.LoadResources(d2dContext)
+        'Call GameResources.LoadResources(d2dContext)   单独放到mainGameloop里了
     End Sub
 
     Public Sub PaintImage()

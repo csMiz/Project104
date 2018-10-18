@@ -153,12 +153,15 @@
     <Compile Include="ProgramSystem\IntegerProperty.vb" />
     <Compile Include="ProgramSystem\ISaveProperty.vb" />
     <Compile Include="ProgramSystem\LoggingService.vb" />
+    <Compile Include="ProgramSystem\MainGameLoop.vb" />
     <Compile Include="ProgramSystem\MathHelper.vb" />
     <Compile Include="ProgramSystem\MonitoredProperty.vb" />
     <Compile Include="ProgramSystem\PolygonArea.vb" />
     <Compile Include="ProgramSystem\SingleProperty.vb" />
     <Compile Include="ProgramSystem\SkirmishGameLoop.vb" />
     <Compile Include="ProgramSystem\SpectatorCamera.vb" />
+    <Compile Include="ProgramSystem\BasicImageRepository.vb" />
+    <Compile Include="ProgramSystem\SpriteLive2dImage.vb" />
     <Compile Include="ProgramSystem\UnitDetailDialog.vb" />
   </ItemGroup>
   <ItemGroup>

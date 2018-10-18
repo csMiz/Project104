@@ -11,6 +11,44 @@ Public Class GameTest
     Public Dialog As UnitDetailDialog = UnitDetailDialog.Instance
     Public TestGameLoop As New SkirmishGameLoop
 
+    Public MainGame As MainGameLoop
+
+
+    Public Async Function MainGameLoopTest() As Task
+        MainGame = New MainGameLoop
+
+        Dim myCamera As New SpectatorCamera
+        With myCamera
+            .Resolve = New PointI(1024, 768)
+            .CameraFocus = New PointF2(300, 300)
+            .Zoom = 0.25
+            .InitializeDirect2d()
+        End With
+        MainGame.InitializeCamera(myCamera)
+
+        'TODO: draw a image of "Loading..."
+        'MainGame.DrawLoadingPage()
+
+        MainGame.StartLoadGlobalResources()
+        Dim loadResult As Integer = Await MainGame.WaitForLoad()
+
+        'TODO: draw main menu
+        'MainGame.DrawMainMenu()
+
+        'user select "New Game"
+        MainGame.StartLoadSave(-1)
+        loadResult = Await MainGame.WaitForLoadSave()
+
+        'draw Skirmish or Menu
+        'TODO: draw a image of "Loading..."
+        MainGame.StartLoadSkirmish()
+        loadResult = Await MainGame.WaitForLoadSkirmish()
+
+        'draw SkirmishMap
+        MainGame.DrawSkirmish()
+        MainGame.StartPaint()
+
+    End Function
 
     <Obsolete("此部分已经封装在SkirmishGameLoop里了->SkirmishGameLoopTest()", False)>
     Public Sub LoadMapTest()

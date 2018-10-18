@@ -24,11 +24,11 @@ Public Class GameUnit
     ''' <summary>
     ''' 单位所处位置
     ''' </summary>
-    Protected Property Position As PointI
+    Protected Property Position As PointI3
     ''' <summary>
     ''' 移动单位后的临时位置
     ''' </summary>
-    Protected Property PositionTmpMove As PointI
+    Protected Property PositionTmpMove As PointI3
     ''' <summary>
     ''' HP
     ''' </summary>
@@ -148,6 +148,10 @@ Public Class GameUnit
     Public Function GetTemplateId() As Short
         Return Me.WrappedTemplateId
     End Function
+
+    Public Sub SetUnitPosition(newPosition As PointI3)
+        Me.Position = newPosition
+    End Sub
 
     Public Sub AddBuff(buff As GameUnitBuff)
 

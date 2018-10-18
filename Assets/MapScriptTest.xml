@@ -3,7 +3,7 @@
   <side value="0" name="Remilia" type="Player" team="0">
     <character>
       <hero w_index="1">
-        <startpos value="0,0"/>
+        <startpos value="0,0,0"/>
       </hero>
       
     </character>
@@ -28,7 +28,7 @@
   <side value="1" name="Reimu" type="AI" team="1" >
     <character>
       <hero w_index="0" >
-        <startpos value="6,6" />
+        <startpos value="6,6,0" />
       </hero>
     </character>
     <building>

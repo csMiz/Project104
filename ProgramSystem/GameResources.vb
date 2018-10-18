@@ -56,6 +56,7 @@ Module GameResources
     Public Const THIRTY_THOUSAND As Integer = 30000
     Public ReadOnly HALF_ROOT3 As Single = Sqrt(3) / 2
     Public Const DEFAULT_STRING As String = "Default"
+    Public Const UNDERLINE As String = "_"
     Public Const NOT_TRANSPARENT As Single = 1.0F
 
     ''' <summary>
@@ -76,9 +77,9 @@ Module GameResources
     ''' 加载资源
     ''' </summary>
     Public Sub LoadResources(context As SharpDX.Direct2D1.DeviceContext)
-        Dim bitmap_hex_grass As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\hex_grass.png")
-        Dim bitmap_hex_forest As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\hex_forest.png")
-        Dim bitmap_hex_mountain As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\hex_mountain.png")
+        Dim bitmap_hex_grass As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\Map\hex_grass.png")
+        Dim bitmap_hex_forest As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\Map\hex_forest.png")
+        Dim bitmap_hex_mountain As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\Map\hex_mountain.png")
 
         With TERRAIN_BITMAP
             .Add(Nothing) 'none
@@ -98,7 +99,7 @@ Module GameResources
             .Add(New SolidColorBrush(context, New RawColor4(90 / 255, 149 / 255, 103 / 255, 1)))
         End With
 
-        Dim bitmap_tree2 As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\tree2.png")
+        Dim bitmap_tree2 As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\Map\tree2.png")
         ACCESSORY_TREE.Add(bitmap_tree2)
 
         Dim unitTemplatesString As String = My.Resources.UnitTemplates
@@ -133,10 +134,23 @@ Module GameResources
     ''' </summary>
     ''' <param name="context">d2dContext对象</param>
     ''' <param name="filePath">图片路径</param>
-    ''' <returns></returns>
     Public Function LoadBitmapUsingWIC(context As DeviceContext, filePath As String) As Bitmap1
         Dim fileStream As NativeFileStream = New NativeFileStream(filePath, NativeFileMode.Open, NativeFileAccess.Read)
         Dim bitmapDecoder As WIC.BitmapDecoder = New WIC.BitmapDecoder(GameImagingFactory, fileStream, WIC.DecodeOptions.CacheOnDemand)
+        Dim frame As WIC.BitmapFrameDecode = bitmapDecoder.GetFrame(0)
+        Dim Converter As WIC.FormatConverter = New WIC.FormatConverter(GameImagingFactory)
+        Converter.Initialize(frame, SharpDX.WIC.PixelFormat.Format32bppPRGBA)
+        Dim newBitmap As Bitmap1 = SharpDX.Direct2D1.Bitmap1.FromWicBitmap(context, Converter)
+        Return newBitmap
+    End Function
+
+    ''' <summary>
+    ''' 使用WIC载入图片资源
+    ''' </summary>
+    ''' <param name="context">d2dContext对象</param>
+    ''' <param name="readStream">文件流</param>
+    Public Function LoadBitmapUsingWIC(context As DeviceContext, readStream As System.IO.FileStream) As Bitmap1
+        Dim bitmapDecoder As WIC.BitmapDecoder = New WIC.BitmapDecoder(GameImagingFactory, readStream, WIC.DecodeOptions.CacheOnDemand)
         Dim frame As WIC.BitmapFrameDecode = bitmapDecoder.GetFrame(0)
         Dim Converter As WIC.FormatConverter = New WIC.FormatConverter(GameImagingFactory)
         Converter.Initialize(frame, SharpDX.WIC.PixelFormat.Format32bppPRGBA)

@@ -1,4 +1,5 @@
 ﻿Imports System.Math
+Imports System.Text.RegularExpressions
 
 ''' <summary>
 ''' 数学助手类
@@ -16,6 +17,15 @@ Public Class MathHelper
 
     Public Shared Function GetRandom() As Double
         Return Rnd.NextDouble
+    End Function
+
+    Public Shared Function ParsePointI3(input As String) As PointI3
+        Dim value() As String = Regex.Split(input, COMMA)
+        Dim result As New PointI3 With {
+            .X = CShort(value(0)),
+            .Y = CShort(value(1)),
+            .Z = CShort(value(2))}
+        Return result
     End Function
 
 End Class
@@ -57,6 +67,19 @@ Public Structure PointI
         X = inputX
         Y = inputY
     End Sub
+End Structure
+
+Public Structure PointI3
+    Public Property X As Short
+    Public Property Y As Short
+    Public Property Z As Short
+
+    Public Sub New(inputX As Short, inputY As Short, inputZ As Short)
+        X = inputX
+        Y = inputY
+        Z = inputZ
+    End Sub
+
 End Structure
 
 

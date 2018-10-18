@@ -7,6 +7,7 @@ Public Class SkirmishGameLoop
 
     Private GameLoopStatus As SingleGameLoopStage = SingleGameLoopStage.MyTurnStart
     Private MapLoaded As MapLoadStatus = MapLoadStatus.NotLoaded
+    Private LoadingProcess As Task
     Private GameEnded As GameEndInfo
 
     Private CampaignIndex As Short = -1
@@ -39,8 +40,8 @@ Public Class SkirmishGameLoop
         If missionIndex < 0 Then Throw New Exception("invalid mission")
         CampaignIndex = missionIndex
         '建立独立线程
-        Dim loadProcess As New Task(AddressOf LoadResources)
-        loadProcess.Start()
+        LoadingProcess = New Task(AddressOf LoadResources)
+        LoadingProcess.Start()
 
     End Sub
 
@@ -54,7 +55,7 @@ Public Class SkirmishGameLoop
 
         SkirmishGameMap.LoadAccessories(BindingCamera.GetDevceContext, BindingCamera.Zoom)
 
-        Me.LoadUnitsFromXMLAndTemplates(GetCampaignScript(0))
+        'Me.LoadUnitsFromXMLAndTemplates(GetCampaignScript(0))
 
         SkirmishGameMap.ResourcesLoaded = True
         MapLoaded = MapLoadStatus.Loaded
@@ -64,6 +65,7 @@ Public Class SkirmishGameLoop
         While (Me.MapLoaded <> MapLoadStatus.Loaded)
             Await Task.Delay(100)
         End While
+        LoadingProcess.Dispose()
         Return 0
     End Function
 
@@ -107,8 +109,15 @@ Public Class SkirmishGameLoop
                                 '经过wrap的对象直接用，不再需要copy，因为在游戏里都是单例
                                 tmpHero = UnitTemplates.GetWrappedHeroTemplate(wrappedTemplateIndex)
 
-                                '第四层
-                                'TODO
+                                Dim children4 As XmlNodeList = element3.ChildNodes
+                                For Each item4 As XmlNode In children4
+                                    Dim element4 As XmlElement = CType(item4, XmlElement)
+                                    If element4.Name = "startpos" Then
+                                        Dim unitPosition As PointI3 = MathHelper.ParsePointI3(element4.GetAttribute("value"))
+                                        tmpHero.SetUnitPosition(unitPosition)
+                                    End If
+
+                                Next
 
                                 tmpHero.InitializeUnitId(Me.UnitList.Count)
                                 Me.UnitList.Add(tmpHero)
