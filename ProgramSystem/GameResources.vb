@@ -27,6 +27,8 @@ Module GameResources
     ''' 游戏图标资源仓库
     ''' </summary>
     Public GameIcons As GameIconRepository = GameIconRepository.Instance
+
+    Public FragmentImages As BasicImageRepository = BasicImageRepository.Instance
     ''' <summary>
     ''' 文字字体助手
     ''' </summary>
@@ -57,6 +59,9 @@ Module GameResources
     Public ReadOnly HALF_ROOT3 As Single = Sqrt(3) / 2
     Public Const DEFAULT_STRING As String = "Default"
     Public Const UNDERLINE As String = "_"
+    Public Const TYPE_THREE_IMAGES As String = "three"
+    Public Const SKIRMISH_FRAGMENT_DOMAIN As String = "skirmish_unit"
+    Public Const SKIRMISH_IMAGE_GROUP As String = "skirmish_chess"
     Public Const NOT_TRANSPARENT As Single = 1.0F
 
     ''' <summary>
@@ -105,6 +110,7 @@ Module GameResources
         Dim unitTemplatesString As String = My.Resources.UnitTemplates
         UnitTemplates.LoadTemplates(unitTemplatesString)
 
+        FragmentImages.LoadImages(context)
         UnitImages.LoadFromFiles(context)
         GameIcons.LoadFromFiles(context)
 

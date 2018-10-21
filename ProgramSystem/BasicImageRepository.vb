@@ -9,7 +9,9 @@ Imports SharpDX.Mathematics.Interop
 Public Class BasicImageRepository
     Private Shared me_instance As BasicImageRepository = Nothing
 
-    Private FragmentImages As New List(Of BasicImagePair)
+    Private LeftPanelFragmentImages As New List(Of BasicImagePair)
+    Private SkirmishUnitFragmentImages As New List(Of BasicImagePair)
+
 
     Private Sub New()
     End Sub
@@ -20,9 +22,14 @@ Public Class BasicImageRepository
     End Function
 
     Public Sub LoadImages(context As DeviceContext)
-        Dim loadPath As String = Application.StartupPath & "\Resources\Images\UnitDetailLP\"
+        Dim loadPath As String = Application.StartupPath & "\Resources\Images\"
+        Me.LoadToDirectory(context, loadPath & "UnitDetailLP\", LeftPanelFragmentImages)
+        Me.LoadToDirectory(context, loadPath & "SkirmishUnit\", SkirmishUnitFragmentImages)
 
-        Dim dirInfo As New System.IO.DirectoryInfo(loadPath)
+    End Sub
+
+    Private Sub LoadToDirectory(context As DeviceContext, folderPath As String, group As List(Of BasicImagePair))
+        Dim dirInfo As New System.IO.DirectoryInfo(folderPath)
         Dim allFiles() As System.IO.FileInfo = dirInfo.GetFiles
         For Each file As System.IO.FileInfo In allFiles
             Dim readStream As System.IO.FileStream = file.OpenRead
@@ -34,9 +41,19 @@ Public Class BasicImageRepository
                 .Key = New List(Of String)(keys),
                 .Image = tmpImage}
 
-            Me.FragmentImages.Add(tmpPair)
+            group.Add(tmpPair)
         Next
     End Sub
+
+    Public Function GetFragment(index As Integer, domain As String) As Bitmap1
+        If domain = SKIRMISH_FRAGMENT_DOMAIN Then
+            Return Me.SkirmishUnitFragmentImages(index).Image
+
+            'TODO
+
+        End If
+        Return Nothing
+    End Function
 
 End Class
 

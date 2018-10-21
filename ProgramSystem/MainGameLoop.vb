@@ -127,7 +127,7 @@ Public Class MainGameLoop
             .PaintingLayers.Clear()
             .PaintingLayersDescription.Clear()
 
-            .PaintingLayers.Push(AddressOf Me.Skirmish.SkirmishGameMap.DrawHexMap)
+            .PaintingLayers.Push(AddressOf Me.Skirmish.DrawSkirmishMapLayer)
             .PaintingLayersDescription.Push(GameImageLayer.SkirmishMap)
         End With
 

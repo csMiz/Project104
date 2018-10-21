@@ -37,6 +37,16 @@ p104
 &lt;/content&gt; 的本地化字符串。
 </summary>
 </member>
+<member name="P:p104.My.Resources.Resources.AssembleImages">
+<summary>
+  查找类似 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
+&lt;content&gt;
+  &lt;static id=&quot;0&quot; group=&quot;skirmish_chess&quot; domain=&quot;fine&quot; &gt;
+    &lt;fragment id=&quot;0&quot; from=&quot;skirmish_unit&quot; pos=&quot;0,0&quot; size=&quot;-1,-1&quot;/&gt;
+  &lt;/static&gt;
+&lt;/content&gt; 的本地化字符串。
+</summary>
+</member>
 <member name="P:p104.My.Resources.Resources.Colours">
 <summary>
   查找类似 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
@@ -62,7 +72,7 @@ p104
   &lt;side value=&quot;0&quot; name=&quot;Remilia&quot; type=&quot;Player&quot; team=&quot;0&quot;&gt;
     &lt;character&gt;
       &lt;hero w_index=&quot;1&quot;&gt;
-        &lt;startpos value=&quot;0,0&quot;/&gt;
+        &lt;startpos value=&quot;0,0,0&quot;/&gt;
       &lt;/hero&gt;
       
     &lt;/character&gt;
@@ -79,7 +89,7 @@ p104
       &lt;lose&gt;
         &lt;loseevent name=&quot;Clean&quot; value=&quot;0&quot;/&gt;
         &lt;loseevent name=&quot;Turn&quot; value=&quot;20&quot; /&gt;
-      &lt;/los [字符串的其余部分被截断]&quot;; 的本地化字符串。
+      &lt;/l [字符串的其余部分被截断]&quot;; 的本地化字符串。
 </summary>
 </member>
 <member name="P:p104.My.Resources.Resources.Skill">
@@ -270,6 +280,11 @@ p104
  士气
  </summary>
 </member>
+<member name="F:p104.GameUnit.SpiritStatus">
+ <summary>
+ 
+ </summary>
+</member>
 <member name="P:p104.GameUnit.Status">
  <summary>
  状态
@@ -447,6 +462,11 @@ p104
  详情面板左侧立绘
  </summary>
 </member>
+<member name="F:p104.UnitImageRepository.SkirmishChess">
+ <summary>
+ 遭遇战地图人物图标图片
+ </summary>
+</member>
 <member name="M:p104.UnitImageRepository.Instance">
  <summary>
  单例
@@ -462,9 +482,14 @@ p104
  获取单位立绘组
  </summary>
 </member>
-<member name="T:p104.LeftPanelImageSet">
+<member name="T:p104.ThreeStatesImageSet">
  <summary>
- 立绘图片组类
+ 三状态图片组类
+ </summary>
+</member>
+<member name="T:p104.TachieStatus">
+ <summary>
+ 人物立绘状态枚举
  </summary>
 </member>
 <member name="T:p104.UnitTemplateRepository">

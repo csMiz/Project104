@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<content>
+  <static id="0" type="three" group="skirmish_chess" domain="fine" size="200,200">
+    <fragment id="0" from="skirmish_unit" pos="0,0" size="200,200"/>
+  </static>
+</content>

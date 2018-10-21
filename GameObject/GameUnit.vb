@@ -58,6 +58,10 @@ Public Class GameUnit
     ''' </summary>
     Protected Spirit As SingleProperty = New SingleProperty(100)
     ''' <summary>
+    ''' 
+    ''' </summary>
+    Protected SpiritStatus As TachieStatus = TachieStatus.Fine
+    ''' <summary>
     ''' 状态
     ''' </summary>
     Protected Property Status As UnitStatus
@@ -73,6 +77,9 @@ Public Class GameUnit
     Protected View As SingleProperty
 
     Protected Hide As SingleProperty
+
+    Protected SkirmishChessImageIndex As Integer
+
 
     Public Sub InitializeUnitType(input As String)
         Me.UnitType.Clear()
@@ -149,6 +156,10 @@ Public Class GameUnit
         Return Me.WrappedTemplateId
     End Function
 
+    Public Sub SetBindingSkirmishChessImage(inputImageIndex As Integer)
+        Me.SkirmishChessImageIndex = inputImageIndex
+    End Sub
+
     Public Sub SetUnitPosition(newPosition As PointI3)
         Me.Position = newPosition
     End Sub
@@ -159,6 +170,10 @@ Public Class GameUnit
 
     Public Function GetSideColorSet() As SolidColorBrushSet
         Return SIDE_COLOUR(Me.Player)
+    End Function
+
+    Public Function GetSkirmishChessImage() As IGameImage
+        Return UnitImages.GetChessImage(Me.SkirmishChessImageIndex, Me.SpiritStatus)
     End Function
 
     Public Overridable Function GlobalSaveUnit() As String

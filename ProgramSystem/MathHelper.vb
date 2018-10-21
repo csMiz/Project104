@@ -28,6 +28,14 @@ Public Class MathHelper
         Return result
     End Function
 
+    Public Shared Function ParsePointI(input As String) As PointI
+        Dim value() As String = Regex.Split(input, COMMA)
+        Dim result As New PointI With {
+            .X = CShort(value(0)),
+            .Y = CShort(value(1))}
+        Return result
+    End Function
+
 End Class
 
 ''' <summary>

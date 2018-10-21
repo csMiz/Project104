@@ -155,7 +155,10 @@ Public Class SkirmishMap
             '             .RadiusY = 25}, brush1)
 
         End With
+
     End Sub
+
+
 
     Public Sub Dispose()
 

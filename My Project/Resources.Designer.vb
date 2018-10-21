@@ -80,6 +80,20 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  查找类似 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
+        '''&lt;content&gt;
+        '''  &lt;static id=&quot;0&quot; group=&quot;skirmish_chess&quot; domain=&quot;fine&quot; &gt;
+        '''    &lt;fragment id=&quot;0&quot; from=&quot;skirmish_unit&quot; pos=&quot;0,0&quot; size=&quot;-1,-1&quot;/&gt;
+        '''  &lt;/static&gt;
+        '''&lt;/content&gt; 的本地化字符串。
+        '''</summary>
+        Friend ReadOnly Property AssembleImages() As String
+            Get
+                Return ResourceManager.GetString("AssembleImages", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  查找类似 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
         '''&lt;content&gt;
         '''  &lt;set index=&quot;0&quot;&gt;
@@ -107,7 +121,7 @@ Namespace My.Resources
         '''  &lt;side value=&quot;0&quot; name=&quot;Remilia&quot; type=&quot;Player&quot; team=&quot;0&quot;&gt;
         '''    &lt;character&gt;
         '''      &lt;hero w_index=&quot;1&quot;&gt;
-        '''        &lt;startpos value=&quot;0,0&quot;/&gt;
+        '''        &lt;startpos value=&quot;0,0,0&quot;/&gt;
         '''      &lt;/hero&gt;
         '''      
         '''    &lt;/character&gt;
@@ -124,7 +138,7 @@ Namespace My.Resources
         '''      &lt;lose&gt;
         '''        &lt;loseevent name=&quot;Clean&quot; value=&quot;0&quot;/&gt;
         '''        &lt;loseevent name=&quot;Turn&quot; value=&quot;20&quot; /&gt;
-        '''      &lt;/los [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        '''      &lt;/l [字符串的其余部分被截断]&quot;; 的本地化字符串。
         '''</summary>
         Friend ReadOnly Property MapScriptTest() As String
             Get

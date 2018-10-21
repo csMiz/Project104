@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <content>
-  <h id="0" template="0">
+  <h id="0" template="0" chessImage="0">
     <level value="1" />
     <lock value="Unlocked" />
   </h>
-  <h id="1" template="1" >
+  <h id="1" template="1" chessImage="0">
     <level value="1" />
     <lock value="Unlocked" />
   </h>

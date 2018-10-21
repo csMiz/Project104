@@ -215,6 +215,9 @@
     <Content Include="Assets\AllUnits.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Assets\AssembleImages.xml">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

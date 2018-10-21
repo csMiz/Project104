@@ -1,5 +1,7 @@
 ﻿Imports System.IO
 Imports System.Xml
+Imports SharpDX.Direct2D1
+Imports SharpDX.Mathematics.Interop
 ''' <summary>
 ''' 遭遇战GameLoop
 ''' </summary>
@@ -55,7 +57,7 @@ Public Class SkirmishGameLoop
 
         SkirmishGameMap.LoadAccessories(BindingCamera.GetDevceContext, BindingCamera.Zoom)
 
-        'Me.LoadUnitsFromXMLAndTemplates(GetCampaignScript(0))
+        Me.LoadUnitsFromXMLAndTemplates(GetCampaignScript(0))
 
         SkirmishGameMap.ResourcesLoaded = True
         MapLoaded = MapLoadStatus.Loaded
@@ -131,6 +133,21 @@ Public Class SkirmishGameLoop
 
             End If
         Next
+
+    End Sub
+
+    Public Sub DrawSkirmishMapLayer(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As Bitmap1)
+        Me.SkirmishGameMap.DrawHexMap(context, spectator, canvasBitmap)
+        Me.DrawUnitLayer(context, spectator, canvasBitmap)
+    End Sub
+
+
+    Private Sub DrawUnitLayer(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As Bitmap1)
+        Dim tmpUnit As GameUnit = Me.UnitList(0)
+        Dim tmpImage As Bitmap1 = tmpUnit.GetSkirmishChessImage().GetImage
+
+        context.DrawBitmap(tmpImage, New RawRectangleF(220, 80, 320, 180), NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
+
 
     End Sub
 
