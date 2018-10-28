@@ -1,5 +1,6 @@
 ﻿
 Imports System.Text.RegularExpressions
+Imports p104
 ''' <summary>
 ''' 行动单位类
 ''' </summary>
@@ -7,78 +8,93 @@ Public Class GameUnit
     ''' <summary>
     ''' 一场游戏内单位唯一id，游戏外则为-1
     ''' </summary>
-    Protected Property UnitId As Short = -1
+    Public UnitId As Short = -1
     ''' <summary>
     ''' 存储模板对应id
     ''' </summary>
-    ''' <returns></returns>
-    Protected Property WrappedTemplateId As Short = -1
+    Public WrappedTemplateId As Short = -1
     ''' <summary>
     ''' 显示的名字
     ''' </summary>
-    Public Property ShownName As String
+    Public ShownName As String = ""
     ''' <summary>
     ''' 字段
     ''' </summary>
-    Protected UnitType As New List(Of GameUnitType)
+    Public UnitType As New List(Of GameUnitType)
     ''' <summary>
     ''' 单位所处位置
     ''' </summary>
-    Protected Property Position As PointI3
+    Public Position As PointI3
     ''' <summary>
     ''' 移动单位后的临时位置
     ''' </summary>
-    Protected Property PositionTmpMove As PointI3
+    Public PositionTmpMove As PointI3
     ''' <summary>
     ''' HP
     ''' </summary>
-    Protected FullHP As IntegerProperty
+    Public FullHP As IntegerProperty
 
-    Protected RemainHP As IntegerProperty
+    Public RemainHP As IntegerProperty
     ''' <summary>
     ''' 行动类型
     ''' </summary>
-    Protected Property MovementType As UnitMoveMentType
-
-    Protected Property MovePoint As IntegerProperty
+    Public MovementType As UnitMoveMentType
+    ''' <summary>
+    ''' 行动力
+    ''' </summary>
+    Public MovePoint As IntegerProperty
     ''' <summary>
     ''' 进攻点数
     ''' </summary>
-    Protected AttackPoint As AttackType
+    Public AttackPoint As AttackType
     ''' <summary>
     ''' 第二攻击形式
     ''' </summary>
-    Protected SubAttackPoint As AttackType
+    Public SubAttackPoint As AttackType
     ''' <summary>
     ''' 防守点数
     ''' </summary>
-    Protected DefendPoint As DefendType
+    Public DefendPoint As DefendType
     ''' <summary>
     ''' 士气
     ''' </summary>
-    Protected Spirit As SingleProperty = New SingleProperty(100)
+    Public Spirit As SingleProperty = New SingleProperty(100)
     ''' <summary>
-    ''' 
+    ''' 立绘分类状态
     ''' </summary>
-    Protected SpiritStatus As TachieStatus = TachieStatus.Fine
+    Public SpiritStatus As TachieStatus = TachieStatus.Fine
     ''' <summary>
     ''' 状态
     ''' </summary>
-    Protected Property Status As UnitStatus
+    Public Status As UnitStatus
+    ''' <summary>
+    ''' 单位阶段
+    ''' </summary>
+    Public UnitPhase As SingleGameLoopStage = SingleGameLoopStage.OutOfTurn
+
+    Public UnitPhaseStatus As StateMachineSingleProcessStatus = StateMachineSingleProcessStatus.NA
+    ''' <summary>
+    ''' 剩余行动次数，行动指战斗或技能或物品
+    ''' </summary>
+    Public RemainActionCount As IntegerProperty = New IntegerProperty(0)
+    ''' <summary>
+    ''' 剩余移动次数
+    ''' </summary>
+    Public RemainMovementCount As IntegerProperty = New IntegerProperty(0)
     ''' <summary>
     ''' 此单位归属于
     ''' </summary>
-    Protected Property Player As Integer
+    Public Player As Integer
 
-    Protected BuffList As New List(Of GameUnitBuff)
+    Public BuffList As New List(Of GameUnitBuff)
 
-    Protected UnitBurden As IntegerProperty
+    Public UnitBurden As IntegerProperty
 
-    Protected View As SingleProperty
+    Public View As SingleProperty
 
-    Protected Hide As SingleProperty
+    Public Hide As SingleProperty
 
-    Protected SkirmishChessImageIndex As Integer
+    Public SkirmishChessImageIndex As Integer
 
 
     Public Sub InitializeUnitType(input As String)
@@ -152,18 +168,6 @@ Public Class GameUnit
         End If
     End Sub
 
-    Public Function GetTemplateId() As Short
-        Return Me.WrappedTemplateId
-    End Function
-
-    Public Sub SetBindingSkirmishChessImage(inputImageIndex As Integer)
-        Me.SkirmishChessImageIndex = inputImageIndex
-    End Sub
-
-    Public Sub SetUnitPosition(newPosition As PointI3)
-        Me.Position = newPosition
-    End Sub
-
     Public Sub AddBuff(buff As GameUnitBuff)
 
     End Sub
@@ -176,15 +180,37 @@ Public Class GameUnit
         Return UnitImages.GetChessImage(Me.SkirmishChessImageIndex, Me.SpiritStatus)
     End Function
 
+    Public Sub ResetUnitStatus(inputStatus As UnitStatus, Optional mov_count As Integer = -1, Optional atk_count As Integer = -1)
+        Me.Status = inputStatus
+        If mov_count >= 0 Then
+            Me.RemainMovementCount.SetValue(mov_count, LogSenderType.Change_Program)
+        End If
+        If atk_count >= 0 Then
+            Me.RemainActionCount.SetValue(atk_count, LogSenderType.Change_Program)
+        End If
+    End Sub
+
+    Public Function AllActionDone() As Boolean
+        Return (Me.RemainMovementCount.GetValue = 0 AndAlso Me.RemainActionCount.GetValue = 0)
+    End Function
+    Public Function IsWaitingCommand() As Boolean
+        Return (Me.Status = UnitStatus.Waiting)
+    End Function
+
     Public Overridable Function GlobalSaveUnit() As String
         Dim result As String = ""
         result = "{" & Me.WrappedTemplateId & COMMA
 
         '...
+        'TODO
+        Throw New NotImplementedException
 
     End Function
 
     Public Function Copy() As GameUnit
+
+        'TODO
+        Throw New NotImplementedException
 
     End Function
 
@@ -201,10 +227,13 @@ Public Enum UnitMoveMentType As Byte
 End Enum
 
 Public Enum UnitStatus As Byte
-    NotAvailable = 0
+    OutOfTurn = 0
     Waiting = 1
-    Acting = 2
-    Finished = 3
+    Moving = 2
+    Acting_attack = 3
+    Acting_skill = 4
+    Acting_item = 5
+    Finished = 6
 
 End Enum
 

@@ -48,6 +48,9 @@ Public Class GameTest
         MainGame.DrawSkirmish()
         MainGame.StartPaint()
 
+        'start state machine
+
+
     End Function
 
     <Obsolete("此部分已经封装在SkirmishGameLoop里了->SkirmishGameLoopTest()", False)>

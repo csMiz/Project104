@@ -144,7 +144,7 @@ Public Class UnitTemplateRepository
                 Dim tmpHero As GameHero = Nothing
                 tmpHero = Me.GetHeroTemplate(element.GetAttribute("template")).Copy
                 tmpHero.SetTemplateId(element.GetAttribute("template"))
-                tmpHero.SetBindingSkirmishChessImage(CInt(element.GetAttribute("chessImage")))
+                tmpHero.SkirmishChessImageIndex = CInt(element.GetAttribute("chessImage"))
                 Dim children As XmlNodeList = element.ChildNodes
                 For Each child As XmlNode In children
                     Dim childElement As XmlElement = CType(child, XmlElement)

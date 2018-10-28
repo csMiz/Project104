@@ -96,7 +96,7 @@ Public Class GameHero
         Dim tmpHero As New GameHero
         With tmpHero
             .UnitId = -1
-            .SetTemplateId(Me.GetTemplateId)
+            .SetTemplateId(Me.WrappedTemplateId)
             .ShownName = Me.ShownName
             For Each ut As GameUnitType In Me.UnitType
                 .UnitType.Add(ut)

@@ -162,6 +162,7 @@
     <Compile Include="ProgramSystem\SpectatorCamera.vb" />
     <Compile Include="ProgramSystem\BasicImageRepository.vb" />
     <Compile Include="ProgramSystem\SpriteLive2dImage.vb" />
+    <Compile Include="ProgramSystem\StateMachine.vb" />
     <Compile Include="ProgramSystem\UnitDetailDialog.vb" />
   </ItemGroup>
   <ItemGroup>

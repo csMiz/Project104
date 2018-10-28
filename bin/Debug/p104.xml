@@ -219,18 +219,17 @@ p104
  行动单位类
  </summary>
 </member>
-<member name="P:p104.GameUnit.UnitId">
+<member name="F:p104.GameUnit.UnitId">
  <summary>
  一场游戏内单位唯一id，游戏外则为-1
  </summary>
 </member>
-<member name="P:p104.GameUnit.WrappedTemplateId">
+<member name="F:p104.GameUnit.WrappedTemplateId">
  <summary>
  存储模板对应id
  </summary>
- <returns></returns>
 </member>
-<member name="P:p104.GameUnit.ShownName">
+<member name="F:p104.GameUnit.ShownName">
  <summary>
  显示的名字
  </summary>
@@ -240,12 +239,12 @@ p104
  字段
  </summary>
 </member>
-<member name="P:p104.GameUnit.Position">
+<member name="F:p104.GameUnit.Position">
  <summary>
  单位所处位置
  </summary>
 </member>
-<member name="P:p104.GameUnit.PositionTmpMove">
+<member name="F:p104.GameUnit.PositionTmpMove">
  <summary>
  移动单位后的临时位置
  </summary>
@@ -255,9 +254,14 @@ p104
  HP
  </summary>
 </member>
-<member name="P:p104.GameUnit.MovementType">
+<member name="F:p104.GameUnit.MovementType">
  <summary>
  行动类型
+ </summary>
+</member>
+<member name="F:p104.GameUnit.MovePoint">
+ <summary>
+ 行动力
  </summary>
 </member>
 <member name="F:p104.GameUnit.AttackPoint">
@@ -282,15 +286,30 @@ p104
 </member>
 <member name="F:p104.GameUnit.SpiritStatus">
  <summary>
- 
+ 立绘分类状态
  </summary>
 </member>
-<member name="P:p104.GameUnit.Status">
+<member name="F:p104.GameUnit.Status">
  <summary>
  状态
  </summary>
 </member>
-<member name="P:p104.GameUnit.Player">
+<member name="F:p104.GameUnit.UnitPhase">
+ <summary>
+ 单位阶段
+ </summary>
+</member>
+<member name="F:p104.GameUnit.RemainActionCount">
+ <summary>
+ 剩余行动次数，行动指战斗或技能或物品
+ </summary>
+</member>
+<member name="F:p104.GameUnit.RemainMovementCount">
+ <summary>
+ 剩余移动次数
+ </summary>
+</member>
+<member name="F:p104.GameUnit.Player">
  <summary>
  此单位归属于
  </summary>
@@ -850,6 +869,21 @@ p104
  计算两点间距离
  </summary>
 </member>
+<member name="M:p104.MathHelper.GetRandom">
+ <summary>
+ 获取0到1之间的随机数
+ </summary>
+</member>
+<member name="M:p104.MathHelper.ParsePointI3(System.String)">
+ <summary>
+ 按英文逗号分隔符转换PointI3对象
+ </summary>
+</member>
+<member name="M:p104.MathHelper.ParsePointI(System.String)">
+ <summary>
+ 按英文逗号分隔符转换PointI对象
+ </summary>
+</member>
 <member name="T:p104.PointF2">
  <summary>
  简化的PointF结构体
@@ -865,6 +899,11 @@ p104
  XY均为Short类型的Point结构体
  </summary>
 </member>
+<member name="T:p104.PointI3">
+ <summary>
+ XYZ均为Short类型的Point结构体
+ </summary>
+</member>
 <member name="T:p104.MonitoredProperty">
  <summary>
  受到监视的属性类
@@ -875,14 +914,29 @@ p104
  遭遇战GameLoop
  </summary>
 </member>
-<member name="P:p104.SkirmishGameLoop.Sides">
+<member name="F:p104.SkirmishGameLoop.Sides">
  <summary>
  势力
  </summary>
 </member>
-<member name="P:p104.SkirmishGameLoop.NowTurn">
+<member name="F:p104.SkirmishGameLoop.NowTurn">
  <summary>
  当前回合数
+ </summary>
+</member>
+<member name="F:p104.SkirmishGameLoop.SkirmishGamePhases">
+ <summary>
+ 阶段状态机
+ </summary>
+</member>
+<member name="F:p104.SkirmishGameLoop.SkirmishGlobalStateIndex">
+ <summary>
+ 当前阶段
+ </summary>
+</member>
+<member name="F:p104.SkirmishGameLoop.NowPlayer">
+ <summary>
+ 当前玩家
  </summary>
 </member>
 <member name="F:p104.SkirmishGameLoop.UnitList">
@@ -906,6 +960,37 @@ p104
  </summary>
  <param name="xml">关卡脚本文件xml</param>
 </member>
+<member name="M:p104.SkirmishGameLoop.InitializeSkirmishGamePhases">
+ <summary>
+ 初始化GameLoop状态机并启动
+ </summary>
+</member>
+<member name="M:p104.SkirmishGameLoop.UnitGoNextState1(p104.GameUnit)">
+ <summary>
+ 用于回合开始阶段，准备阶段和回合结束阶段。全局状态需要与单位状态同步。
+ </summary>
+</member>
+<member name="M:p104.SkirmishGameLoop.UnitGoNextState2(p104.GameUnit)">
+ <summary>
+ 用于主要阶段。全局状态停留在主要阶段1直到所有单位完成行动，单位可以处于主要阶段，战斗阶段。
+ </summary>
+</member>
+<member name="M:p104.SkirmishGameLoop.MarkUnitStateCompleteCounter(System.Int16)">
+ <summary>
+ 使单位行动计数器计数
+ </summary>
+</member>
+<member name="M:p104.SkirmishGameLoop.ResetUnitStateCounter">
+ <summary>
+ 重置单位行动计数器
+ </summary>
+</member>
+<member name="M:p104.SkirmishGameLoop.AllUnitStateComplete">
+ <summary>
+ 检查所有单位状态已更改
+ </summary>
+ <returns></returns>
+</member>
 <member name="T:p104.SingleGameLoopStage">
  <summary>
  回合阶段枚举，参考“游戏王大师规则”
@@ -926,11 +1011,6 @@ p104
  主要阶段1
  </summary>
 </member>
-<member name="F:p104.SingleGameLoopStage.Battle">
- <summary>
- 战斗阶段
- </summary>
-</member>
 <member name="F:p104.SingleGameLoopStage.MainB">
  <summary>
  主要阶段2
@@ -939,6 +1019,71 @@ p104
 <member name="F:p104.SingleGameLoopStage.MyTurnEnd">
  <summary>
  回合结束阶段
+ </summary>
+</member>
+<member name="F:p104.SingleGameLoopStage.OutOfTurn">
+ <summary>
+ 非己方回合
+ </summary>
+</member>
+<member name="T:p104.SkirmishPhaseSingleState">
+ <summary>
+ 遭遇战阶段类，继承状态机单个状态类
+ </summary>
+</member>
+<member name="M:p104.SkirmishPhaseSingleState.Trigger(p104.GameUnit)">
+ <summary>
+ 开始执行
+ </summary>
+</member>
+<member name="M:p104.SkirmishPhaseSingleState.Trigger(p104.SkirmishGameLoop)">
+ <summary>
+ 开始执行
+ </summary>
+</member>
+<member name="M:p104.SkirmishPhaseSingleState.TryResumeProcess(p104.GameUnit)">
+ <summary>
+ 状态恢复为Normal后尝试重新启动
+ </summary>
+</member>
+<member name="M:p104.SkirmishPhaseSingleState.TryResumeProcess(p104.SkirmishGameLoop)">
+ <summary>
+ 状态恢复为Normal后尝试重新启动
+ </summary>
+</member>
+<member name="T:p104.SkirmishTurnStartPhase">
+ <summary>
+ 遭遇战回合开始阶段类
+ </summary>
+</member>
+<member name="T:p104.SkirmishPreparePhase">
+ <summary>
+ 遭遇战准备阶段类
+ </summary>
+</member>
+<member name="T:p104.SkirmishMainAPhase">
+ <summary>
+ 遭遇战主要阶段1类
+ </summary>
+</member>
+<member name="T:p104.SkirmishBattlePhase">
+ <summary>
+ 遭遇战战斗阶段类
+ </summary>
+</member>
+<member name="T:p104.SkirmishMainBPhase">
+ <summary>
+ 遭遇战主要阶段2类
+ </summary>
+</member>
+<member name="T:p104.SkirmishTurnEndPhase">
+ <summary>
+ 遭遇战回合结束阶段类
+ </summary>
+</member>
+<member name="T:p104.SkirmishOutOfTurnPhase">
+ <summary>
+ 遭遇战回合外阶段类
  </summary>
 </member>
 <member name="T:p104.SpectatorCamera">
@@ -1004,6 +1149,31 @@ p104
 <member name="M:p104.SpriteLive2dImage.CalculateRect">
  <summary>
  通过三个顶点计算外围矩形
+ </summary>
+</member>
+<member name="T:p104.StateMachine">
+ <summary>
+ 状态机类
+ </summary>
+</member>
+<member name="F:p104.StateMachine.TransitionFunction">
+ <summary>
+ (nowState,input)
+ </summary>
+</member>
+<member name="T:p104.StateMachineSingleState">
+ <summary>
+ 状态机单个状态类
+ </summary>
+</member>
+<member name="T:p104.StateMachineInputAlphabet">
+ <summary>
+ 状态机改变输入参数枚举
+ </summary>
+</member>
+<member name="T:p104.StateMachineSingleProcessStatus">
+ <summary>
+ 状态机单个状态进度枚举
  </summary>
 </member>
 <member name="T:p104.UnitDetailDialog">

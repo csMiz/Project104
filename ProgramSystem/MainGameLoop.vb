@@ -148,6 +148,8 @@ Public Class MainGameLoop
         Loop
     End Sub
 
+
+
     Public Function GetFPS() As Integer
         Return Me.PaintFPS
     End Function

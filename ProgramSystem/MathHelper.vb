@@ -15,10 +15,16 @@ Public Class MathHelper
         Return Sqrt((a.X - b.X) ^ 2 + (a.Y - b.Y) ^ 2)
     End Function
 
+    ''' <summary>
+    ''' 获取0到1之间的随机数
+    ''' </summary>
     Public Shared Function GetRandom() As Double
         Return Rnd.NextDouble
     End Function
 
+    ''' <summary>
+    ''' 按英文逗号分隔符转换PointI3对象
+    ''' </summary>
     Public Shared Function ParsePointI3(input As String) As PointI3
         Dim value() As String = Regex.Split(input, COMMA)
         Dim result As New PointI3 With {
@@ -27,7 +33,9 @@ Public Class MathHelper
             .Z = CShort(value(2))}
         Return result
     End Function
-
+    ''' <summary>
+    ''' 按英文逗号分隔符转换PointI对象
+    ''' </summary>
     Public Shared Function ParsePointI(input As String) As PointI
         Dim value() As String = Regex.Split(input, COMMA)
         Dim result As New PointI With {
@@ -77,6 +85,9 @@ Public Structure PointI
     End Sub
 End Structure
 
+''' <summary>
+''' XYZ均为Short类型的Point结构体
+''' </summary>
 Public Structure PointI3
     Public Property X As Short
     Public Property Y As Short
@@ -89,5 +100,4 @@ Public Structure PointI3
     End Sub
 
 End Structure
-
 
