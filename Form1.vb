@@ -62,6 +62,10 @@ L1:
         End If
     End Sub
 
+    Private Sub Form1_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
+        test.MainGame.MainMenu.TriggerMouseMove(e)
+    End Sub
+
     'Public Sub test_keydown(sender As Object, args As KeyboardInputEventArgs)
 
     '    If (args.Key = Keys.W) Then

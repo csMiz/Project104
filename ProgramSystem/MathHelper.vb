@@ -44,6 +44,19 @@ Public Class MathHelper
         Return result
     End Function
 
+    Public Shared Function Size2RawRect(input As PointI) As SharpDX.Mathematics.Interop.RawRectangleF
+        Dim result As New SharpDX.Mathematics.Interop.RawRectangleF With {
+            .Left = 0,
+            .Top = 0,
+            .Right = input.X,
+            .Bottom = input.Y}
+        Return result
+    End Function
+
+    Public Shared Function GetAverage2(a As Single, b As Single) As Single
+        Return (a + b) / 2
+    End Function
+
 End Class
 
 ''' <summary>
@@ -100,4 +113,6 @@ Public Structure PointI3
     End Sub
 
 End Structure
+
+
 

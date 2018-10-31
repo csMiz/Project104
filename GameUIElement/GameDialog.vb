@@ -1,9 +1,12 @@
 ﻿
-Imports Sharpdx.Direct2d1
+Imports p104
+Imports SharpDX.Direct2D1
 ''' <summary>
 ''' 游戏对话框基类
 ''' </summary>
 Public MustInherit Class GameDialog
+    Inherits GameBasicUIElement
+
     Protected Property Width As Integer
     Protected Property Height As Integer
     Protected Camera As SpectatorCamera = Nothing
@@ -20,17 +23,6 @@ Public MustInherit Class GameDialog
             .Height = inputHeight
             .Camera = spec
         End With
-    End Sub
-
-    Public MustOverride Sub PaintDialog(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
-
-    Public Sub MouseDown(e As MouseEventArgs)
-    End Sub
-
-    Public Sub MouseMove(e As MouseEventArgs)
-    End Sub
-
-    Public Sub MouseUp(e As MouseEventArgs)
     End Sub
 
 End Class

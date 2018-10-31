@@ -40,11 +40,11 @@ Public Class TextResource
 End Class
 
 Public Class TextItem
-    Private Text As String
+    Public Text As String
     Private UsingFontFamily As System.Drawing.FontFamily
     Private FontSize As Single
     Private FontColor As SolidBrush
-    Private FontImage As Sharpdx.Direct2d1.Bitmap
+    Public FontImage As SharpDX.Direct2D1.Bitmap
     Private ImageSize As PointI
 
     Public Sub New(printText As String, rectSize As PointI)
@@ -62,12 +62,11 @@ Public Class TextItem
         Dim bitmap As New System.Drawing.Bitmap(ImageSize.X, ImageSize.Y)
         Dim G As Graphics = Graphics.FromImage(bitmap)
         G.DrawString(Text, New Drawing.Font(UsingFontFamily, FontSize), FontColor, 0, 0)
+        G.Dispose()
+        If Me.FontImage IsNot Nothing Then Me.FontImage.Dispose()
         FontImage = GameResources.LoadBitmap(rt, bitmap)
+        bitmap.Dispose()
     End Sub
-
-    Public Function GetImage() As Sharpdx.Direct2d1.Bitmap
-        Return FontImage
-    End Function
 
 End Class
 

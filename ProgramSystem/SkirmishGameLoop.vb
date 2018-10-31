@@ -56,6 +56,8 @@ Public Class SkirmishGameLoop
     ''' </summary>
     Public BuildingList As New List(Of GameBuilding)
 
+    Public SkirmishUnitDetailDialog As UnitDetailDialog = UnitDetailDialog.Instance
+
 
 
     Public Sub StartLoadSkirmishMapResources(missionIndex As Short)
@@ -173,7 +175,7 @@ Public Class SkirmishGameLoop
     End Sub
 
     ''' <summary>
-    ''' 初始化GameLoop状态机并启动
+    ''' 初始化GameLoop状态机
     ''' </summary>
     Public Sub InitializeSkirmishGamePhases()
         Dim phases As New List(Of StateMachineSingleState)
@@ -246,20 +248,27 @@ Public Class SkirmishGameLoop
         End With
 
         Me.SkirmishGamePhases.InitializeStateMachine(phases, transition)
+
+    End Sub
+
+    ''' <summary>
+    ''' 开始遭遇战游戏流程
+    ''' </summary>
+    Public Sub StartSkirmishGameStateMachine()
+
         Me.SkirmishGlobalStateIndex = SingleGameLoopStage.OutOfTurn
         Me.ResetUnitStateCounter()
 
         '全局状态进入回合开始阶段
-        Dim tmpGlobalPhase As SkirmishPhaseSingleState = Me.SkirmishGamePhases.NextState(Me.SkirmishGlobalStateIndex, StateMachineInputAlphabet.StateGo)
+        Dim tmpGlobalPhase As SkirmishPhaseSingleState = Me.SkirmishGamePhases.NextState(Me.SkirmishGlobalStateIndex, SkirmishStateMachineInputAlphabet.NormalGo)
         tmpGlobalPhase.Trigger(Me)
         '每个单位状态进入回合开始阶段
         For Each tmpUnit As GameUnit In UnitList
             If tmpUnit.Player = 0 Then
-                Dim tmpPhase As SkirmishPhaseSingleState = Me.SkirmishGamePhases.NextState(tmpUnit.UnitPhase, StateMachineInputAlphabet.StateGo)
+                Dim tmpPhase As SkirmishPhaseSingleState = Me.SkirmishGamePhases.NextState(tmpUnit.UnitPhase, SkirmishStateMachineInputAlphabet.NormalGo)
                 tmpPhase.Trigger(tmpUnit)
             End If
         Next
-
 
     End Sub
 
@@ -268,6 +277,7 @@ Public Class SkirmishGameLoop
     ''' </summary>
     Public Sub UnitGoNextState1(sender As GameUnit)
         Me.MarkUnitStateCompleteCounter()
+        Debug.WriteLine("已完成:" & sender.ShownName)
     End Sub
     Public Sub GlobalGoNextState1(sender As SkirmishGameLoop)
         Dim processContent = Async Sub()
@@ -276,12 +286,13 @@ Public Class SkirmishGameLoop
                                  Loop
                                  Me.ResetUnitStateCounter()
 
-                                 Dim tmpGlobalPhase As SkirmishPhaseSingleState = Me.SkirmishGamePhases.NextState(sender.SkirmishGlobalStateIndex, StateMachineInputAlphabet.StateGo)
+                                 Dim tmpGlobalPhase As SkirmishPhaseSingleState = Me.SkirmishGamePhases.NextState(sender.SkirmishGlobalStateIndex, SkirmishStateMachineInputAlphabet.NormalGo)
                                  tmpGlobalPhase.Trigger(sender)
                                  For Each tmpUnit As GameUnit In sender.UnitList
                                      If tmpUnit.Player = 0 Then
-                                         Dim tmpPhase As SkirmishPhaseSingleState = Me.SkirmishGamePhases.NextState(tmpUnit.UnitPhase, StateMachineInputAlphabet.StateGo)
+                                         Dim tmpPhase As SkirmishPhaseSingleState = Me.SkirmishGamePhases.NextState(tmpUnit.UnitPhase, SkirmishStateMachineInputAlphabet.NormalGo)
                                          tmpPhase.Trigger(tmpUnit)
+                                         Await Task.Delay(50)
                                      End If
                                  Next
 
@@ -291,7 +302,7 @@ Public Class SkirmishGameLoop
     End Sub
 
     ''' <summary>
-    ''' 用于主要阶段。全局状态停留在主要阶段1直到所有单位完成行动，单位可以处于主要阶段，战斗阶段。
+    ''' 用于主要阶段。全局状态停留在主要阶段1直到所有单位完成行动。
     ''' </summary>
     Public Sub UnitGoNextState2(sender As GameUnit)
         Throw New NotImplementedException()
@@ -328,8 +339,10 @@ Public Class SkirmishGameLoop
     ''' </summary>
     ''' <returns></returns>
     Public Function AllUnitStateComplete() As Boolean
-        Debug.WriteLine("单位状态计数器： " & Me.UnitStateCompleteCounter & " / " & Me.UnitStateCompleteCounterExpectValue)
-        Return Not CBool(Me.UnitStateCompleteCounter - Me.UnitStateCompleteCounterExpectValue)
+        Dim a As Integer = Me.UnitStateCompleteCounter
+        Dim b As Integer = Me.UnitStateCompleteCounterExpectValue
+        Debug.WriteLine("单位状态计数器： " & a & " / " & b)
+        Return Not CBool(a - b)
     End Function
 
     Public Function CheckTurnCountWin() As Boolean

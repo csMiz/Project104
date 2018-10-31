@@ -63,13 +63,19 @@ Module GameResources
     Public Const SKIRMISH_FRAGMENT_DOMAIN As String = "skirmish_unit"
     Public Const SKIRMISH_IMAGE_GROUP As String = "skirmish_chess"
     Public Const NOT_TRANSPARENT As Single = 1.0F
+    Public Const UNIT_DETAIL_HV_RATIO As Single = 1.618
+    Public ReadOnly ROOT_FIVE As Single = Sqrt(5)
+    Public ReadOnly ROOT_THREE As Single = Sqrt(3)
+    Public Const ONE_THIRD As Single = 1 / 3
 
     ''' <summary>
     ''' 阵营颜色预设列表
     ''' </summary>
     Public SIDE_COLOUR As List(Of SolidColorBrushSet) = Nothing
-
-    Public GREY_COLOUR As New List(Of SolidColorBrush)
+    ''' <summary>
+    ''' 由透明到不透明的黑色SolidBrush，索引为0到4
+    ''' </summary>
+    Public GREY_COLOUR As List(Of SolidColorBrush)
     Public WHITE_COLOUR As New RawColor4(1, 1, 1, 1)
 
     Public NORMAL_BITMAP_PROPERTY As BitmapProperties1 = New BitmapProperties1() With {
@@ -115,7 +121,15 @@ Module GameResources
         GameIcons.LoadFromFiles(context)
 
         SIDE_COLOUR = SolidColorBrushSet.LoadFromXml(context, My.Resources.Colours)
-        GREY_COLOUR.Add(New SolidColorBrush(context, New RawColor4(0, 0, 0, 0.5)))
+
+        GREY_COLOUR = New List(Of SolidColorBrush)
+        With GREY_COLOUR
+            .Add(New SolidColorBrush(context, New RawColor4(0, 0, 0, 0.5 * ONE_THIRD)))
+            .Add(New SolidColorBrush(context, New RawColor4(0, 0, 0, ONE_THIRD)))
+            .Add(New SolidColorBrush(context, New RawColor4(0, 0, 0, 0.5)))
+            .Add(New SolidColorBrush(context, New RawColor4(0, 0, 0, 0.5 + 0.5 * ONE_THIRD)))
+            .Add(New SolidColorBrush(context, New RawColor4(0, 0, 0, 0.5 + ONE_THIRD)))
+        End With
 
         GameFontHelper.AddFontFile(Application.StartupPath & "\P104_Font1.ttf", "P104_Font1")
 

@@ -536,6 +536,154 @@ p104
  根据index获取英雄模板
  </summary>
 </member>
+<member name="T:p104.GameBasicUIElement">
+ <summary>
+ 游戏UI控件基类
+ </summary>
+</member>
+<member name="F:p104.GameBasicUIElement.BasicRect">
+ <summary>
+ 内容框矩形
+ </summary>
+</member>
+<member name="M:p104.GameBasicUIElement.InitializeBasicRect(System.Int32,System.Int32,System.Int32,System.Int32)">
+ <summary>
+ 初始化矩形框
+ </summary>
+</member>
+<member name="T:p104.GameButton">
+ <summary>
+ Button基类
+ </summary>
+</member>
+<member name="T:p104.GameContentFrame">
+ <summary>
+ 内容框控件类
+ </summary>
+</member>
+<member name="T:p104.GameDialog">
+ <summary>
+ 游戏对话框基类
+ </summary>
+</member>
+<member name="M:p104.GameDialog.InitializeDialog(System.Int32,System.Int32,p104.SpectatorCamera)">
+ <summary>
+ 初始化对话框
+ </summary>
+ <param name="inputWidth">宽度</param>
+ <param name="inputHeight">长度</param>
+ <param name="spec">Spectator</param>
+</member>
+<member name="T:p104.GameFlatButton">
+ <summary>
+ 扁平化按钮控件类
+ </summary>
+</member>
+<member name="M:p104.GamePageProperty.TriggerMouseMove(System.Windows.Forms.MouseEventArgs)">
+ <summary>
+ 触发MouseMove, MouseEnter, MouseLeave
+ </summary>
+</member>
+<member name="T:p104.UnitDetailDialog">
+ <summary>
+ Skirmish模式下的单位详细信息面板类
+ </summary>
+</member>
+<member name="F:p104.UnitDetailDialog.Rect_BG">
+ <summary>
+ 背景矩形，应该初始化为全屏
+ </summary>
+</member>
+<member name="F:p104.UnitDetailDialog.Rect_Content">
+ <summary>
+ 内容矩形
+ </summary>
+</member>
+<member name="F:p104.UnitDetailDialog.Rect_LeftBar">
+ <summary>
+ 左侧立绘区矩形
+ </summary>
+</member>
+<member name="F:p104.UnitDetailDialog.Line_LeftBar_Right">
+ <summary>
+ 立绘区右侧分隔线
+ </summary>
+</member>
+<member name="F:p104.UnitDetailDialog.Rect_AtkBar">
+ <summary>
+ 攻击力区矩形
+ </summary>
+</member>
+<member name="F:p104.UnitDetailDialog.Line_AtkBar_Right">
+ <summary>
+ 攻击力区右侧分隔线
+ </summary>
+</member>
+<member name="F:p104.UnitDetailDialog.Line_AtkBar_Bottom">
+ <summary>
+ 攻击力区底部分隔线
+ </summary>
+</member>
+<member name="F:p104.UnitDetailDialog.Rect_DefBar">
+ <summary>
+ 防御力区矩形
+ </summary>
+</member>
+<member name="F:p104.UnitDetailDialog.Line_DefBar_Bottom">
+ <summary>
+ 防御力区底部分隔线
+ </summary>
+</member>
+<member name="F:p104.UnitDetailDialog.Rect_SkillTreeBar">
+ <summary>
+ 技能树区矩形
+ </summary>
+</member>
+<member name="F:p104.UnitDetailDialog.Line_SkillTree_Right">
+ <summary>
+ 技能树区右侧分隔线
+ </summary>
+</member>
+<member name="F:p104.UnitDetailDialog.Rect_SkillBar">
+ <summary>
+ 技能槽区矩形
+ </summary>
+</member>
+<member name="F:p104.UnitDetailDialog.Line_SkillBar_Bottom">
+ <summary>
+ 技能槽区底部分隔线
+ </summary>
+</member>
+<member name="F:p104.UnitDetailDialog.SourceBGBrush">
+ <summary>
+ 模糊后图像画笔
+ </summary>
+</member>
+<member name="F:p104.UnitDetailDialog.DialogBitmap">
+ <summary>
+ 绘制原图的画布对象
+ </summary>
+</member>
+<member name="F:p104.UnitDetailDialog.BlurBitmap">
+ <summary>
+ 绘制模糊背景的画布对象
+ </summary>
+</member>
+<member name="F:p104.UnitDetailDialog.BlurEffectLayer">
+ <summary>
+ 背景高斯模糊效果
+ </summary>
+</member>
+<member name="M:p104.UnitDetailDialog.DrawControl(SharpDX.Direct2D1.DeviceContext@,p104.SpectatorCamera@,SharpDX.Direct2D1.Bitmap1)">
+ <summary>
+ 绘制对话框
+ </summary>
+</member>
+<member name="M:p104.UnitDetailDialog.Instance">
+ <summary>
+ 单例模式
+ </summary>
+</member>
 <member name="T:p104.GameMap">
  <summary>
  游戏世界大地图的地图类
@@ -700,6 +848,11 @@ p104
  阵营颜色预设列表
  </summary>
 </member>
+<member name="F:p104.GameResources.GREY_COLOUR">
+ <summary>
+ 由透明到不透明的黑色SolidBrush，索引为0到4
+ </summary>
+</member>
 <member name="M:p104.GameResources.LoadResources(SharpDX.Direct2D1.DeviceContext)">
  <summary>
  加载资源
@@ -760,19 +913,6 @@ p104
  <summary>
  游戏测试类
  </summary>
-</member>
-<member name="T:p104.GameDialog">
- <summary>
- 游戏对话框基类
- </summary>
-</member>
-<member name="M:p104.GameDialog.InitializeDialog(System.Int32,System.Int32,p104.SpectatorCamera)">
- <summary>
- 初始化对话框
- </summary>
- <param name="inputWidth">宽度</param>
- <param name="inputHeight">长度</param>
- <param name="spec">Spectator</param>
 </member>
 <member name="T:p104.IGameImage">
  <summary>
@@ -909,6 +1049,11 @@ p104
  受到监视的属性类
  </summary>
 </member>
+<member name="T:p104.Quadtree">
+ <summary>
+ 四叉树类
+ </summary>
+</member>
 <member name="T:p104.SkirmishGameLoop">
  <summary>
  遭遇战GameLoop
@@ -962,7 +1107,12 @@ p104
 </member>
 <member name="M:p104.SkirmishGameLoop.InitializeSkirmishGamePhases">
  <summary>
- 初始化GameLoop状态机并启动
+ 初始化GameLoop状态机
+ </summary>
+</member>
+<member name="M:p104.SkirmishGameLoop.StartSkirmishGameStateMachine">
+ <summary>
+ 开始遭遇战游戏流程
  </summary>
 </member>
 <member name="M:p104.SkirmishGameLoop.UnitGoNextState1(p104.GameUnit)">
@@ -972,7 +1122,7 @@ p104
 </member>
 <member name="M:p104.SkirmishGameLoop.UnitGoNextState2(p104.GameUnit)">
  <summary>
- 用于主要阶段。全局状态停留在主要阶段1直到所有单位完成行动，单位可以处于主要阶段，战斗阶段。
+ 用于主要阶段。全局状态停留在主要阶段1直到所有单位完成行动。
  </summary>
 </member>
 <member name="M:p104.SkirmishGameLoop.MarkUnitStateCompleteCounter(System.Int16)">
@@ -1174,21 +1324,6 @@ p104
 <member name="T:p104.StateMachineSingleProcessStatus">
  <summary>
  状态机单个状态进度枚举
- </summary>
-</member>
-<member name="T:p104.UnitDetailDialog">
- <summary>
- Skirmish模式下的单位详细信息面板类
- </summary>
-</member>
-<member name="M:p104.UnitDetailDialog.PaintDialog(SharpDX.Direct2D1.DeviceContext@,p104.SpectatorCamera@,SharpDX.Direct2D1.Bitmap1)">
- <summary>
- 绘制对话框
- </summary>
-</member>
-<member name="M:p104.UnitDetailDialog.Instance">
- <summary>
- 单例模式
  </summary>
 </member>
 </members>

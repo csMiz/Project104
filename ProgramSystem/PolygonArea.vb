@@ -5,6 +5,11 @@ Public Class PolygonArea
     Implements IMouseArea
 
     Public Points As New List(Of PointF2)
+    Public Event MouseDown(e As MouseEventArgs) Implements IMouseArea.MouseDown
+    Public Event MouseMove(e As MouseEventArgs) Implements IMouseArea.MouseMove
+    Public Event MouseUp(e As MouseEventArgs) Implements IMouseArea.MouseUp
+    Public Event MouseEnter() Implements IMouseArea.MouseEnter
+    Public Event MouseLeave() Implements IMouseArea.MouseLeave
 
     Public Function IsInside(input As PointF2) As Boolean Implements IMouseArea.IsInside
         'http://www.html-js.com/article/1538

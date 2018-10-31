@@ -1,6 +1,7 @@
 ﻿
 Imports System.Threading
 Imports SharpDX.Direct2D1
+Imports SharpDX.Mathematics.Interop
 ''' <summary>
 ''' 游戏主流程
 ''' </summary>
@@ -18,11 +19,43 @@ Public Class MainGameLoop
     Private Delegate Sub SimplePaint()
     Private CameraPaint As SimplePaint
 
-    Private Skirmish As SkirmishGameLoop
+    Public MainMenu As New GamePageProperty
+    Public Skirmish As SkirmishGameLoop
 
     Private PaintThread As Thread = New Thread(AddressOf PaintGameImage)
     Private PaintFPS As Integer = 0
 
+    Public Sub LoadMainMenu()
+        Dim btnMissionSelect As New GameFlatButton
+        With btnMissionSelect
+            .BindDeviceContext(Me.CameraD2DContext)
+            .BorderColour = New SolidColorBrush(Me.CameraD2DContext, New RawColor4(0.9, 0.9, 0.9, 1))
+            .InitializeBasicRect(Camera.Resolve.X / 2 - 200, 400, Camera.Resolve.X / 2 + 200, 450)
+            .Text = "Mission Select"
+        End With
+        Dim tmpMouseEnter = Sub()
+                                btnMissionSelect.BorderColour = New SolidColorBrush(Me.CameraD2DContext, New RawColor4(1, 0, 0, 1))
+                            End Sub
+        Dim tmpMouseLeave = Sub()
+                                btnMissionSelect.BorderColour = New SolidColorBrush(Me.CameraD2DContext, New RawColor4(0.9, 0.9, 0.9, 1))
+                            End Sub
+        AddHandler btnMissionSelect.MouseEnter, tmpMouseEnter
+        AddHandler btnMissionSelect.MouseLeave, tmpMouseLeave
+
+        Dim btnExitGame As New GameFlatButton
+        With btnExitGame
+            .BindDeviceContext(Me.CameraD2DContext)
+            .BorderColour = New SolidColorBrush(Me.CameraD2DContext, New RawColor4(0.9, 0.9, 0.9, 1))
+            .InitializeBasicRect(Camera.Resolve.X / 2 - 200, 460, Camera.Resolve.X / 2 + 200, 510)
+            .Text = "End Game"
+        End With
+
+        Me.MainMenu.UIElements.Add(btnMissionSelect)
+        Me.MainMenu.UIElements.Add(btnExitGame)
+
+        Me.MainMenu.GenerateElementsQuadtree(Me.Camera.Resolve)
+        Me.MainMenu.InitializeCursor(Me.Camera.Resolve.X / 2, Me.Camera.Resolve.Y / 2)
+    End Sub
 
     ''' <summary>
     ''' 加载全局资源，用户设置，不载入存档
@@ -35,6 +68,7 @@ Public Class MainGameLoop
     Private Sub LoadGlobalResources()
         Me.GameLoaded = MapLoadStatus.Loading
         Call GameResources.LoadResources(CameraD2DContext)
+        Call Me.LoadMainMenu()
         Me.GameLoaded = MapLoadStatus.Loaded
     End Sub
 
@@ -120,6 +154,16 @@ Public Class MainGameLoop
             Me.PaintThread.Abort()
         Catch ex As Exception
         End Try
+    End Sub
+
+    Public Sub DrawMainMenu()
+        With Me.Camera
+            .PaintingLayers.Clear()
+            .PaintingLayersDescription.Clear()
+
+            .PaintingLayers.Push(AddressOf Me.MainMenu.PaintMainMenuElements)
+            .PaintingLayersDescription.Push(GameImageLayer.MainMenu)
+        End With
     End Sub
 
     Public Sub DrawSkirmish()

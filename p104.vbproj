@@ -115,6 +115,14 @@
     <Compile Include="GameObject\SkillSystem\SkillRepository.vb" />
     <Compile Include="GameObject\UnitImageRepository.vb" />
     <Compile Include="GameObject\UnitTemplateRepository.vb" />
+    <Compile Include="GameUIElement\GameBasicUIElement.vb" />
+    <Compile Include="GameUIElement\GameButton.vb" />
+    <Compile Include="GameUIElement\GameContentFrame.vb" />
+    <Compile Include="GameUIElement\GameDialog.vb" />
+    <Compile Include="GameUIElement\GameFlatButton.vb" />
+    <Compile Include="GameUIElement\GamePageProperty.vb" />
+    <Compile Include="GameUIElement\IAnimatedControl.vb" />
+    <Compile Include="GameUIElement\UnitDetailDialog.vb" />
     <Compile Include="MapObject\GameMap.vb" />
     <Compile Include="MapObject\MapBlock.vb" />
     <Compile Include="MapObject\SkirmishMap.vb" />
@@ -147,9 +155,8 @@
     <Compile Include="ProgramSystem\GameStaticImage.vb" />
     <Compile Include="ProgramSystem\GameTeamInfo.vb" />
     <Compile Include="ProgramSystem\GameTest.vb" />
-    <Compile Include="ProgramSystem\GameDialog.vb" />
     <Compile Include="ProgramSystem\IGameImage.vb" />
-    <Compile Include="ProgramSystem\IMouseArea.vb" />
+    <Compile Include="GameUIElement\IMouseArea.vb" />
     <Compile Include="ProgramSystem\IntegerProperty.vb" />
     <Compile Include="ProgramSystem\ISaveProperty.vb" />
     <Compile Include="ProgramSystem\LoggingService.vb" />
@@ -157,13 +164,13 @@
     <Compile Include="ProgramSystem\MathHelper.vb" />
     <Compile Include="ProgramSystem\MonitoredProperty.vb" />
     <Compile Include="ProgramSystem\PolygonArea.vb" />
+    <Compile Include="ProgramSystem\Quadtree.vb" />
     <Compile Include="ProgramSystem\SingleProperty.vb" />
     <Compile Include="ProgramSystem\SkirmishGameLoop.vb" />
     <Compile Include="ProgramSystem\SpectatorCamera.vb" />
     <Compile Include="ProgramSystem\BasicImageRepository.vb" />
     <Compile Include="ProgramSystem\SpriteLive2dImage.vb" />
     <Compile Include="ProgramSystem\StateMachine.vb" />
-    <Compile Include="ProgramSystem\UnitDetailDialog.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Form1.resx">
@@ -220,5 +227,6 @@
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

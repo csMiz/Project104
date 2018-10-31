@@ -33,7 +33,10 @@ Public Class GameTest
         Dim loadResult As Integer = Await MainGame.WaitForLoad()
 
         'TODO: draw main menu
-        'MainGame.DrawMainMenu()
+        MainGame.DrawMainMenu()
+
+        MainGame.StartPaint()
+        Return
 
         'user select "New Game"
         MainGame.StartLoadSave(-1)
@@ -49,7 +52,22 @@ Public Class GameTest
         MainGame.StartPaint()
 
         'start state machine
+        MainGame.Skirmish.StartSkirmishGameStateMachine()
+        'state machine should stop at Main_A_Phase
 
+        'open unit detail dialog
+        'TODO: put initialize codes into LoadResources
+        Dialog.InitializeDialog(myCamera.Resolve.X, myCamera.Resolve.Y, myCamera)
+        Dialog.BindUnit(UnitTemplates.GetWrappedHeroTemplate(0))
+        Dialog.InitializeColor()
+        Dialog.InitializeConetentBox()
+        Dialog.InitializeEffects()
+
+        'TODO: put painting code into SkirmishGameLoop
+        myCamera.PaintingLayers.Push(AddressOf Dialog.DrawControl)
+        myCamera.PaintingLayersDescription.Push(GameImageLayer.Skirmish_UnitDetail)
+
+        Application.DoEvents()
 
     End Function
 
@@ -144,7 +162,7 @@ Public Class GameTest
         Dialog.InitializeColor()
         Dialog.InitializeConetentBox()
 
-        User.PaintingLayers.Push(AddressOf Dialog.PaintDialog)
+        User.PaintingLayers.Push(AddressOf Dialog.DrawControl)
         User.PaintingLayersDescription.Push(GameImageLayer.Skirmish_UnitDetail)
 
         Application.DoEvents()
