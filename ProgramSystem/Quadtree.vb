@@ -50,7 +50,7 @@ Public Class Quadtree
         End If
     End Sub
 
-    Public Function Find(point As Point) As List(Of IQuadtreeRecognizable)
+    Public Function Find(point As PointI) As List(Of IQuadtreeRecognizable)
 
         Dim result As New List(Of IQuadtreeRecognizable)
 
@@ -85,7 +85,7 @@ End Class
 Public Interface IQuadtreeRecognizable
 
     Function CompareRegionDirection(input As PointI) As QuadtreeDirection
-    Function IsInside(input As Point) As Boolean
+    Function IsInside(input As PointI) As Boolean
 
 
 End Interface

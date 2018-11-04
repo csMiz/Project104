@@ -29,9 +29,13 @@ Public Class SpectatorCamera
     ''' </summary>
     Public PaintingLayers As New Stack(Of Draw)
     ''' <summary>
-    ''' 图层说明，用于鼠标点击判定
+    ''' 图层说明
     ''' </summary>
     Public PaintingLayersDescription As New Stack(Of GameImageLayer)
+    ''' <summary>
+    ''' 图层控件页，用于鼠标点击判定，可以不与绘图图层同步
+    ''' </summary>
+    Public ActivePages As New List(Of GamePageProperty)
     ''' <summary>
     ''' d2d画布对象
     ''' </summary>

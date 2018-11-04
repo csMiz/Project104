@@ -11,6 +11,8 @@ Public Class SkirmishMap
 
     Public Property ResourcesLoaded As Boolean = False
 
+    Public MovementGlance As New List(Of MovementGlanceNode)
+
     Public Sub New()
         For i = 0 To 49
             For j = 0 To 49
@@ -142,10 +144,12 @@ Public Class SkirmishMap
         UpdateBlocksInCamera(drawRangeX - 5, drawRangeX + 5, drawRangeY - 5, drawRangeY + 5, spectator.CameraFocus, spectator.Resolve, zoom)
 
         With context
-            For j = 0 To PaintOrderList.Count - 1
+            For i = 0 To PaintOrderList.Count - 1
                 '画地图块
-                Dim block As SkirmishMapBlock = PaintOrderList(j)
-                block.PaintMapBlock(context)
+                Dim block As SkirmishMapBlock = PaintOrderList(i)
+                If block.Terrain <> TerrainType.None Then
+                    block.PaintMapBlock(context)
+                End If
             Next
 
             '画参考中央圈
@@ -158,10 +162,119 @@ Public Class SkirmishMap
 
     End Sub
 
+    ''' <summary>
+    ''' 生成角色行动范围
+    ''' </summary>
+    ''' <param name="targetUnit">选定操作的角色</param>
+    Public Sub GenerateMoveRange(targetUnit As GameUnit)
+        Me.MovementGlance.Clear()
+        Dim startPoint As New MovementGlanceNode With {
+            .Position = targetUnit.Position2,
+            .Parent = Nothing,
+            .CumulativeMovePoint = 0.0F}
+        Me.MovementGlance.Add(startPoint)
+
+        Call Me.ExpandMovementNode(startPoint, targetUnit)
+        Call PrintMovementGlance()
+    End Sub
+
+    ''' <summary>
+    ''' 打印角色行动范围结果
+    ''' </summary>
+    Public Sub PrintMovementGlance()
+        Dim result As String = "MOV Glance: [" & vbCrLf
+        For j = 0 To 9
+            For i = 0 To 9
+                Dim tmpPoint As MovementGlanceNode = GlanceContains(New PointI(i, j))
+                If tmpPoint IsNot Nothing Then
+                    result = result & tmpPoint.CumulativeMovePoint & ","
+                Else
+                    result = result & "x,"
+                End If
+            Next
+            result = result & vbCrLf
+        Next
+        Debug.Print(result & "]" & vbCrLf)
+    End Sub
+
+    Public Function GlanceContains(position As PointI) As MovementGlanceNode
+        For Each item In Me.MovementGlance
+            If item.Position.X = position.X AndAlso item.Position.Y = position.Y Then
+                Return item
+            End If
+        Next
+        Return Nothing
+    End Function
+
+    Public Sub ExpandMovementNode(targetNode As MovementGlanceNode, targetUnit As GameUnit)
+        Dim nodePosition As PointI = targetNode.Position
+        Dim cumulativePoint As Single = targetNode.CumulativeMovePoint
+        Dim pointUBound As Single = targetUnit.FinalMovePoint
+
+        'top(0,-1) tl(-1,0)or(-1,-1) tr(1,0)or(1,-1) bl(-1,1)or(-1,0) br(1,1)or(1,0) bottom(0,1)
+        Dim neighbour As New List(Of PointI)
+        If nodePosition.Y <> 0 Then neighbour.Add(New PointI(0, -1))    'top
+        If nodePosition.Y <> 49 Then neighbour.Add(New PointI(0, 1))    'bottom
+        If CBool(nodePosition.X Mod 2) Then    'type 2
+            With neighbour
+                If nodePosition.X <> 0 Then .Add(New PointI(-1, 0))                                 'top_left
+                If nodePosition.X <> 49 Then .Add(New PointI(1, 0))                                 'top_right
+                If nodePosition.X <> 0 AndAlso nodePosition.Y <> 49 Then .Add(New PointI(-1, 1))    'bottom_left
+                If nodePosition.X <> 49 AndAlso nodePosition.Y <> 49 Then .Add(New PointI(1, 1))    'bottom_right
+            End With
+        Else    'type 1
+            With neighbour
+                If nodePosition.X <> 0 AndAlso nodePosition.Y <> 0 Then .Add(New PointI(-1, -1))    'top_left
+                If nodePosition.X <> 49 AndAlso nodePosition.Y <> 0 Then .Add(New PointI(1, -1))    'top_right
+                If nodePosition.X <> 0 Then .Add(New PointI(-1, 0))                                 'bottom_left
+                If nodePosition.X <> 49 Then .Add(New PointI(1, 0))                                 'bottom_right
+            End With
+        End If
+
+        For Each delta As PointI In neighbour
+            Dim tmpPosition As New PointI(nodePosition.X + delta.X, nodePosition.Y + delta.Y)
+            Dim neighbour_terrain As TerrainType = Blocks(tmpPosition.X, tmpPosition.Y).Terrain
+            Dim deltaAltitude As Short = Blocks(tmpPosition.X, tmpPosition.Y).Altitude - Blocks(nodePosition.X, nodePosition.Y).Altitude
+            Dim cost As Single = cumulativePoint + SkirmishTerrain.CalculateFinalTerrainCost(neighbour_terrain, targetUnit, deltaAltitude)
+            'checkUnitOccupied(cost,new pointi(nodePosition.X, nodePosition.Y - 1))
+            '              => function(byref cost, pos):if occupied then cost = 999
+            If cost <= pointUBound Then
+                Dim comparePoint As MovementGlanceNode = GlanceContains(tmpPosition)
+                If comparePoint Is Nothing Then
+                    Dim tmpNewNode As New MovementGlanceNode With {
+                        .Position = tmpPosition,
+                        .Parent = targetNode,
+                        .CumulativeMovePoint = cost}
+                    Me.MovementGlance.Add(tmpNewNode)
+                    Call ExpandMovementNode(tmpNewNode, targetUnit)
+                Else
+                    If cost < comparePoint.CumulativeMovePoint Then
+                        With comparePoint
+                            .Parent = targetNode
+                            .CumulativeMovePoint = cost
+                        End With
+                        Call ExpandMovementNode(comparePoint, targetUnit)
+                    End If
+                End If
+            End If
+
+        Next
+
+    End Sub
 
 
     Public Sub Dispose()
 
     End Sub
+
+End Class
+
+''' <summary>
+''' 行动预览节点类
+''' </summary>
+Public Class MovementGlanceNode
+    Public Position As PointI = Nothing
+    Public Parent As MovementGlanceNode = Nothing
+    Public CumulativeMovePoint As Single = 0.0F
 
 End Class

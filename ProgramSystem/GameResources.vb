@@ -67,6 +67,7 @@ Module GameResources
     Public ReadOnly ROOT_FIVE As Single = Sqrt(5)
     Public ReadOnly ROOT_THREE As Single = Sqrt(3)
     Public Const ONE_THIRD As Single = 1 / 3
+    Public Const TERRAIN_COST_MAX As Single = 999.9F
 
     ''' <summary>
     ''' 阵营颜色预设列表
@@ -83,6 +84,9 @@ Module GameResources
                               .BitmapOptions = BitmapOptions.Target}
 
     Public ReadOnly ALL_GAME_STAGES As New List(Of SingleGameLoopStage) From {0, 1, 2, 3, 4, 5}
+
+    Public TestTextImage As TextItem
+
 
     ''' <summary>
     ''' 加载资源
@@ -133,11 +137,18 @@ Module GameResources
 
         GameFontHelper.AddFontFile(Application.StartupPath & "\P104_Font1.ttf", "P104_Font1")
 
+        SkirmishTerrain.Initialize()
+
+        TestTextImage = New TextItem("Test String Edge", New PointI(500, 500))
+        TestTextImage.LoadFont(GameFontHelper.GetFontFamily(0), 32, Brushes.Pink, Color.Red)
+        TestTextImage.GenerateImage(context)
+
     End Sub
 
     ''' <summary>
     ''' 将system.drawing.bitmap转换为d2dbitmap
     ''' </summary>
+    <Obsolete("改用wic", False)>
     Public Function LoadBitmap(rt As RenderTarget, drawingBitmap As System.Drawing.Bitmap) As Bitmap
         Dim result As Bitmap = Nothing
         Dim drawingBitmapData As BitmapData = drawingBitmap.LockBits(New Rectangle(0, 0, drawingBitmap.Width, drawingBitmap.Height), ImageLockMode.ReadOnly, Imaging.PixelFormat.Format32bppPArgb)
@@ -146,6 +157,7 @@ Module GameResources
         properties.PixelFormat = New Direct2D1.PixelFormat(DXGI.Format.B8G8R8A8_UNorm, Direct2D1.AlphaMode.Premultiplied)
         result = New Direct2D1.Bitmap(rt, New Size2(drawingBitmap.Width, drawingBitmap.Height), dataStreamxx, drawingBitmapData.Stride, properties)
         drawingBitmap.UnlockBits(drawingBitmapData)
+        dataStreamxx.Dispose()
         Return result
     End Function
 
@@ -158,9 +170,13 @@ Module GameResources
         Dim fileStream As NativeFileStream = New NativeFileStream(filePath, NativeFileMode.Open, NativeFileAccess.Read)
         Dim bitmapDecoder As WIC.BitmapDecoder = New WIC.BitmapDecoder(GameImagingFactory, fileStream, WIC.DecodeOptions.CacheOnDemand)
         Dim frame As WIC.BitmapFrameDecode = bitmapDecoder.GetFrame(0)
-        Dim Converter As WIC.FormatConverter = New WIC.FormatConverter(GameImagingFactory)
-        Converter.Initialize(frame, SharpDX.WIC.PixelFormat.Format32bppPRGBA)
-        Dim newBitmap As Bitmap1 = SharpDX.Direct2D1.Bitmap1.FromWicBitmap(context, Converter)
+        Dim converter As WIC.FormatConverter = New WIC.FormatConverter(GameImagingFactory)
+        converter.Initialize(frame, SharpDX.WIC.PixelFormat.Format32bppPRGBA)
+        Dim newBitmap As Bitmap1 = SharpDX.Direct2D1.Bitmap1.FromWicBitmap(context, converter)
+        fileStream.Dispose()
+        bitmapDecoder.Dispose()
+        frame.Dispose()
+        converter.Dispose()
         Return newBitmap
     End Function
 
@@ -169,12 +185,15 @@ Module GameResources
     ''' </summary>
     ''' <param name="context">d2dContext对象</param>
     ''' <param name="readStream">文件流</param>
-    Public Function LoadBitmapUsingWIC(context As DeviceContext, readStream As System.IO.FileStream) As Bitmap1
+    Public Function LoadBitmapUsingWIC(context As DeviceContext, readStream As System.IO.Stream) As Bitmap1
         Dim bitmapDecoder As WIC.BitmapDecoder = New WIC.BitmapDecoder(GameImagingFactory, readStream, WIC.DecodeOptions.CacheOnDemand)
         Dim frame As WIC.BitmapFrameDecode = bitmapDecoder.GetFrame(0)
         Dim Converter As WIC.FormatConverter = New WIC.FormatConverter(GameImagingFactory)
         Converter.Initialize(frame, SharpDX.WIC.PixelFormat.Format32bppPRGBA)
         Dim newBitmap As Bitmap1 = SharpDX.Direct2D1.Bitmap1.FromWicBitmap(context, Converter)
+        bitmapDecoder.Dispose()
+        frame.Dispose()
+        Converter.Dispose()
         Return newBitmap
     End Function
 
@@ -182,8 +201,10 @@ Module GameResources
         If index = 0 Then
             Return My.Resources.MapScriptTest
         End If
-        Return ""
+        Return vbNullString
     End Function
+
+
 End Module
 
 ''' <summary>

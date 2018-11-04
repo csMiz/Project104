@@ -1,4 +1,6 @@
-﻿''' <summary>
+﻿Imports p104
+Imports SharpDX
+''' <summary>
 ''' 字体助手类
 ''' </summary>
 Public Class FontHelper
@@ -41,9 +43,10 @@ End Class
 
 Public Class TextItem
     Public Text As String
-    Private UsingFontFamily As System.Drawing.FontFamily
-    Private FontSize As Single
-    Private FontColor As SolidBrush
+    Public UsingFontFamily As System.Drawing.FontFamily
+    Public FontSize As Single
+    Public FontColor As SolidBrush
+    Public ReferenceBackgroundColor As System.Drawing.Color
     Public FontImage As SharpDX.Direct2D1.Bitmap
     Private ImageSize As PointI
 
@@ -52,19 +55,27 @@ Public Class TextItem
         ImageSize = rectSize
     End Sub
 
-    Public Sub LoadFont(family As FontFamily, size As Single, color As SolidBrush)
+    Public Sub LoadFont(family As FontFamily, size As Single, color As SolidBrush, refColor As Color)
         UsingFontFamily = family
         FontSize = size
         FontColor = color
+        ReferenceBackgroundColor = refColor
     End Sub
 
     Public Sub GenerateImage(rt As SharpDX.Direct2D1.DeviceContext)
         Dim bitmap As New System.Drawing.Bitmap(ImageSize.X, ImageSize.Y)
         Dim G As Graphics = Graphics.FromImage(bitmap)
+        G.Clear(ReferenceBackgroundColor)
         G.DrawString(Text, New Drawing.Font(UsingFontFamily, FontSize), FontColor, 0, 0)
-        G.Dispose()
+        G.Dispose()    '存在黑边的问题
         If Me.FontImage IsNot Nothing Then Me.FontImage.Dispose()
-        FontImage = GameResources.LoadBitmap(rt, bitmap)
+        bitmap.MakeTransparent(ReferenceBackgroundColor)
+        'FontImage = GameResources.LoadBitmap(rt, bitmap)
+        '改用wic
+        Dim tmpStream As New System.IO.MemoryStream()
+        bitmap.Save(tmpStream, Imaging.ImageFormat.Png)
+        FontImage = LoadBitmapUsingWIC(rt, tmpStream)
+        tmpStream.Dispose()
         bitmap.Dispose()
     End Sub
 
@@ -75,3 +86,152 @@ Public Enum LocaleType As Short
     S_Chinese = 1
     English = 2
 End Enum
+
+'Public Class MyFontContext
+'    Private context As MyFontContext
+'    Private g_dwriteFactory As DirectWrite.Factory
+'    Private hr As Integer
+'    Private cKeys As New List(Of UInteger)
+
+
+
+'    Public Sub New()
+'        g_dwriteFactory.UnregisterFontCollectionLoader(MyFontCollectionLoader.GetLoader())
+'    End Sub
+'    Public Sub New(pFactory As DirectWrite.Factory)
+'        hr = 0
+'        g_dwriteFactory = pFactory
+'    End Sub
+'    Public Function Initialize() As Integer
+'        If hr = 0 Then
+'            hr = InitInternal()
+'        End If
+'        Return hr
+'    End Function
+'    Private Function InitInternal() As Integer
+'        Dim r As Integer = 1        '1 for success
+'        If (Not MyFontCollectionLoader.IsLoaderInitialized()) Then
+'            Return -1       '-1 for fail
+'        End If
+'        'Register our custom loader with the factory object.
+'        g_dwriteFactory.RegisterFontCollectionLoader(MyFontCollectionLoader.GetLoader())
+'        Return r
+'    End Function
+'    Public Function CreateFontCollection(ByRef newCollection As List(Of String), ByRef result As DirectWrite.FontCollection) As Integer
+'        result = Nothing
+'        Dim r As Integer = 1
+
+'        'save new collection in MFFontGlobalsfontCollections vector
+'        Dim collectionKey As UInteger = MyFontGlobals.Push(newCollection)
+'        cKeys.Add(collectionKey)
+
+'        Dim fontCollectionKey As DataPointer = New DataPointer(cKeys.Last, 4)
+
+'        hr = Initialize()
+'        If (hr = -1) Then Return hr
+
+'        result = New DirectWrite.FontCollection(g_dwriteFactory, MyFontCollectionLoader.GetLoader(), fontCollectionKey)
+
+'        Return hr
+'    End Function
+
+'End Class
+
+'Public Class MyFontCollectionLoader
+'    Implements DirectWrite.FontCollectionLoader
+
+'    Private refCount As ULong
+'    Private Shared me_instance As New MyFontCollectionLoader
+
+'    Public Shared Function GetLoader() As DirectWrite.FontCollectionLoader
+'        Return me_instance
+'    End Function
+'    Public Shared Function IsLoaderInitialized() As Boolean
+'        Return (me_instance IsNot Nothing)
+'    End Function
+
+'    Public Sub New()
+'        refCount = 0
+'    End Sub
+
+'    Public Property Shadow As IDisposable Implements ICallbackable.Shadow
+'        Get
+'            Return Nothing 'not implemented
+'        End Get
+'        Set(value As IDisposable)
+'            Return 'not implemented
+'        End Set
+'    End Property
+
+'    Public Function CreateEnumeratorFromKey(factory As DirectWrite.Factory, collectionKey As DataPointer) As DirectWrite.FontFileEnumerator Implements DirectWrite.FontCollectionLoader.CreateEnumeratorFromKey
+'        Throw New NotImplementedException()
+'    End Function
+
+'    Public Function QueryInterface(ByRef guid As Guid, ByRef comObject As IntPtr) As Result Implements IUnknown.QueryInterface
+'        Dim gch As Runtime.InteropServices.GCHandle = Runtime.InteropServices.GCHandle.Alloc(Me, Runtime.InteropServices.GCHandleType.Pinned)
+'        comObject = gch.AddrOfPinnedObject
+'        gch.Free()
+'        AddReference()
+'        Return 1
+'    End Function
+
+'    Public Function AddReference() As Integer Implements IUnknown.AddReference
+'        refCount += 1
+'        Return refCount
+'    End Function
+
+'    Public Function Release() As Integer Implements IUnknown.Release
+'        refCount -= 1
+'        Dim newCount As ULong = refCount
+'        If (newCount = 0) Then
+'            'Me.Dispose()
+'        End If
+'        Return newCount
+'    End Function
+
+'#Region "IDisposable Support"
+'    Private disposedValue As Boolean ' 要检测冗余调用
+
+'    ' IDisposable
+'    Protected Overridable Sub Dispose(disposing As Boolean)
+'        If Not disposedValue Then
+'            If disposing Then
+'                ' TODO: 释放托管状态(托管对象)。
+'            End If
+
+'            ' TODO: 释放未托管资源(未托管对象)并在以下内容中替代 Finalize()。
+'            ' TODO: 将大型字段设置为 null。
+'        End If
+'        disposedValue = True
+'    End Sub
+
+'    ' TODO: 仅当以上 Dispose(disposing As Boolean)拥有用于释放未托管资源的代码时才替代 Finalize()。
+'    'Protected Overrides Sub Finalize()
+'    '    ' 请勿更改此代码。将清理代码放入以上 Dispose(disposing As Boolean)中。
+'    '    Dispose(False)
+'    '    MyBase.Finalize()
+'    'End Sub
+
+'    ' Visual Basic 添加此代码以正确实现可释放模式。
+'    Public Sub Dispose() Implements IDisposable.Dispose
+'        ' 请勿更改此代码。将清理代码放入以上 Dispose(disposing As Boolean)中。
+'        Dispose(True)
+'        ' TODO: 如果在以上内容中替代了 Finalize()，则取消注释以下行。
+'        ' GC.SuppressFinalize(Me)
+'    End Sub
+'#End Region
+
+'End Class
+
+'Public Class MyFontGlobals
+'    Public Shared fontCollections As New List(Of String)
+
+'    Public Sub New()
+
+'    End Sub
+'    Public Shared Function Push(addCollection As List(Of String)) As UInteger
+'        fontCollections.AddRange(addCollection)
+'        Return fontCollections.Count
+'    End Function
+
+'End Class

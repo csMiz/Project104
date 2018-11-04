@@ -5,11 +5,11 @@ Imports SharpDX.Mathematics.Interop
 ''' 单个六边形地图块类
 ''' </summary>
 Public Class SkirmishMapBlock
-    Public Property X As Short
-    Public Property Y As Short
+    Public X As Short
+    Public Y As Short
 
-    Public Property Altitude As Short = 0
-    Public Property Terrain As TerrainType
+    Public Altitude As Short = 0
+    Public Terrain As TerrainType
     Private Accessories As New List(Of SkirmishMapBlockAccessory)
     Private AccessoryImage As Bitmap1
     Private Shared AccessoryCompare As New Comparison(Of SkirmishMapBlockAccessory)(AddressOf CompareAccessory)

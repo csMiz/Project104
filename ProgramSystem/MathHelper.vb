@@ -96,6 +96,7 @@ Public Structure PointI
         X = inputX
         Y = inputY
     End Sub
+
 End Structure
 
 ''' <summary>

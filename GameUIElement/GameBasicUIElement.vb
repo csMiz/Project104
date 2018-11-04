@@ -25,11 +25,11 @@ Public MustInherit Class GameBasicUIElement
     Public Visible As Boolean = True
     Public Opacity As Single = 1.0F
 
-    Public Event MouseDown(e As MouseEventArgs) Implements IMouseArea.MouseDown
-    Public Event MouseMove(e As MouseEventArgs) Implements IMouseArea.MouseMove
-    Public Event MouseUp(e As MouseEventArgs) Implements IMouseArea.MouseUp
     Public Event MouseEnter() Implements IMouseArea.MouseEnter
     Public Event MouseLeave() Implements IMouseArea.MouseLeave
+    Public Event MouseDown(e As GameMouseEventArgs) Implements IMouseArea.MouseDown
+    Public Event MouseMove(e As GameMouseEventArgs) Implements IMouseArea.MouseMove
+    Public Event MouseUp(e As GameMouseEventArgs) Implements IMouseArea.MouseUp
 
     ''' <summary>
     ''' 初始化矩形框
@@ -43,7 +43,7 @@ Public MustInherit Class GameBasicUIElement
     Public Function IsInside(input As PointF2) As Boolean Implements IMouseArea.IsInside
         Return (input.X >= Me.BasicRect.Left AndAlso input.X <= Me.BasicRect.Right AndAlso input.Y >= Me.BasicRect.Top AndAlso input.Y <= Me.BasicRect.Bottom)
     End Function
-    Public Function IsInside(input As Point) As Boolean Implements IQuadtreeRecognizable.IsInside
+    Public Function IsInside(input As PointI) As Boolean Implements IQuadtreeRecognizable.IsInside
         Return (input.X >= Me.BasicRect.Left AndAlso input.X <= Me.BasicRect.Right AndAlso input.Y >= Me.BasicRect.Top AndAlso input.Y <= Me.BasicRect.Bottom)
     End Function
 
@@ -68,8 +68,14 @@ Public MustInherit Class GameBasicUIElement
 
     End Function
 
-    Public Sub RaiseMouseMove(e As MouseEventArgs)
+    Public Sub RaiseMouseDown(e As GameMouseEventArgs)
+        RaiseEvent MouseDown(e)
+    End Sub
+    Public Sub RaiseMouseMove(e As GameMouseEventArgs)
         RaiseEvent MouseMove(e)
+    End Sub
+    Public Sub RaiseMouseUp(e As GameMouseEventArgs)
+        RaiseEvent MouseUp(e)
     End Sub
     Public Sub RaiseMouseEnter()
         RaiseEvent MouseEnter()

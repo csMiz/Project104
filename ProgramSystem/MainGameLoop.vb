@@ -14,8 +14,8 @@ Public Class MainGameLoop
     Private SaveLoadingProcess As Task
     Private SelectedSaveIndex As Short = -1
 
-    Private Camera As SpectatorCamera
-    Private CameraD2DContext As DeviceContext
+    Public Camera As SpectatorCamera
+    Public CameraD2DContext As DeviceContext
     Private Delegate Sub SimplePaint()
     Private CameraPaint As SimplePaint
 
@@ -23,7 +23,8 @@ Public Class MainGameLoop
     Public Skirmish As SkirmishGameLoop
 
     Private PaintThread As Thread = New Thread(AddressOf PaintGameImage)
-    Private PaintFPS As Integer = 0
+    Private PaintSuspended As Boolean = False
+    Public PaintFPS As Integer = 0
 
     Public Sub LoadMainMenu()
         Dim btnMissionSelect As New GameFlatButton
@@ -39,8 +40,26 @@ Public Class MainGameLoop
         Dim tmpMouseLeave = Sub()
                                 btnMissionSelect.BorderColour = New SolidColorBrush(Me.CameraD2DContext, New RawColor4(0.9, 0.9, 0.9, 1))
                             End Sub
+        Dim tmpMouseDown = Async Sub()
+                               Debug.WriteLine("click!!")
+                               Me.SuspendPaint()
+
+                               Camera.ActivePages.Remove(Me.MainMenu)
+
+                               Me.StartLoadSave(-1)
+                               Dim loadResult As Integer = 0
+                               loadResult = Await Me.WaitForLoadSave()
+                               Me.StartLoadSkirmish()
+                               loadResult = Await Me.WaitForLoadSkirmish()
+
+                               Me.Skirmish.SkirmishGameMap.GenerateMoveRange(Me.Skirmish.UnitList(0))
+
+                               Me.DrawSkirmish()
+                               Me.StartPaint()
+                           End Sub
         AddHandler btnMissionSelect.MouseEnter, tmpMouseEnter
         AddHandler btnMissionSelect.MouseLeave, tmpMouseLeave
+        AddHandler btnMissionSelect.MouseDown, tmpMouseDown
 
         Dim btnExitGame As New GameFlatButton
         With btnExitGame
@@ -138,15 +157,15 @@ Public Class MainGameLoop
     End Function
 
     Public Sub StartPaint()
-        If Me.PaintThread.ThreadState = ThreadState.Suspended Then
-            Me.PaintThread.Resume()
+        If Me.PaintSuspended Then
+            Me.PaintSuspended = False
             Return
         End If
         Me.PaintThread.Start()
     End Sub
 
     Public Sub SuspendPaint()
-        Me.PaintThread.Suspend()
+        Me.PaintSuspended = True
     End Sub
 
     Public Sub EndPaint()
@@ -160,9 +179,11 @@ Public Class MainGameLoop
         With Me.Camera
             .PaintingLayers.Clear()
             .PaintingLayersDescription.Clear()
+            .ActivePages.Clear()
 
-            .PaintingLayers.Push(AddressOf Me.MainMenu.PaintMainMenuElements)
+            .PaintingLayers.Push(AddressOf Me.MainMenu.PaintElements)
             .PaintingLayersDescription.Push(GameImageLayer.MainMenu)
+            .ActivePages.Add(Me.MainMenu)
         End With
     End Sub
 
@@ -183,7 +204,9 @@ Public Class MainGameLoop
         Dim span As TimeSpan
         Do
             startTime = DateTime.Now
-            CameraPaint.Invoke()
+            If Not PaintSuspended Then
+                CameraPaint.Invoke()
+            End If
             Do
                 endTime = DateTime.Now
                 span = endTime - startTime
@@ -192,10 +215,5 @@ Public Class MainGameLoop
         Loop
     End Sub
 
-
-
-    Public Function GetFPS() As Integer
-        Return Me.PaintFPS
-    End Function
 
 End Class

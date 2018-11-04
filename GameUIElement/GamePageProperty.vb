@@ -13,22 +13,21 @@ Public Class GamePageProperty
     Public UIElements As New List(Of GameBasicUIElement)
     Public ElementsQuadtree As Quadtree
 
-    Public MouseLastPosition As Point = Nothing
+    Public MouseLastPosition As PointI = Nothing
     'Private ElementsMouseOutside As New List(Of GameBasicUIElement)
     Private ElementsMouseInside As New List(Of GameBasicUIElement)
-    Private FullPage As PointI = Nothing
 
-
-    Public Sub PaintMainMenuElements(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
+    Public Sub PaintElements(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
         For Each element As GameBasicUIElement In Me.UIElements
             If element.Visible Then
                 element.DrawControl(context, spec, canvasBitmap)
             End If
         Next
+
+        context.DrawBitmap(TestTextImage.FontImage, New SharpDX.Mathematics.Interop.RawRectangleF(50, 50, 550, 550), NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
     End Sub
 
     Public Sub GenerateElementsQuadtree(pageSize As PointI)
-        Me.FullPage = pageSize
         Me.ElementsQuadtree = New Quadtree(MathHelper.Size2RawRect(pageSize))
         For Each element As GameBasicUIElement In UIElements
             Me.ElementsQuadtree.AddItem(element)
@@ -36,8 +35,8 @@ Public Class GamePageProperty
     End Sub
 
     Public Sub InitializeCursor(setX As Integer, setY As Integer)
-        Dim cursorPoint As Point = New Point(setX, setY)
-        System.Windows.Forms.Cursor.Position = cursorPoint    'not correct
+        Dim cursorPoint As PointI = New PointI(setX, setY)
+        'System.Windows.Forms.Cursor.Position = cursorPoint    'not correct
         Me.MouseLastPosition = cursorPoint
 
         Dim cursorResult As List(Of IQuadtreeRecognizable) = ElementsQuadtree.Find(cursorPoint)
@@ -52,10 +51,8 @@ Public Class GamePageProperty
     ''' <summary>
     ''' 触发MouseMove, MouseEnter, MouseLeave
     ''' </summary>
-    Public Sub TriggerMouseMove(e As MouseEventArgs)
-        Dim nowPosition As New Point(e.X * Me.FullPage.X / Form1.ClientRectangle.Width, e.Y * Me.FullPage.Y / Form1.ClientRectangle.Height)
-
-        Dim cursorResult As List(Of IQuadtreeRecognizable) = ElementsQuadtree.Find(nowPosition)
+    Public Sub TriggerMouseMove(e As GameMouseEventArgs)
+        Dim cursorResult As List(Of IQuadtreeRecognizable) = ElementsQuadtree.Find(e.Position)
         If cursorResult.Count Then
             Dim refreshElementsInside As New List(Of GameBasicUIElement)
             For Each element As GameBasicUIElement In cursorResult
@@ -78,7 +75,26 @@ Public Class GamePageProperty
             ElementsMouseInside.Clear()
         End If
 
-        Me.MouseLastPosition = nowPosition
+        Me.MouseLastPosition = e.Position
+    End Sub
+
+    Public Sub TriggerMouseDown(e As GameMouseEventArgs)
+        Dim cursorResult As List(Of IQuadtreeRecognizable) = ElementsQuadtree.Find(e.Position)
+        If cursorResult.Count Then
+            For Each element As GameBasicUIElement In cursorResult
+                element.RaiseMouseDown(e)
+            Next
+        End If
+    End Sub
+
+    Public Sub TriggerMouseUp(e As GameMouseEventArgs)
+        Dim cursorResult As List(Of IQuadtreeRecognizable) = ElementsQuadtree.Find(e.Position)
+        If cursorResult.Count Then
+            For Each element As GameBasicUIElement In cursorResult
+                element.RaiseMouseUp(e)
+            Next
+        End If
     End Sub
 
 End Class
+

@@ -244,6 +244,11 @@ p104
  单位所处位置
  </summary>
 </member>
+<member name="P:p104.GameUnit.Position2">
+ <summary>
+ 获取二维位置
+ </summary>
+</member>
 <member name="F:p104.GameUnit.PositionTmpMove">
  <summary>
  移动单位后的临时位置
@@ -262,6 +267,11 @@ p104
 <member name="F:p104.GameUnit.MovePoint">
  <summary>
  行动力
+ </summary>
+</member>
+<member name="P:p104.GameUnit.FinalMovePoint">
+ <summary>
+ 获取计算后的行动力
  </summary>
 </member>
 <member name="F:p104.GameUnit.AttackPoint">
@@ -579,7 +589,7 @@ p104
  扁平化按钮控件类
  </summary>
 </member>
-<member name="M:p104.GamePageProperty.TriggerMouseMove(System.Windows.Forms.MouseEventArgs)">
+<member name="M:p104.GamePageProperty.TriggerMouseMove(p104.GameMouseEventArgs)">
  <summary>
  触发MouseMove, MouseEnter, MouseLeave
  </summary>
@@ -728,6 +738,22 @@ p104
  <param name="spectator">观察者对象</param>
  <param name="canvasBitmap">传入的原始Bitmap1对象</param>
 </member>
+<member name="M:p104.SkirmishMap.GenerateMoveRange(p104.GameUnit)">
+ <summary>
+ 生成角色行动范围
+ </summary>
+ <param name="targetUnit">选定操作的角色</param>
+</member>
+<member name="M:p104.SkirmishMap.PrintMovementGlance">
+ <summary>
+ 打印角色行动范围结果
+ </summary>
+</member>
+<member name="T:p104.MovementGlanceNode">
+ <summary>
+ 行动预览节点类
+ </summary>
+</member>
 <member name="T:p104.SkirmishMapBlock">
  <summary>
  单个六边形地图块类
@@ -746,6 +772,21 @@ p104
 <member name="T:p104.SkirmishMapBlockAccessory">
  <summary>
  六角地图装饰物类，用于树木、岩石等
+ </summary>
+</member>
+<member name="T:p104.SkirmishTerrain">
+ <summary>
+ 游戏遭遇战地形类
+ </summary>
+</member>
+<member name="F:p104.SkirmishTerrain.TERRAIN_MOVE_COST">
+ <summary>
+ 默认地形阻力
+ </summary>
+</member>
+<member name="T:p104.TerrainType">
+ <summary>
+ 遭遇战地形枚举
  </summary>
 </member>
 <member name="T:p104.FontHelper">
@@ -870,7 +911,7 @@ p104
  <param name="context">d2dContext对象</param>
  <param name="filePath">图片路径</param>
 </member>
-<member name="M:p104.GameResources.LoadBitmapUsingWIC(SharpDX.Direct2D1.DeviceContext,System.IO.FileStream)">
+<member name="M:p104.GameResources.LoadBitmapUsingWIC(SharpDX.Direct2D1.DeviceContext,System.IO.Stream)">
  <summary>
  使用WIC载入图片资源
  </summary>
@@ -1268,7 +1309,12 @@ p104
 </member>
 <member name="F:p104.SpectatorCamera.PaintingLayersDescription">
  <summary>
- 图层说明，用于鼠标点击判定
+ 图层说明
+ </summary>
+</member>
+<member name="F:p104.SpectatorCamera.PaintingLayersPage">
+ <summary>
+ 图层控件页，用于鼠标点击判定
  </summary>
 </member>
 <member name="F:p104.SpectatorCamera.RT">

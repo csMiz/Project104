@@ -103,7 +103,7 @@ Public Class GameHero
             Next
             .InitializeHP(Me.FullHP.GetValue)
             .MovementType = Me.MovementType
-            .MovePoint = New IntegerProperty(Me.MovePoint.GetValue)
+            .MovePoint = New SingleProperty(Me.MovePoint.GetValue)
             .AttackPoint = Me.AttackPoint.Copy
             .SubAttackPoint = Me.SubAttackPoint.Copy
             .DefendPoint = Me.DefendPoint.Copy

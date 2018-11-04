@@ -34,7 +34,7 @@ Public MustInherit Class GameButton
     Private Sub ResetTextImage(value As String)
         If Me.TextImage Is Nothing Then
             Me.TextImage = New TextItem(value, New PointI(Me.BasicRect.Right - Me.BasicRect.Left, Me.BasicRect.Bottom - Me.BasicRect.Top))
-            Me.TextImage.LoadFont(GameFontHelper.GetFontFamily(0), 18, Brushes.White)
+            Me.TextImage.LoadFont(GameFontHelper.GetFontFamily(0), 18, Brushes.White, Color.Gray)
             Me.TextImage.GenerateImage(Me.BindingContext)
         Else
             Me.TextImage.Text = value

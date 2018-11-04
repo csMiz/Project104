@@ -26,6 +26,14 @@ Public Class GameUnit
     ''' </summary>
     Public Position As PointI3
     ''' <summary>
+    ''' 获取二维位置
+    ''' </summary>
+    Public ReadOnly Property Position2 As PointI
+        Get
+            Return New PointI(Position.X, Position.Y)
+        End Get
+    End Property
+    ''' <summary>
     ''' 移动单位后的临时位置
     ''' </summary>
     Public PositionTmpMove As PointI3
@@ -39,10 +47,20 @@ Public Class GameUnit
     ''' 行动类型
     ''' </summary>
     Public MovementType As UnitMoveMentType
+
+    Public MovementTerrainRatio As New List(Of KeyValuePair(Of Byte, Single))
     ''' <summary>
     ''' 行动力
     ''' </summary>
-    Public MovePoint As IntegerProperty
+    Public MovePoint As SingleProperty
+    ''' <summary>
+    ''' 获取计算后的行动力
+    ''' </summary>
+    Public ReadOnly Property FinalMovePoint As Single
+        Get
+            Return MovePoint.GetValue   'TODO: Calculate buffs
+        End Get
+    End Property
     ''' <summary>
     ''' 进攻点数
     ''' </summary>
@@ -118,7 +136,7 @@ Public Class GameUnit
         With Me
             .MovementType = [Enum].Parse(Me.MovementType.GetType, value(0))
             If (.MovePoint IsNot Nothing) Then Throw New Exception("movepoint has been initialized!")
-            .MovePoint = New IntegerProperty(CInt(value(1)))
+            .MovePoint = New SingleProperty(CInt(value(1)))
         End With
     End Sub
 
@@ -195,6 +213,15 @@ Public Class GameUnit
     End Function
     Public Function IsWaitingCommand() As Boolean
         Return (Me.Status = UnitStatus.Waiting)
+    End Function
+
+    Public Function GetMovementTerrainRatio(terrain As TerrainType) As Single
+        For Each pair As KeyValuePair(Of Byte, Single) In Me.MovementTerrainRatio
+            If pair.Key = terrain Then
+                Return pair.Value
+            End If
+        Next
+        Return 1.0F
     End Function
 
     Public Overridable Function GlobalSaveUnit() As String

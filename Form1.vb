@@ -4,7 +4,7 @@ Imports SharpDX.XInput
 Imports SharpDX.RawInput
 
 Public Class Form1
-    Private test As New GameTest
+    Public test As New GameTest
     Private PaintThread As Thread
     Private Delegate Sub paintGame()
 
@@ -49,10 +49,14 @@ L1:
     End Sub
 
     Private Sub Form1_MouseDown(sender As Object, e As MouseEventArgs) Handles Me.MouseDown
+        Dim args As GameMouseEventArgs = GameMouseEventArgs.FromMouseEventArgs(e, Me.ClientRectangle, test.MainGame.Camera.Resolve)
+        test.MainGame.MainMenu.TriggerMouseDown(args)
+        'TODO: 改为使用spectatorCamera的ActivePage进行注册
+
 
         'Dim controller As Controller = New Controller(UserIndex.One)
         'Dim gamePad As Gamepad = controller.GetState().Gamepad  'xinput->手柄
-        MsgBox(LoggingService.GetRecordCount & vbCrLf & test.MainGame.GetFPS)
+        Debug.WriteLine(LoggingService.GetRecordCount & ", " & test.MainGame.PaintFPS)
 
     End Sub
 
@@ -63,7 +67,8 @@ L1:
     End Sub
 
     Private Sub Form1_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
-        test.MainGame.MainMenu.TriggerMouseMove(e)
+        Dim args As GameMouseEventArgs = GameMouseEventArgs.FromMouseEventArgs(e, Me.ClientRectangle, test.MainGame.Camera.Resolve)
+        test.MainGame.MainMenu.TriggerMouseMove(args)
     End Sub
 
     'Public Sub test_keydown(sender As Object, args As KeyboardInputEventArgs)

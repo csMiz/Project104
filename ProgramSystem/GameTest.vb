@@ -71,6 +71,20 @@ Public Class GameTest
 
     End Function
 
+    'Public Sub DWTest()
+    '    Dim pDWriteFactory As New SharpDX.DirectWrite.Factory
+    '    Dim fCollection As SharpDX.DirectWrite.FontCollection
+    '    Dim pTextFormat As SharpDX.DirectWrite.TextFormat
+
+    '    Dim fContext As MyFontContext = New MyFontContext(pDWriteFactory)
+    '    Dim filepaths As New List(Of String)
+    '    Dim fontFileFilePath As String = "C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\P104_Font1.ttf"
+    '    filepaths.Add(fontFileFilePath)
+    '    Dim hr As Integer = fContext.CreateFontCollection(filepaths, fCollection)
+    '    pTextFormat = New SharpDX.DirectWrite.TextFormat(pDWriteFactory, "P104_Font1", fCollection, SharpDX.DirectWrite.FontWeight.Regular, SharpDX.DirectWrite.FontStyle.Normal, SharpDX.DirectWrite.FontStretch.Normal, 16)
+
+    'End Sub
+
     <Obsolete("此部分已经封装在SkirmishGameLoop里了->SkirmishGameLoopTest()", False)>
     Public Sub LoadMapTest()
         Dim stream As FileStream = New FileStream(Application.StartupPath & "\newmap.txt", FileMode.Open)
