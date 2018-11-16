@@ -55,7 +55,7 @@ Public Class Quadtree
         Dim result As New List(Of IQuadtreeRecognizable)
 
         For Each item As IQuadtreeRecognizable In Me.Node
-            If item.IsInside(point) Then
+            If item.IsValid AndAlso item.IsInside(point) Then
                 result.Add(item)
             End If
         Next
@@ -73,7 +73,7 @@ Public Class Quadtree
 
         If Me.Children(nextDirection) IsNot Nothing Then
             Dim nextResult As List(Of IQuadtreeRecognizable) = Me.Children(nextDirection).Find(point)
-            result = result.Concat(nextResult)
+            result.AddRange(nextResult)
         End If
 
         Return result
@@ -86,7 +86,7 @@ Public Interface IQuadtreeRecognizable
 
     Function CompareRegionDirection(input As PointI) As QuadtreeDirection
     Function IsInside(input As PointI) As Boolean
-
+    Function IsValid() As Boolean
 
 End Interface
 

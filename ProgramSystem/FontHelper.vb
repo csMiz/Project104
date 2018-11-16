@@ -1,13 +1,19 @@
-﻿Imports p104
+﻿Imports System.IO
+Imports System.Text.RegularExpressions
+Imports p104
 Imports SharpDX
 ''' <summary>
 ''' 字体助手类
 ''' </summary>
 Public Class FontHelper
     Private Shared me_instance As FontHelper = Nothing
-
-    Private TextRepository As New List(Of TextResource)
-    Private FontRepository As New System.Drawing.Text.PrivateFontCollection
+    ''' <summary>
+    ''' 多语言文本仓库，TextRepo(locale)(index)
+    ''' </summary>
+    Public TextRepository As New List(Of List(Of String))
+    Public LocaleList As New List(Of String)
+    Public LocaleCodeList As New List(Of Byte())
+    Public FontRepository As New System.Drawing.Text.PrivateFontCollection
     Private FontForGDI As New List(Of System.Drawing.FontFamily)
 
     Private Sub New()
@@ -30,14 +36,61 @@ Public Class FontHelper
         Return FontForGDI(index)
     End Function
 
-End Class
+    ''' <summary>
+    ''' 从文本解析多语言文字资源
+    ''' </summary>
+    ''' <param name="source">多语言文本源，需要注意文字编码和换行符的问题</param>
+    Public Sub LoadLocaleTextResourcesFromText(source As String)
+        Dim result As New List(Of String)
+        Dim lines() As String = Regex.Split(source, vbCrLf)
+        If lines.Count >= 2 Then
+            Dim languageName As String = "#Undefined"
+            Dim languageCode(3) As Byte
+            If lines(0).Remove(1) = "#" Then
+                Dim languageDefinition() As String = Regex.Split(lines(0).Substring(1), "#")
+                languageName = languageDefinition(0)
+                Dim languageCodeSource() As Char = languageDefinition(1).ToCharArray
+                For i = 0 To 3
+                    languageCode(i) = AscW(languageCodeSource(i))
+                Next
+            End If
+            LocaleList.Add(languageName)
+            LocaleCodeList.Add(languageCode)
+            For i = 1 To lines.Count - 1
+                Dim eachLine As String = lines(i)
+                If eachLine.Contains("|") Then
+                    Dim parts() As String = Regex.Split(eachLine, ESCAPE_VERTICAL_LINE)
+                    'Dim tmpId As Integer = CInt(parts(0))
+                    result.Add(parts(1))
+                End If
+            Next
+            TextRepository.Add(result)
+        End If
+    End Sub
 
-''' <summary>
-''' 多语言文字资源类
-''' </summary>
-Public Class TextResource
-    Private TextResourceId As Integer
-    Private Items(2) As TextItem
+    Public Sub LoadTextFromFiles()
+        Dim dirInfo As New System.IO.DirectoryInfo(Application.StartupPath & "\Resources\Languages\")
+        Dim allFiles() As System.IO.FileInfo = dirInfo.GetFiles
+        For Each file As System.IO.FileInfo In allFiles
+            Dim readStream As System.IO.FileStream = file.OpenRead
+            Dim tmpFileContent As String = vbNullString
+            Using sr As StreamReader = New StreamReader(readStream, System.Text.Encoding.Unicode)
+                tmpFileContent = sr.ReadToEnd()
+            End Using
+            readStream.Close()
+            readStream.Dispose()
+            Call LoadLocaleTextResourcesFromText(tmpFileContent)
+        Next
+    End Sub
+
+    Public Function FindLanguageIndex(code As String) As Integer
+        'TODO
+        Throw New NotImplementedException
+    End Function
+
+    Public Function GetLanguageCode(index As Integer) As Byte()
+        Return LocaleCodeList(index)
+    End Function
 
 End Class
 
@@ -85,6 +138,8 @@ Public Enum LocaleType As Short
     Others = 0
     S_Chinese = 1
     English = 2
+    T_Chinese = 3
+
 End Enum
 
 'Public Class MyFontContext

@@ -23,7 +23,6 @@ Public Class SpectatorCamera
     ''' 定义绘图委托
     ''' </summary>
     Public Delegate Sub Draw(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As Bitmap1)
-
     ''' <summary>
     ''' 分层绘图，不考虑小窗口穿透的模式
     ''' </summary>
@@ -36,6 +35,10 @@ Public Class SpectatorCamera
     ''' 图层控件页，用于鼠标点击判定，可以不与绘图图层同步
     ''' </summary>
     Public ActivePages As New List(Of GamePageProperty)
+    ''' <summary>
+    ''' 当前鼠标位置
+    ''' </summary>
+    Public CurrentCursorPosition As PointI
     ''' <summary>
     ''' d2d画布对象
     ''' </summary>
@@ -144,6 +147,10 @@ Public Class SpectatorCamera
 
     Public Function GetDevceContext() As DeviceContext
         Return d2dContext
+    End Function
+
+    Public Function GetCenter() As PointI
+        Return New PointI(CInt(Me.Resolve.X / 2), CInt(Me.Resolve.Y / 2))
     End Function
 
     Public Sub Dispose() Implements IDisposable.Dispose

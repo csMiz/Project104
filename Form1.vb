@@ -22,6 +22,7 @@ Public Class Form1
 
         Await test.MainGameLoopTest()
 
+        'test.OOPTest()
 
         'Device.RegisterDevice(SharpDX.Multimedia.UsagePage.Generic, SharpDX.Multimedia.UsageId.GenericKeyboard, DeviceFlags.None)
         'AddHandler Device.KeyboardInput, AddressOf test_keydown
@@ -50,13 +51,16 @@ L1:
 
     Private Sub Form1_MouseDown(sender As Object, e As MouseEventArgs) Handles Me.MouseDown
         Dim args As GameMouseEventArgs = GameMouseEventArgs.FromMouseEventArgs(e, Me.ClientRectangle, test.MainGame.Camera.Resolve)
-        test.MainGame.MainMenu.TriggerMouseDown(args)
-        'TODO: 改为使用spectatorCamera的ActivePage进行注册
-
+        test.MainGame.Camera.CurrentCursorPosition = args.Position
+        Debug.WriteLine("Mouse Clicked at: " & args.PrintPositionString)
+        For i = 0 To test.MainGame.Camera.ActivePages.Count - 1
+            Dim page As GamePageProperty = test.MainGame.Camera.ActivePages(i)
+            page.TriggerMouseDown(args)
+        Next
 
         'Dim controller As Controller = New Controller(UserIndex.One)
         'Dim gamePad As Gamepad = controller.GetState().Gamepad  'xinput->手柄
-        Debug.WriteLine(LoggingService.GetRecordCount & ", " & test.MainGame.PaintFPS)
+        Debug.WriteLine("Monitor Count: " & LoggingService.GetRecordCount & ", FPS: " & test.MainGame.PaintFPS)
 
     End Sub
 
@@ -68,7 +72,11 @@ L1:
 
     Private Sub Form1_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
         Dim args As GameMouseEventArgs = GameMouseEventArgs.FromMouseEventArgs(e, Me.ClientRectangle, test.MainGame.Camera.Resolve)
-        test.MainGame.MainMenu.TriggerMouseMove(args)
+        test.MainGame.Camera.CurrentCursorPosition = args.Position
+        For i = 0 To test.MainGame.Camera.ActivePages.Count - 1
+            Dim page As GamePageProperty = test.MainGame.Camera.ActivePages(i)
+            page.TriggerMouseMove(args)
+        Next
     End Sub
 
     'Public Sub test_keydown(sender As Object, args As KeyboardInputEventArgs)

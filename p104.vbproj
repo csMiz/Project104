@@ -117,10 +117,17 @@
     <Compile Include="GameObject\UnitTemplateRepository.vb" />
     <Compile Include="GameUIElement\GameBasicUIElement.vb" />
     <Compile Include="GameUIElement\GameButton.vb" />
+    <Compile Include="GameUIElement\GameComboBox.vb" />
     <Compile Include="GameUIElement\GameContentFrame.vb" />
     <Compile Include="GameUIElement\GameDialog.vb" />
     <Compile Include="GameUIElement\GameFlatButton.vb" />
+    <Compile Include="GameUIElement\GameInteractiveRectangle.vb" />
     <Compile Include="GameUIElement\GamePageProperty.vb" />
+    <Compile Include="GameUIElement\GamePictureBox.vb" />
+    <Compile Include="GameUIElement\GameScrollViewer.vb" />
+    <Compile Include="GameUIElement\GameTextBlock.vb" />
+    <Compile Include="GameUIElement\GameTextBox.vb" />
+    <Compile Include="GameUIElement\GameTreeViewItem.vb" />
     <Compile Include="GameUIElement\IAnimatedControl.vb" />
     <Compile Include="GameUIElement\UnitDetailDialog.vb" />
     <Compile Include="MapObject\GameMap.vb" />
@@ -146,11 +153,14 @@
     </Compile>
     <Compile Include="ProgramSystem\CircleArea.vb" />
     <Compile Include="ProgramSystem\FontHelper.vb" />
+    <Compile Include="ProgramSystem\GameAchievement.vb" />
+    <Compile Include="ProgramSystem\GameAchievementRecord.vb" />
     <Compile Include="ProgramSystem\GameEndInfo.vb" />
     <Compile Include="ProgramSystem\GameIconRepository.vb" />
     <Compile Include="ProgramSystem\GameLive2dAnimation.vb" />
     <Compile Include="ProgramSystem\GameLive2dImage.vb" />
     <Compile Include="ProgramSystem\GameResources.vb" />
+    <Compile Include="ProgramSystem\GameSettingRepository.vb" />
     <Compile Include="ProgramSystem\GameSideInfo.vb" />
     <Compile Include="ProgramSystem\GameStaticImage.vb" />
     <Compile Include="ProgramSystem\GameTeamInfo.vb" />
@@ -184,6 +194,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\SaveFileFormat_psav.md" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>

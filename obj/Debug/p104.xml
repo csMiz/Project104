@@ -556,9 +556,9 @@ p104
  内容框矩形
  </summary>
 </member>
-<member name="M:p104.GameBasicUIElement.InitializeBasicRect(System.Int32,System.Int32,System.Int32,System.Int32)">
+<member name="F:p104.GameBasicUIElement.BindingContext">
  <summary>
- 初始化矩形框
+ 绑定的D2dDeviceContext
  </summary>
 </member>
 <member name="T:p104.GameButton">
@@ -566,9 +566,24 @@ p104
  Button基类
  </summary>
 </member>
+<member name="F:p104.GameButton.CanBePressed">
+ <summary>
+ 按钮是否有效，相当于Enable
+ </summary>
+</member>
 <member name="T:p104.GameContentFrame">
  <summary>
  内容框控件类
+ </summary>
+</member>
+<member name="M:p104.GameContentFrame.CalculateRelativeTotalHeight">
+ <summary>
+ 返回内容总高度，同时刷新BasicRect.Bottom
+ </summary>
+</member>
+<member name="M:p104.GameContentFrame.RefreshChildrenRelativeBasicRects">
+ <summary>
+ 重新计算所有子元素的BasicRect
  </summary>
 </member>
 <member name="T:p104.GameDialog">
@@ -592,6 +607,62 @@ p104
 <member name="M:p104.GamePageProperty.TriggerMouseMove(p104.GameMouseEventArgs)">
  <summary>
  触发MouseMove, MouseEnter, MouseLeave
+ </summary>
+</member>
+<member name="T:p104.GamePictureBox">
+ <summary>
+ 游戏图片框控件类
+ </summary>
+</member>
+<member name="T:p104.GameScrollViewer">
+ <summary>
+ 游戏滚动页面控件类
+ </summary>
+</member>
+<member name="F:p104.GameScrollViewer.Children">
+ <summary>
+ 滚动区域内的子元素，需要使用相对位置，从上到下排列
+ </summary>
+</member>
+<member name="P:p104.GameScrollViewer.CurrentScrollPosition">
+ <summary>
+ 当前滚动位置
+ </summary>
+</member>
+<member name="F:p104.GameScrollViewer.ScrollMax">
+ <summary>
+ 滚动最大位置
+ </summary>
+</member>
+<member name="F:p104.GameScrollViewer.ScrollBarWidth">
+ <summary>
+ 滚动条宽度
+ </summary>
+</member>
+<member name="P:p104.GameScrollViewer.ContentHeight">
+ <summary>
+ 滚动区总高度
+ </summary>
+</member>
+<member name="M:p104.GameScrollViewer.#ctor(System.Boolean)">
+ <summary>
+ 构造函数
+ </summary>
+ <param name="defaultEvents">是否使用默认的鼠标事件</param>
+</member>
+<member name="M:p104.GameScrollViewer.CalculateScrollMax">
+ <summary>
+ 计算最大滚动高度
+ </summary>
+</member>
+<member name="M:p104.GameScrollViewer.GenerateShownChildren">
+ <summary>
+ 获取当前滚动区会显示的子控件
+ </summary>
+</member>
+<member name="M:p104.GameScrollViewer.DrawItemsAtCanvas(SharpDX.Direct2D1.DeviceContext@,p104.SpectatorCamera@,SharpDX.Direct2D1.Bitmap1)">
+ <summary>
+ 清空滚动区画布并在其上绘制控件
  </summary>
 </member>
 <member name="T:p104.UnitDetailDialog">
@@ -794,14 +865,25 @@ p104
  字体助手类
  </summary>
 </member>
+<member name="F:p104.FontHelper.TextRepository">
+ <summary>
+ 多语言文本仓库，TextRepo(locale)(index)
+ </summary>
+</member>
 <member name="M:p104.FontHelper.Instance">
  <summary>
  单例
  </summary>
 </member>
-<member name="T:p104.TextResource">
+<member name="M:p104.FontHelper.LoadLocaleTextResourcesFromText(System.String)">
  <summary>
- 多语言文字资源类
+ 从文本解析多语言文字资源
+ </summary>
+ <param name="source">多语言文本源，需要注意文字编码和换行符的问题</param>
+</member>
+<member name="T:p104.GameAchievementRecord">
+ <summary>
+ 用户成就记录类
  </summary>
 </member>
 <member name="T:p104.GameEndInfo">
@@ -889,9 +971,14 @@ p104
  阵营颜色预设列表
  </summary>
 </member>
-<member name="F:p104.GameResources.GREY_COLOUR">
+<member name="F:p104.GameResources.BLACK_COLOUR_BRUSH">
  <summary>
  由透明到不透明的黑色SolidBrush，索引为0到4
+ </summary>
+</member>
+<member name="F:p104.GameResources.WHITE_COLOUR_BRUSH">
+ <summary>
+ 由透明到不透明的白色SolidBrush，索引为0到4
  </summary>
 </member>
 <member name="M:p104.GameResources.LoadResources(SharpDX.Direct2D1.DeviceContext)">
@@ -921,6 +1008,51 @@ p104
 <member name="T:p104.SolidColorBrushSet">
  <summary>
  游戏阵营颜色预设
+ </summary>
+</member>
+<member name="T:p104.GameSettingRepository">
+ <summary>
+ 用户存档设置信息类
+ </summary>
+</member>
+<member name="F:p104.GameSettingRepository.Username">
+ <summary>
+ 档案用户名
+ </summary>
+</member>
+<member name="F:p104.GameSettingRepository.UserDomain">
+ <summary>
+ 用户权限
+ </summary>
+</member>
+<member name="F:p104.GameSettingRepository.UserLanguageIndex">
+ <summary>
+ 用户语言偏好
+ </summary>
+</member>
+<member name="F:p104.GameSettingRepository.GameWindowType">
+ <summary>
+ 窗口模式
+ </summary>
+</member>
+<member name="F:p104.GameSettingRepository.UserResolve">
+ <summary>
+ 分辨率
+ </summary>
+</member>
+<member name="F:p104.GameSettingRepository.GameUserRecord">
+ <summary>
+ 对应用户成就记录
+ </summary>
+</member>
+<member name="M:p104.GameSettingRepository.LoadSettingsFromBinaryFile(System.IO.Stream)">
+ <summary>
+ 读取用户设置
+ </summary>
+</member>
+<member name="M:p104.GameSettingRepository.SaveSettingsIntoBinaryFile(System.IO.Stream)">
+ <summary>
+ 保存用户设置
  </summary>
 </member>
 <member name="T:p104.GameSideInfo">
@@ -974,7 +1106,6 @@ p104
  <summary>
  直接绘图
  </summary>
- <param name="context"></param>
 </member>
 <member name="T:p104.IMouseArea">
  <summary>
@@ -1018,6 +1149,16 @@ p104
 <member name="T:p104.MainGameLoop">
  <summary>
  游戏主流程
+ </summary>
+</member>
+<member name="F:p104.MainGameLoop.MainMenuPage">
+ <summary>
+ 游戏主菜单页
+ </summary>
+</member>
+<member name="F:p104.MainGameLoop.SettingPage">
+ <summary>
+ 游戏设置菜单页
  </summary>
 </member>
 <member name="M:p104.MainGameLoop.StartLoadGlobalResources">
@@ -1100,6 +1241,11 @@ p104
  遭遇战GameLoop
  </summary>
 </member>
+<member name="F:p104.SkirmishGameLoop.SkirmishPage">
+ <summary>
+ 处理控件面板等鼠标点击事件
+ </summary>
+</member>
 <member name="F:p104.SkirmishGameLoop.Sides">
  <summary>
  势力
@@ -1122,7 +1268,7 @@ p104
 </member>
 <member name="F:p104.SkirmishGameLoop.NowPlayer">
  <summary>
- 当前玩家
+ 当前玩家，对应Sides
  </summary>
 </member>
 <member name="F:p104.SkirmishGameLoop.UnitList">
@@ -1138,6 +1284,11 @@ p104
 <member name="F:p104.SkirmishGameLoop.BuildingList">
  <summary>
  此游戏中的建筑物列表
+ </summary>
+</member>
+<member name="F:p104.SkirmishGameLoop.SelectedUnitIndex">
+ <summary>
+ 每个玩家当前选中的单位在列表里对应的索引
  </summary>
 </member>
 <member name="M:p104.SkirmishGameLoop.LoadUnitsFromXMLAndTemplates(System.String)">
@@ -1181,6 +1332,12 @@ p104
  检查所有单位状态已更改
  </summary>
  <returns></returns>
+</member>
+<member name="M:p104.SkirmishGameLoop.MouseTryClickUnit(p104.PointI)">
+ <summary>
+ 尝试用鼠标选中一个单位
+ </summary>
+ <param name="input">点击的格子索引</param>
 </member>
 <member name="T:p104.SingleGameLoopStage">
  <summary>
@@ -1312,9 +1469,14 @@ p104
  图层说明
  </summary>
 </member>
-<member name="F:p104.SpectatorCamera.PaintingLayersPage">
+<member name="F:p104.SpectatorCamera.ActivePages">
  <summary>
- 图层控件页，用于鼠标点击判定
+ 图层控件页，用于鼠标点击判定，可以不与绘图图层同步
+ </summary>
+</member>
+<member name="F:p104.SpectatorCamera.CurrentCursorPosition">
+ <summary>
+ 当前鼠标位置
  </summary>
 </member>
 <member name="F:p104.SpectatorCamera.RT">

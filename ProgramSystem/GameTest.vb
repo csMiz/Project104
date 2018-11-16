@@ -182,4 +182,35 @@ Public Class GameTest
         Application.DoEvents()
     End Sub
 
+    Public Sub OOPTest()
+        'Dim animalList As New List(Of Animal)
+        'Dim tmpAnimal As New Animal
+        'Dim tmpDog As New Dog
+        'animalList.Add(tmpAnimal)
+        'animalList.Add(tmpDog)
+        'Debug.WriteLine(AnimalControl.GetAnimalType(animalList(0)))
+        'Debug.WriteLine(AnimalControl.GetAnimalType(animalList(1)))
+        ''这样输出均为Animal
+
+    End Sub
+
+End Class
+
+Public Class Animal
+    Public Name As String = vbNullString
+End Class
+
+Public Class Dog
+    Inherits Animal
+
+End Class
+
+Public Class AnimalControl
+    Public Overloads Shared Function GetAnimalType(item As Animal) As String
+        Return "animal"
+    End Function
+
+    Public Overloads Shared Function GetAnimalType(item As Dog) As String
+        Return "dog"
+    End Function
 End Class

@@ -24,7 +24,7 @@ Public Class GamePageProperty
             End If
         Next
 
-        context.DrawBitmap(TestTextImage.FontImage, New SharpDX.Mathematics.Interop.RawRectangleF(50, 50, 550, 550), NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
+        'context.DrawBitmap(TestTextImage.FontImage, New SharpDX.Mathematics.Interop.RawRectangleF(50, 50, 550, 550), NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
     End Sub
 
     Public Sub GenerateElementsQuadtree(pageSize As PointI)
@@ -37,8 +37,11 @@ Public Class GamePageProperty
     Public Sub InitializeCursor(setX As Integer, setY As Integer)
         Dim cursorPoint As PointI = New PointI(setX, setY)
         'System.Windows.Forms.Cursor.Position = cursorPoint    'not correct
-        Me.MouseLastPosition = cursorPoint
+        Call Me.InitializeCursor(cursorPoint)
+    End Sub
 
+    Public Sub InitializeCursor(cursorPoint As PointI)
+        Me.MouseLastPosition = cursorPoint
         Dim cursorResult As List(Of IQuadtreeRecognizable) = ElementsQuadtree.Find(cursorPoint)
         If cursorResult.Count Then
             For Each element As GameBasicUIElement In cursorResult
@@ -74,7 +77,11 @@ Public Class GamePageProperty
             Next
             ElementsMouseInside.Clear()
         End If
-
+        If Me.UIElements.Count Then
+            For Each element In Me.UIElements
+                element.RaiseGlobalMouseMove(e)
+            Next
+        End If
         Me.MouseLastPosition = e.Position
     End Sub
 

@@ -1,4 +1,5 @@
 ﻿
+Imports p104
 Imports SharpDX.Direct2D1
 Imports SharpDX.DirectWrite
 Imports SharpDX.Mathematics.Interop
@@ -115,20 +116,20 @@ Public Class UnitDetailDialog
 
         If Me.Camera Is Nothing Then Throw New Exception("camera is null!")
 
-        Dim top_left_x As Integer = Camera.Resolve.X / 2 - Me.Width / 2
-        Dim top_left_y As Integer = Camera.Resolve.Y / 2 - Me.Height / 2
+        Dim top_left_x As Integer = Camera.Resolve.X / 2 - Me.DialogWidth / 2
+        Dim top_left_y As Integer = Camera.Resolve.Y / 2 - Me.DialogHeight / 2
 
-        Rect_BG = New RawRectangleF(top_left_x, top_left_y, top_left_x + Me.Width, top_left_y + Me.Height)
+        Rect_BG = New RawRectangleF(top_left_x, top_left_y, top_left_x + Me.DialogWidth, top_left_y + Me.DialogHeight)
 
         '内容边界，不显示
         '纵横比为1/1.618
         Dim content_height As Integer = 0
         Dim content_width As Integer = 0
-        If (Me.Width / Me.Height) > UNIT_DETAIL_HV_RATIO Then
-            content_height = Me.Height
+        If (Me.DialogWidth / Me.DialogHeight) > UNIT_DETAIL_HV_RATIO Then
+            content_height = Me.DialogHeight
             content_width = CInt(content_height * UNIT_DETAIL_HV_RATIO)
         Else
-            content_width = Me.Width
+            content_width = Me.DialogWidth
             content_height = CInt(content_width / UNIT_DETAIL_HV_RATIO)
         End If
 
@@ -242,7 +243,7 @@ Public Class UnitDetailDialog
             .DrawBitmap(Me.BlurBitmap, NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
 
             '绘制半透明黑色背景
-            .FillRectangle(Rect_BG, GREY_COLOUR(3))
+            .FillRectangle(Rect_BG, BLACK_COLOUR_BRUSH(3))
 
             '绘制分割线
             .DrawLine(Line_LeftBar_Right(0), Line_LeftBar_Right(1), SourceBGBrush, SeparateLineStrokeWidth1, LineStyle)
@@ -276,6 +277,10 @@ Public Class UnitDetailDialog
 
 
         End With
+    End Sub
+
+    Public Overrides Sub DrawControl(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1, newRect As RawRectangleF)
+        Call Me.DrawControl(context, spec, canvasBitmap)
     End Sub
 
     Public Sub Dispose()

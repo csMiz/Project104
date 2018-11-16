@@ -12,6 +12,10 @@ Public Interface IMouseArea
     Event MouseEnter()
     Event MouseLeave()
 
+    Event MouseWheel(e As GameMouseEventArgs)
+
+    Event GlobalMouseMove(e As GameMouseEventArgs)
+
 End Interface
 
 Public Class GameMouseEventArgs
@@ -38,6 +42,10 @@ Public Class GameMouseEventArgs
             .MouseWheel = source.Delta
         End With
         Return me_instance
+    End Function
+
+    Public Function PrintPositionString() As String
+        Return "(" & Me.Position.X & ", " & Me.Position.Y & ")"
     End Function
 
 End Class

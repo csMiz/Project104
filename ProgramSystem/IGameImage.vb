@@ -13,7 +13,6 @@ Public Interface IGameImage
     ''' <summary>
     ''' 直接绘图
     ''' </summary>
-    ''' <param name="context"></param>
     Sub PaintFullImage(ByRef context As SharpDX.Direct2D1.DeviceContext)
 
 

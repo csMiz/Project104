@@ -11,6 +11,8 @@ Public Class PolygonArea
     Public Event MouseDown(e As GameMouseEventArgs) Implements IMouseArea.MouseDown
     Public Event MouseMove(e As GameMouseEventArgs) Implements IMouseArea.MouseMove
     Public Event MouseUp(e As GameMouseEventArgs) Implements IMouseArea.MouseUp
+    Public Event MouseWheel(e As GameMouseEventArgs) Implements IMouseArea.MouseWheel
+    Public Event GlobalMouseMove(e As GameMouseEventArgs) Implements IMouseArea.GlobalMouseMove
 
     Public Function IsInside(input As PointF2) As Boolean Implements IMouseArea.IsInside
         'http://www.html-js.com/article/1538

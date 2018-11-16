@@ -14,8 +14,22 @@ Public Class SkirmishGameLoop
     Private GameEnded As GameEndInfo
 
     Private CampaignIndex As Short = -1
-    Public SkirmishGameMap As New SkirmishMap
+    Public SkirmishGameMap As SkirmishMap = Nothing
     Public BindingCamera As SpectatorCamera
+
+    ''' <summary>
+    ''' 处理控件面板等鼠标点击事件
+    ''' </summary>
+    Public SkirmishPage As GamePageProperty = Nothing
+
+    Public UI_BottomLeftUnitAvatar As GameContentFrame
+
+    Public UI_TopLeftResourceBar As GameContentFrame
+
+    Public UI_BottomActionBar As GameContentFrame
+
+    Public UI_BottomRightMiniMap As GamePictureBox
+
 
     ''' <summary>
     ''' 势力
@@ -40,7 +54,7 @@ Public Class SkirmishGameLoop
 
     Public UnitStateCompleteCounterExpectValue As Integer = 0
     ''' <summary>
-    ''' 当前玩家
+    ''' 当前玩家，对应Sides
     ''' </summary>
     Private NowPlayer As Short = 0
     ''' <summary>
@@ -57,6 +71,11 @@ Public Class SkirmishGameLoop
     Public BuildingList As New List(Of GameBuilding)
 
     Public SkirmishUnitDetailDialog As UnitDetailDialog = UnitDetailDialog.Instance
+    ''' <summary>
+    ''' 每个玩家当前选中的单位在列表里对应的索引
+    ''' </summary>
+    Public SelectedUnitIndex() As Integer
+
 
 
 
@@ -74,12 +93,20 @@ Public Class SkirmishGameLoop
 
         If CampaignIndex = 0 Then
             Dim stream As FileStream = New FileStream(Application.StartupPath & "\newmap.txt", FileMode.Open)
+            If SkirmishGameMap Is Nothing Then SkirmishGameMap = New SkirmishMap
             SkirmishGameMap.LoadFromFile(stream)
-        End If
-
-        SkirmishGameMap.LoadAccessories(BindingCamera.GetDevceContext, BindingCamera.Zoom)
-
+            End If
+            '预先绘制地图装饰物
+            SkirmishGameMap.LoadAccessories(BindingCamera.GetDevceContext, BindingCamera.Zoom)
+        '载入预设单位
         Me.LoadUnitsFromXMLAndTemplates(GetCampaignScript(0))
+        '初始化选择单位字段为空(-1)
+        ReDim Me.SelectedUnitIndex(Me.Sides.Count - 1)
+        For i = 0 To Me.Sides.Count - 1
+            Me.SelectedUnitIndex(i) = -1
+        Next
+        Me.InitializeSkirmishPage()
+        '初始化流程状态机
         Me.InitializeSkirmishGamePhases()
 
         SkirmishGameMap.ResourcesLoaded = True
@@ -350,6 +377,72 @@ Public Class SkirmishGameLoop
         Return False
 
     End Function
+
+    Public Sub InitializeSkirmishPage()
+        Me.SkirmishPage = New GamePageProperty
+
+        Dim tmpGameBoard As New GameInteractiveRectangle
+        With tmpGameBoard
+            .BasicRect = New RawRectangleF(0, 0, Me.BindingCamera.Resolve.X, Me.BindingCamera.Resolve.Y)
+        End With
+        AddHandler tmpGameBoard.MouseDown, AddressOf Me.GameBoardMouseDown
+        Me.SkirmishPage.UIElements.Add(tmpGameBoard)
+
+        Dim tmpBottomLeftUnitAvatar As New GameContentFrame
+        Dim tmpAvatarPicture As New GamePictureBox With {
+        .Visible = False,
+        .BasicRect = New RawRectangleF(0, 568, 200, 768),
+        .Opacity = NOT_TRANSPARENT,
+        .Z_Index = 1,
+        .ImageSource = Nothing}
+        tmpBottomLeftUnitAvatar.Children.Add(tmpAvatarPicture)
+        tmpBottomLeftUnitAvatar.BasicRect = New RawRectangleF(0, 568, 200, 768)
+        tmpBottomLeftUnitAvatar.DefaultBackground = BLACK_COLOUR_BRUSH(2)
+        Dim tmpLeftAvatarMouseDown = Sub()
+                                         Debug.WriteLine("avatar clicked!")
+                                     End Sub
+
+        AddHandler tmpBottomLeftUnitAvatar.MouseDown, tmpLeftAvatarMouseDown
+        'AddHandler tmpBottomLeftUnitAvatar .MouseMove , AddressOf ...
+        Me.SkirmishPage.UIElements.Add(tmpBottomLeftUnitAvatar)
+        Me.SkirmishPage.GenerateElementsQuadtree(Me.BindingCamera.Resolve)
+        Me.SkirmishPage.InitializeCursor(Me.BindingCamera.CurrentCursorPosition)
+
+        Me.BindingCamera.PaintingLayers.Push(AddressOf Me.SkirmishPage.PaintElements)
+        'TODO: Add painting description
+        Me.BindingCamera.ActivePages.Add(Me.SkirmishPage)
+
+    End Sub
+
+    Public Sub GameBoardMouseDown(e As GameMouseEventArgs)
+
+    End Sub
+
+    ''' <summary>
+    ''' 尝试用鼠标选中一个单位
+    ''' </summary>
+    ''' <param name="input">点击的格子索引</param>
+    Public Sub MouseTryClickUnit(input As PointI)
+        Dim tmpSelectedUnit As Integer = -1
+        For i = 0 To Me.UnitList.Count - 1
+            Dim tmpUnit As GameUnit = Me.UnitList(i)
+            If tmpUnit.Position.X = input.X AndAlso tmpUnit.Position.Y = input.Y Then
+                tmpSelectedUnit = i
+                Exit For
+            End If
+        Next
+        Me.SelectedUnitIndex(NowPlayer) = tmpSelectedUnit
+        If tmpSelectedUnit = -1 Then Return
+
+        If Me.UnitList(tmpSelectedUnit).Player = NowPlayer Then
+            'ShowUnitDetailUI()
+        Else
+            'ShowRestrictedDetailUI()
+        End If
+
+
+    End Sub
+
 
     Public Sub Dispose()
         'TODO

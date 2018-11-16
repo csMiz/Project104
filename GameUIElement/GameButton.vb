@@ -13,17 +13,19 @@ Imports SharpDX.Direct2D1
 ''' </summary>
 Public MustInherit Class GameButton
     Inherits GameBasicUIElement
-
-    Protected BindingContext As DeviceContext = Nothing
-
-    Private ButtonTextSource As String = vbNullString
+    ''' <summary>
+    ''' 按钮是否有效，相当于Enable
+    ''' </summary>
+    Protected CanBePressed As Boolean = True
+    Private TextSource As String = vbNullString
     Public Property Text As String
-        Set(value As String)
-            Me.ResetTextImage(value)
-        End Set
         Get
-            Return Me.ButtonTextSource
+            Return TextSource
         End Get
+        Set(value As String)
+            TextSource = value
+            ResetTextImage(value)
+        End Set
     End Property
     Protected TextImage As TextItem = Nothing
 
@@ -43,9 +45,8 @@ Public MustInherit Class GameButton
     End Sub
 
 
-    Public MustOverride Overrides Sub DrawControl(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
+    Public MustOverride Overrides Sub DrawControl(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1, newRect As SharpDX.Mathematics.Interop.RawRectangleF)
 
-    Public Event Click()
 
 
 

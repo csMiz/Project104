@@ -59,6 +59,7 @@ Module GameResources
     Public ReadOnly HALF_ROOT3 As Single = Sqrt(3) / 2
     Public Const DEFAULT_STRING As String = "Default"
     Public Const UNDERLINE As String = "_"
+    Public Const ESCAPE_VERTICAL_LINE As String = "\|"
     Public Const TYPE_THREE_IMAGES As String = "three"
     Public Const SKIRMISH_FRAGMENT_DOMAIN As String = "skirmish_unit"
     Public Const SKIRMISH_IMAGE_GROUP As String = "skirmish_chess"
@@ -76,22 +77,36 @@ Module GameResources
     ''' <summary>
     ''' 由透明到不透明的黑色SolidBrush，索引为0到4
     ''' </summary>
-    Public GREY_COLOUR As List(Of SolidColorBrush)
+    Public BLACK_COLOUR_BRUSH As List(Of SolidColorBrush)
+    ''' <summary>
+    ''' 由透明到不透明的白色SolidBrush，索引为0到4
+    ''' </summary>
+    Public WHITE_COLOUR_BRUSH As List(Of SolidColorBrush)
     Public WHITE_COLOUR As New RawColor4(1, 1, 1, 1)
+    Public TRANSPARENT_BRUSH As SolidColorBrush = Nothing
 
     Public NORMAL_BITMAP_PROPERTY As BitmapProperties1 = New BitmapProperties1() With {
                               .PixelFormat = New SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied),
                               .BitmapOptions = BitmapOptions.Target}
 
-    Public ReadOnly ALL_GAME_STAGES As New List(Of SingleGameLoopStage) From {0, 1, 2, 3, 4, 5}
+    Public NORMAL_BRUSH_PROPERTY As New BrushProperties() With {
+        .Opacity = NOT_TRANSPARENT,
+        .Transform = New RawMatrix3x2 With {
+                .M11 = 1,
+                .M12 = 0,
+                .M21 = 0,
+                .M22 = 1,
+                .M31 = 0,
+                .M32 = 0}}
 
-    Public TestTextImage As TextItem
+    Public ReadOnly ALL_GAME_STAGES As New List(Of SingleGameLoopStage) From {0, 1, 2, 3, 4, 5}
 
 
     ''' <summary>
     ''' 加载资源
     ''' </summary>
     Public Sub LoadResources(context As SharpDX.Direct2D1.DeviceContext)
+
         Dim bitmap_hex_grass As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\Map\hex_grass.png")
         Dim bitmap_hex_forest As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\Map\hex_forest.png")
         Dim bitmap_hex_mountain As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\Map\hex_mountain.png")
@@ -123,25 +138,32 @@ Module GameResources
         FragmentImages.LoadImages(context)
         UnitImages.LoadFromFiles(context)
         GameIcons.LoadFromFiles(context)
+        GameFontHelper.loadTextFromFiles()
 
         SIDE_COLOUR = SolidColorBrushSet.LoadFromXml(context, My.Resources.Colours)
 
-        GREY_COLOUR = New List(Of SolidColorBrush)
-        With GREY_COLOUR
+        BLACK_COLOUR_BRUSH = New List(Of SolidColorBrush)
+        With BLACK_COLOUR_BRUSH
             .Add(New SolidColorBrush(context, New RawColor4(0, 0, 0, 0.5 * ONE_THIRD)))
             .Add(New SolidColorBrush(context, New RawColor4(0, 0, 0, ONE_THIRD)))
             .Add(New SolidColorBrush(context, New RawColor4(0, 0, 0, 0.5)))
             .Add(New SolidColorBrush(context, New RawColor4(0, 0, 0, 0.5 + 0.5 * ONE_THIRD)))
             .Add(New SolidColorBrush(context, New RawColor4(0, 0, 0, 0.5 + ONE_THIRD)))
         End With
+        WHITE_COLOUR_BRUSH = New List(Of SolidColorBrush)
+        With WHITE_COLOUR_BRUSH
+            .Add(New SolidColorBrush(context, New RawColor4(1, 1, 1, 0.5 * ONE_THIRD)))
+            .Add(New SolidColorBrush(context, New RawColor4(1, 1, 1, ONE_THIRD)))
+            .Add(New SolidColorBrush(context, New RawColor4(1, 1, 1, 0.5)))
+            .Add(New SolidColorBrush(context, New RawColor4(1, 1, 1, 0.5 + 0.5 * ONE_THIRD)))
+            .Add(New SolidColorBrush(context, New RawColor4(1, 1, 1, 0.5 + ONE_THIRD)))
+        End With
+        TRANSPARENT_BRUSH = New SolidColorBrush(context, New RawColor4(1, 1, 1, 0))
 
         GameFontHelper.AddFontFile(Application.StartupPath & "\P104_Font1.ttf", "P104_Font1")
 
         SkirmishTerrain.Initialize()
 
-        TestTextImage = New TextItem("Test String Edge", New PointI(500, 500))
-        TestTextImage.LoadFont(GameFontHelper.GetFontFamily(0), 32, Brushes.Pink, Color.Red)
-        TestTextImage.GenerateImage(context)
 
     End Sub
 
