@@ -17,6 +17,15 @@ Public Class GameContentFrame
 
     Public Children As New List(Of GameBasicUIElement)
 
+    Public ChildrenQuadTree As Quadtree = Nothing
+    Private ElementsMouseInside As New List(Of GameBasicUIElement)
+
+    Public Sub InitializeQuadtree(pageSize As PointI)
+        Me.ChildrenQuadTree = New Quadtree(MathHelper.Size2RawRect(pageSize))
+        For Each element As GameBasicUIElement In Children
+            Me.ChildrenQuadTree.AddItem(element)
+        Next
+    End Sub
 
     ''' <summary>
     ''' 返回内容总高度，同时刷新BasicRect.Bottom
@@ -39,9 +48,25 @@ Public Class GameContentFrame
         'TODO
     End Sub
 
-    Public Overrides Sub DrawControl(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1, newRect As RawRectangleF)
-        If Me.DefaultBackground IsNot Nothing Then
-            context.FillRectangle(newRect, Me.DefaultBackground)
-        End If
+    Public Overrides Sub DrawControlAtSelfCanvas(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
+        'context.FillRectangle(Me.SelfCanvasRect, Me.DefaultBackground)
+
+        For Each element As GameBasicUIElement In Me.Children
+            If element.IsValid Then
+                element.DrawControlAtSelfCanvas(context, spec, canvasBitmap)
+            End If
+        Next
+        With context
+            .Target = Me.ControlCanvas
+            .BeginDraw()
+            .Clear(Nothing)
+        End With
+        For Each element As GameBasicUIElement In Me.Children
+            If element.Visible Then
+                element.DrawControl(context, spec, Me.ControlCanvas)
+            End If
+        Next
+        context.EndDraw()
+
     End Sub
 End Class

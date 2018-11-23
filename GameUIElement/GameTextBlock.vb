@@ -17,7 +17,8 @@ Public Class GameTextBlock
 
     Private TextImage As TextItem = Nothing
 
-    Public Overrides Sub DrawControl(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1, newRect As RawRectangleF)
+
+    Public Overrides Sub DrawControlAtSelfCanvas(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
         Throw New NotImplementedException()
     End Sub
 End Class

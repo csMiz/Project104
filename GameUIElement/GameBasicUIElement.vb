@@ -31,8 +31,11 @@ Public MustInherit Class GameBasicUIElement
             Return CInt(BasicRect.Right - BasicRect.Left)
         End Get
     End Property
+    Public AbsoluteRect As RawRectangleF = Nothing
+    Public FatherViewRect As RawRectangleF = Nothing
+    Public InteractiveRect As RawRectangleF = Nothing
     Public Z_Index As Short = 0
-    Public DefaultBackground As Brush = Nothing
+    Public DefaultBackground As Brush = TRANSPARENT_BRUSH
     Public Visible As Boolean = True
     Public FreezeEvents As Boolean = False
     Public Opacity As Single = 1.0F
@@ -40,8 +43,8 @@ Public MustInherit Class GameBasicUIElement
     Public RelativeLastItem As GameBasicUIElement = Nothing
     Public RelativeNextItem As GameBasicUIElement = Nothing
 
-    Public Event MouseEnter() Implements IMouseArea.MouseEnter
-    Public Event MouseLeave() Implements IMouseArea.MouseLeave
+    Public Event MouseEnter(e As GameMouseEventArgs) Implements IMouseArea.MouseEnter
+    Public Event MouseLeave(e As GameMouseEventArgs) Implements IMouseArea.MouseLeave
     Public Event MouseDown(e As GameMouseEventArgs) Implements IMouseArea.MouseDown
     Public Event MouseMove(e As GameMouseEventArgs) Implements IMouseArea.MouseMove
     Public Event MouseUp(e As GameMouseEventArgs) Implements IMouseArea.MouseUp
@@ -54,16 +57,36 @@ Public MustInherit Class GameBasicUIElement
     Public BindingContext As DeviceContext = Nothing
     Protected ControlCanvas As Bitmap1 = Nothing
 
+    Public Shared ZIndexComparison As New Comparison(Of GameBasicUIElement)(AddressOf CompareZIndex)
+    Public Shared ZIndexComparisonReverse As New Comparison(Of GameBasicUIElement)(AddressOf CompareZIndexReverse)
+
     Public Sub InitializeControlCanvas()
         Me.ControlCanvas = New Bitmap1(Me.BindingContext, New SharpDX.Size2(Me.Width, Me.Height), NORMAL_BITMAP_PROPERTY)
         Me.SelfCanvasRect = New RawRectangleF(0, 0, Me.Width, Me.Height)
     End Sub
 
+    Public Overridable Sub RefreshRects()
+        '从外部更新Rect后，在这里调用对子对象Rect的更新
+    End Sub
+
+    ''' <summary>
+    ''' 在控件独立画布上绘制控件
+    ''' </summary>
+    Public MustOverride Sub DrawControlAtSelfCanvas(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
+
+    ''' <summary>
+    ''' 使用默认位置绘制控件
+    ''' </summary>
     Public Overridable Overloads Sub DrawControl(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
         Call Me.DrawControl(context, spec, canvasBitmap, Me.BasicRect)
     End Sub
 
-    Public MustOverride Overloads Sub DrawControl(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1, newRect As RawRectangleF)
+    ''' <summary>
+    ''' 使用新的位置绘制控件
+    ''' </summary>
+    Public Overridable Overloads Sub DrawControl(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1, newRect As RawRectangleF)
+        context.DrawBitmap(Me.ControlCanvas, newRect, NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
+    End Sub
 
     Public Function IsInside(input As PointF2) As Boolean Implements IMouseArea.IsInside
         Return (input.X >= Me.BasicRect.Left AndAlso input.X <= Me.BasicRect.Right AndAlso input.Y >= Me.BasicRect.Top AndAlso input.Y <= Me.BasicRect.Bottom)
@@ -102,11 +125,11 @@ Public MustInherit Class GameBasicUIElement
     Public Sub RaiseMouseUp(e As GameMouseEventArgs)
         If Not FreezeEvents Then RaiseEvent MouseUp(e)
     End Sub
-    Public Sub RaiseMouseEnter()
-        If Not FreezeEvents Then RaiseEvent MouseEnter()
+    Public Sub RaiseMouseEnter(e As GameMouseEventArgs)
+        If Not FreezeEvents Then RaiseEvent MouseEnter(e)
     End Sub
-    Public Sub RaiseMouseLeave()
-        If Not FreezeEvents Then RaiseEvent MouseLeave()
+    Public Sub RaiseMouseLeave(e As GameMouseEventArgs)
+        If Not FreezeEvents Then RaiseEvent MouseLeave(e)
     End Sub
     Public Sub RaiseMouseWheel(e As GameMouseEventArgs)
         If Not FreezeEvents Then RaiseEvent MouseWheel(e)
@@ -118,4 +141,13 @@ Public MustInherit Class GameBasicUIElement
     Public Function IsValid() As Boolean Implements IQuadtreeRecognizable.IsValid
         Return Me.Visible
     End Function
+
+    Public Shared Function CompareZIndex(a As GameBasicUIElement, b As GameBasicUIElement) As Integer
+        Return a.Z_Index - b.Z_Index
+    End Function
+
+    Public Shared Function CompareZIndexReverse(a As GameBasicUIElement, b As GameBasicUIElement) As Integer
+        Return b.Z_Index - a.Z_Index
+    End Function
+
 End Class

@@ -17,4 +17,9 @@ Public Class GameInteractiveRectangle
         'Interactive Rectangle is only a layer for mouse events.
         'It is invisible.
     End Sub
+
+    Public Overrides Sub DrawControlAtSelfCanvas(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
+        'Interactive Rectangle is only a layer for mouse events.
+        'It is invisible.
+    End Sub
 End Class

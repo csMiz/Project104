@@ -28,6 +28,7 @@ Public MustInherit Class GameButton
         End Set
     End Property
     Protected TextImage As TextItem = Nothing
+    Protected HaveFocus As Boolean = False
 
     Public Sub BindDeviceContext(context As DeviceContext)
         Me.BindingContext = context
@@ -43,10 +44,6 @@ Public MustInherit Class GameButton
             Me.TextImage.GenerateImage(Me.BindingContext)
         End If
     End Sub
-
-
-    Public MustOverride Overrides Sub DrawControl(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1, newRect As SharpDX.Mathematics.Interop.RawRectangleF)
-
 
 
 

@@ -19,6 +19,11 @@ Public Class SpectatorCamera
     ''' 分辨率
     ''' </summary>
     Public Resolve As PointI
+    Public ReadOnly Property ResolveRectangle As Mathematics.Interop.RawRectangleF
+        Get
+            Return New Mathematics.Interop.RawRectangleF(0, 0, Me.Resolve.X, Me.Resolve.Y)
+        End Get
+    End Property
     ''' <summary>
     ''' 定义绘图委托
     ''' </summary>

@@ -31,6 +31,10 @@ Public Class GameSettingRepository
     ''' 分辨率
     ''' </summary>
     Public UserResolve As PointI = Nothing
+    ''' <summary>
+    ''' 最大FPS
+    ''' </summary>
+    Public FPSMax As Integer = 30
 
 
 
@@ -46,6 +50,7 @@ Public Class GameSettingRepository
             .UserLanguageIndex = GameFontHelper.findLanguageIndex("ENGL")
             .GameWindowType = WindowType.Window
             .UserResolve = New PointI(1024, 768)
+            .FPSMax = 30
 
             .GameUserRecord = New GameAchievementRecord()
             .GameUserRecord.InitializeEmptyRecord()
@@ -98,7 +103,7 @@ Public Class GameSettingRepository
 
         '---------------
 
-        Dim contentBuffer(32) As Byte
+        Dim contentBuffer(33) As Byte
         For i = 0 To 3
             contentBuffer(i) = &H0
         Next
@@ -131,9 +136,11 @@ Public Class GameSettingRepository
         contentBuffer(31) = resolveY(0)
         contentBuffer(32) = resolveY(1)
 
+        contentBuffer(33) = Me.FPSMax
+
         '--------------
 
-        Dim systemBuffer() As Byte
+        Dim systemBuffer(31) As Byte
         For i = 0 To 3
             systemBuffer(i) = &H0
         Next

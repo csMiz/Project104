@@ -192,17 +192,33 @@ Public Class GameTest
         'Debug.WriteLine(AnimalControl.GetAnimalType(animalList(1)))
         ''这样输出均为Animal
 
+        Dim animalList As New List(Of Animal)
+        Dim tmpAnimal As New Animal
+        Dim tmpDog As New Dog
+        animalList.Add(tmpAnimal)
+        animalList.Add(tmpDog)
+        For i = 0 To 1
+            Call animalList(i).Eat()
+        Next
+        '这样输出是不同的，可行！
     End Sub
 
 End Class
 
 Public Class Animal
     Public Name As String = vbNullString
+
+    Public Overridable Sub Eat()
+        Debug.WriteLine("animal eat")
+    End Sub
 End Class
 
 Public Class Dog
     Inherits Animal
 
+    Public Overrides Sub Eat()
+        Debug.WriteLine("dog eat")
+    End Sub
 End Class
 
 Public Class AnimalControl
@@ -213,4 +229,5 @@ Public Class AnimalControl
     Public Overloads Shared Function GetAnimalType(item As Dog) As String
         Return "dog"
     End Function
+
 End Class

@@ -19,7 +19,15 @@ Public Class GamePictureBox
     '图片绘制会超过控件边缘
     Public ImageSource As IGameImage
 
-    Public Overrides Sub DrawControl(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1, newRect As RawRectangleF)
-        Me.ImageSource.PaintFullImage(context)
+    Public Overrides Sub DrawControlAtSelfCanvas(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
+        With context
+            .Target = Me.ControlCanvas
+            .BeginDraw()
+            .Clear(Nothing)
+
+            Me.ImageSource.PaintFullImage(context)
+
+            .EndDraw()
+        End With
     End Sub
 End Class

@@ -122,9 +122,11 @@
     <Compile Include="GameUIElement\GameDialog.vb" />
     <Compile Include="GameUIElement\GameFlatButton.vb" />
     <Compile Include="GameUIElement\GameInteractiveRectangle.vb" />
+    <Compile Include="GameUIElement\GameListBox.vb" />
     <Compile Include="GameUIElement\GamePageProperty.vb" />
     <Compile Include="GameUIElement\GamePictureBox.vb" />
     <Compile Include="GameUIElement\GameScrollViewer.vb" />
+    <Compile Include="GameUIElement\GameShadowPad.vb" />
     <Compile Include="GameUIElement\GameTextBlock.vb" />
     <Compile Include="GameUIElement\GameTextBox.vb" />
     <Compile Include="GameUIElement\GameTreeViewItem.vb" />

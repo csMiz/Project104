@@ -287,6 +287,10 @@ Public Class UnitDetailDialog
 
     End Sub
 
+    Public Overrides Sub DrawControlAtSelfCanvas(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
+        'TODO
+    End Sub
+
     ''' <summary>
     ''' 单例模式
     ''' </summary>

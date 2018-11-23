@@ -561,6 +561,21 @@ p104
  绑定的D2dDeviceContext
  </summary>
 </member>
+<member name="M:p104.GameBasicUIElement.DrawControlAtSelfCanvas(SharpDX.Direct2D1.DeviceContext@,p104.SpectatorCamera@,SharpDX.Direct2D1.Bitmap1)">
+ <summary>
+ 在控件独立画布上绘制控件
+ </summary>
+</member>
+<member name="M:p104.GameBasicUIElement.DrawControl(SharpDX.Direct2D1.DeviceContext@,p104.SpectatorCamera@,SharpDX.Direct2D1.Bitmap1)">
+ <summary>
+ 使用默认位置绘制控件
+ </summary>
+</member>
+<member name="M:p104.GameBasicUIElement.DrawControl(SharpDX.Direct2D1.DeviceContext@,p104.SpectatorCamera@,SharpDX.Direct2D1.Bitmap1,SharpDX.Mathematics.Interop.RawRectangleF)">
+ <summary>
+ 使用新的位置绘制控件
+ </summary>
+</member>
 <member name="T:p104.GameButton">
  <summary>
  Button基类
@@ -570,6 +585,89 @@ p104
  <summary>
  按钮是否有效，相当于Enable
  </summary>
+</member>
+<member name="T:p104.GameComboBox">
+ <summary>
+ 组合框控件类
+ </summary>
+</member>
+<member name="F:p104.GameComboBox.TitleImage">
+ <summary>
+ 标签文字
+ </summary>
+</member>
+<member name="F:p104.GameComboBox.SelectedBox">
+ <summary>
+ 当前所选内容文本框控件
+ </summary>
+</member>
+<member name="F:p104.GameComboBox.TitleString">
+ <summary>
+ 标签纯文本
+ </summary>
+</member>
+<member name="F:p104.GameComboBox.SelectionStrings">
+ <summary>
+ 所有选项
+ </summary>
+</member>
+<member name="F:p104.GameComboBox.PlaceHolder">
+ <summary>
+ SelectedIndex为-1时显示的提示文字
+ </summary>
+</member>
+<member name="F:p104.GameComboBox.SelectedIndex">
+ <summary>
+ 所选选项索引
+ </summary>
+</member>
+<member name="F:p104.GameComboBox.LabelRect">
+ <summary>
+ 标签矩形
+ </summary>
+</member>
+<member name="F:p104.GameComboBox.FlyoutControl">
+ <summary>
+ 弹出的子菜单控件
+ </summary>
+</member>
+<member name="F:p104.GameComboBox.FlyoutRect">
+ <summary>
+ 定义FlyoutControl的BasicRect
+ </summary>
+</member>
+<member name="F:p104.GameComboBox.FlyoutShadowPad">
+ <summary>
+ 弹出子菜单阴影层控件
+ </summary>
+</member>
+<member name="F:p104.GameComboBox.HaveFocus">
+ <summary>
+ 当前鼠标是否在控件内
+ </summary>
+</member>
+<member name="P:p104.GameComboBox.SelectionCount">
+ <summary>
+ 选项数
+ </summary>
+</member>
+<member name="F:p104.GameComboBox.Editable">
+ <summary>
+ ComboBox是否接受自定义输入
+ </summary>
+</member>
+<member name="M:p104.GameComboBox.ImportShadowPad(p104.GameShadowPad,System.Collections.Generic.List{p104.GameBasicUIElement})">
+ <summary>
+ 导入ShadowPad并设定Flyout至GlobalControlList内，调用此方法前需要先调用InitializeComboBox
+ </summary>
+ <param name="shadowPad">阴影层控件</param>
+ <param name="globalControlList">全局控件列表</param>
+</member>
+<member name="M:p104.GameComboBox.RelativeGlobalMouseMove(p104.GameMouseEventArgs)">
+ <summary>
+ 作为子对象时的默认GMM事件处理
+ </summary>
+ <param name="e">RelativeEventArgs，对应自己的FatherRect</param>
 </member>
 <member name="T:p104.GameContentFrame">
  <summary>
@@ -604,9 +702,35 @@ p104
  扁平化按钮控件类
  </summary>
 </member>
+<member name="M:p104.GameListBox.DisposeTextImages">
+ <summary>
+ 销毁所有缓存的文字图片对象
+ </summary>
+</member>
+<member name="T:p104.GamePageProperty">
+ <summary>
+ 控件页面类，交互的基本容器，需要手动注册四叉树
+ </summary>
+</member>
+<member name="F:p104.GamePageProperty.UIElements">
+ <summary>
+ 子控件
+ </summary>
+</member>
+<member name="F:p104.GamePageProperty.ElementsQuadtree">
+ <summary>
+ 子控件四叉树
+ </summary>
+</member>
+<member name="F:p104.GamePageProperty.ElementsMouseInside">
+ <summary>
+ 当前状态为“指针在控件内”的控件
+ </summary>
+</member>
 <member name="M:p104.GamePageProperty.TriggerMouseMove(p104.GameMouseEventArgs)">
  <summary>
- 触发MouseMove, MouseEnter, MouseLeave
+ 触发MouseMove, MouseEnter, MouseLeave。
+ 一旦将e.Deliver赋值为False，MouseMove, Enter, Leave都将停止传递
  </summary>
 </member>
 <member name="T:p104.GamePictureBox">
@@ -624,6 +748,11 @@ p104
  滚动区域内的子元素，需要使用相对位置，从上到下排列
  </summary>
 </member>
+<member name="F:p104.GameScrollViewer.ScrollMouseLock">
+ <summary>
+ 当鼠标不在ScrollViewer区域内时禁用滚轮事件
+ </summary>
+</member>
 <member name="P:p104.GameScrollViewer.CurrentScrollPosition">
  <summary>
  当前滚动位置
@@ -639,6 +768,26 @@ p104
  滚动条宽度
  </summary>
 </member>
+<member name="F:p104.GameScrollViewer.RenderingItems">
+ <summary>
+ 按ZIndex从后到前（ZIndex递增）的显示的子控件
+ </summary>
+</member>
+<member name="F:p104.GameScrollViewer.RenderingItemRects">
+ <summary>
+ 顺序同RenderingItems，绘制子控件相对于ScrollViewer的ControlCanvas的位置
+ </summary>
+</member>
+<member name="F:p104.GameScrollViewer.RenderingItemsSource">
+ <summary>
+ 由上到下顺序排列的显示的子控件
+ </summary>
+</member>
+<member name="F:p104.GameScrollViewer.MouseFocusChild">
+ <summary>
+ 当前鼠标聚焦的子控件
+ </summary>
+</member>
 <member name="P:p104.GameScrollViewer.ContentHeight">
  <summary>
  滚动区总高度
@@ -648,7 +797,6 @@ p104
  <summary>
  构造函数
  </summary>
- <param name="defaultEvents">是否使用默认的鼠标事件</param>
 </member>
 <member name="M:p104.GameScrollViewer.CalculateScrollMax">
  <summary>
@@ -660,9 +808,9 @@ p104
  获取当前滚动区会显示的子控件
  </summary>
 </member>
-<member name="M:p104.GameScrollViewer.DrawItemsAtCanvas(SharpDX.Direct2D1.DeviceContext@,p104.SpectatorCamera@,SharpDX.Direct2D1.Bitmap1)">
+<member name="T:p104.GameShadowPad">
  <summary>
- 清空滚动区画布并在其上绘制控件
+ 阴影层控件类
  </summary>
 </member>
 <member name="T:p104.UnitDetailDialog">
@@ -1038,6 +1186,11 @@ p104
 <member name="F:p104.GameSettingRepository.UserResolve">
  <summary>
  分辨率
+ </summary>
+</member>
+<member name="F:p104.GameSettingRepository.FPSMax">
+ <summary>
+ 最大FPS
  </summary>
 </member>
 <member name="F:p104.GameSettingRepository.GameUserRecord">

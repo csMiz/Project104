@@ -6,8 +6,8 @@ Public Class PolygonArea
 
     Public Points As New List(Of PointF2)
 
-    Public Event MouseEnter() Implements IMouseArea.MouseEnter
-    Public Event MouseLeave() Implements IMouseArea.MouseLeave
+    Public Event MouseEnter(e As GameMouseEventArgs) Implements IMouseArea.MouseEnter
+    Public Event MouseLeave(e As GameMouseEventArgs) Implements IMouseArea.MouseLeave
     Public Event MouseDown(e As GameMouseEventArgs) Implements IMouseArea.MouseDown
     Public Event MouseMove(e As GameMouseEventArgs) Implements IMouseArea.MouseMove
     Public Event MouseUp(e As GameMouseEventArgs) Implements IMouseArea.MouseUp

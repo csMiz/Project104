@@ -72,10 +72,22 @@ L1:
 
     Private Sub Form1_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
         Dim args As GameMouseEventArgs = GameMouseEventArgs.FromMouseEventArgs(e, Me.ClientRectangle, test.MainGame.Camera.Resolve)
+        Dim args2 As GameMouseEventArgs = GameMouseEventArgs.FromMouseEventArgs(e, Me.ClientRectangle, test.MainGame.Camera.Resolve)
         test.MainGame.Camera.CurrentCursorPosition = args.Position
         For i = 0 To test.MainGame.Camera.ActivePages.Count - 1
             Dim page As GamePageProperty = test.MainGame.Camera.ActivePages(i)
             page.TriggerMouseMove(args)
+            page.TriggerGlobalMouseMove(args2)
+        Next
+    End Sub
+
+    Private Sub Form1_MouseUp(sender As Object, e As MouseEventArgs) Handles Me.MouseUp
+        'TODO
+        Dim args As GameMouseEventArgs = GameMouseEventArgs.FromMouseEventArgs(e, Me.ClientRectangle, test.MainGame.Camera.Resolve)
+        test.MainGame.Camera.CurrentCursorPosition = args.Position
+        For i = 0 To test.MainGame.Camera.ActivePages.Count - 1
+            Dim page As GamePageProperty = test.MainGame.Camera.ActivePages(i)
+            page.TriggerMouseUp(args)
         Next
     End Sub
 

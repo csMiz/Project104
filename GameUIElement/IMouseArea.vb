@@ -9,8 +9,8 @@ Public Interface IMouseArea
     Event MouseMove(e As GameMouseEventArgs)
     Event MouseUp(e As GameMouseEventArgs)
 
-    Event MouseEnter()
-    Event MouseLeave()
+    Event MouseEnter(e As GameMouseEventArgs)
+    Event MouseLeave(e As GameMouseEventArgs)
 
     Event MouseWheel(e As GameMouseEventArgs)
 
@@ -19,11 +19,10 @@ Public Interface IMouseArea
 End Interface
 
 Public Class GameMouseEventArgs
-    Private Shared me_instance As New GameMouseEventArgs
 
-    Public Position As PointI
-    Public MouseButton As MouseButtons
-    Public MouseWheel As Integer
+    Public Position As New PointI(0, 0)
+    Public MouseButton As MouseButtons = MouseButtons.None
+    Public MouseWheel As Integer = 0
     Public ReadOnly Property X
         Get
             Return Position.X
@@ -34,14 +33,14 @@ Public Class GameMouseEventArgs
             Return Position.Y
         End Get
     End Property
+    Public Deliver As Boolean = True
 
     Public Shared Function FromMouseEventArgs(source As MouseEventArgs, windowsRect As Rectangle, cameraRect As PointI) As GameMouseEventArgs
-        With me_instance
-            .Position = New PointI(source.X * cameraRect.X / windowsRect.Width, source.Y * cameraRect.Y / windowsRect.Height)
-            .MouseButton = source.Button
-            .MouseWheel = source.Delta
-        End With
-        Return me_instance
+        Dim result As New GameMouseEventArgs With {
+            .Position = New PointI(source.X * cameraRect.X / windowsRect.Width, source.Y * cameraRect.Y / windowsRect.Height),
+            .MouseButton = source.Button,
+            .MouseWheel = source.Delta}
+        Return result
     End Function
 
     Public Function PrintPositionString() As String

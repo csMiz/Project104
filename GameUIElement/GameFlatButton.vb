@@ -23,22 +23,32 @@ Public Class GameFlatButton
     Public CursorLightBrush As RadialGradientBrush = Nothing
     Public CursorLightBorderBrush As RadialGradientBrush = Nothing
 
-    Public Sub New()
+    Private ContentRect As RawRectangleF = Nothing
+
+    Public Sub New(Optional usingDefaultEvents As Boolean = True)
         AddHandler Me.GlobalMouseMove, AddressOf Me.FluentCursorLight
+        If usingDefaultEvents Then
+            Call Me.UseDefaultMouseEnterLeaveEvents()
+        End If
         Me.BackgroundColour = BLACK_COLOUR_BRUSH(2)
+    End Sub
+
+    Public Sub UseDefaultMouseEnterLeaveEvents()
+        AddHandler Me.MouseEnter, AddressOf DefaultMouseEnter
+        AddHandler Me.MouseLeave, AddressOf DefaultMouseLeave
     End Sub
 
     Public Sub InitializeCursorLightBrush()
         Dim r_brushProperty As New RadialGradientBrushProperties()
         With r_brushProperty
-            .Center = New RawVector2(-100, -100)
+            .Center = New RawVector2(-150, -150)
             .GradientOriginOffset = New RawVector2(0, 0)
-            .RadiusX = 100
-            .RadiusY = 100
+            .RadiusX = 150
+            .RadiusY = 150
         End With
         Dim stops(1) As GradientStop
         stops(0) = New GradientStop() With {
-            .Color = New RawColor4(1, 1, 1, 0.17),         '全局光
+            .Color = New RawColor4(1, 1, 1, 0.37),         '全局光
             .Position = 0.0F}
         stops(1) = New GradientStop() With {
             .Color = New RawColor4(1, 1, 1, 0),
@@ -66,26 +76,8 @@ Public Class GameFlatButton
 
     End Sub
 
-    Public Overrides Sub DrawControl(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1, newRect As RawRectangleF)
-        With context
-            .EndDraw()
-
-            .Target = Me.ControlCanvas
-            .BeginDraw()
-
-            .Clear(Nothing)
-            .FillRectangle(Me.SelfCanvasRect, Me.BackgroundColour)
-            .FillRectangle(Me.SelfCanvasRect, Me.CursorLightBrush)
-            .DrawRectangle(Me.SelfCanvasRect, Me.BorderColour, 3.0F)
-            .DrawRectangle(Me.SelfCanvasRect, Me.CursorLightBorderBrush, 3.0F)
-            .DrawBitmap(Me.TextImage.FontImage, Me.SelfCanvasRect, NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
-
-            .EndDraw()
-            .Target = canvasBitmap
-            .BeginDraw()
-
-            .DrawBitmap(Me.ControlCanvas, newRect, NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
-        End With
+    Public Sub InitializeBorderStyle()
+        Me.ContentRect = New RawRectangleF(2, 2, Me.SelfCanvasRect.Right - 2, Me.SelfCanvasRect.Bottom - 2)
     End Sub
 
     Public Sub FluentCursorLight(e As GameMouseEventArgs)
@@ -94,6 +86,30 @@ Public Class GameFlatButton
         Dim position As New RawVector2(relativeCursorX, relativeCursorY)
         Me.CursorLightBrush.Center = position
         Me.CursorLightBorderBrush.Center = position
+    End Sub
+
+    Public Overrides Sub DrawControlAtSelfCanvas(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
+        With context
+            .Target = Me.ControlCanvas
+            .BeginDraw()
+            .Clear(Nothing)
+
+            .FillRectangle(Me.ContentRect, Me.BackgroundColour)
+            If Me.HaveFocus Then .FillRectangle(Me.ContentRect, Me.CursorLightBrush)
+            .DrawRectangle(Me.SelfCanvasRect, Me.BorderColour, 3.0F)
+            .DrawRectangle(Me.SelfCanvasRect, Me.CursorLightBorderBrush, 3.0F)
+            .DrawBitmap(Me.TextImage.FontImage, Me.SelfCanvasRect, NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
+
+            .EndDraw()
+        End With
+    End Sub
+
+    Private Sub DefaultMouseEnter()
+        Me.HaveFocus = True
+    End Sub
+
+    Private Sub DefaultMouseLeave()
+        Me.HaveFocus = False
     End Sub
 
 End Class

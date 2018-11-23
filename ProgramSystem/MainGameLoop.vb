@@ -42,18 +42,13 @@ Public Class MainGameLoop
         Dim btnMissionSelect As New GameFlatButton
         With btnMissionSelect
             .BindDeviceContext(Me.CameraD2DContext)
-            .BorderColour = New SolidColorBrush(Me.CameraD2DContext, New RawColor4(0.9, 0.9, 0.9, 1))
+            .BorderColour = BLACK_COLOUR_BRUSH(2)
             .BasicRect = New RawRectangleF(Camera.Resolve.X / 2 - 200, 400, Camera.Resolve.X / 2 + 200, 450)
             .InitializeControlCanvas()
             .InitializeCursorLightBrush()
+            .InitializeBorderStyle()
             .Text = "Start Game"
         End With
-        Dim tmpMouseEnter = Sub()
-                                btnMissionSelect.BorderColour = New SolidColorBrush(Me.CameraD2DContext, New RawColor4(1, 0, 0, 1))
-                            End Sub
-        Dim tmpMouseLeave = Sub()
-                                btnMissionSelect.BorderColour = New SolidColorBrush(Me.CameraD2DContext, New RawColor4(0.9, 0.9, 0.9, 1))
-                            End Sub
         Dim tmpMouseDown = Async Sub()
                                Debug.WriteLine("click!!")
                                Me.SuspendPaint()
@@ -69,17 +64,16 @@ Public Class MainGameLoop
                                Me.DrawSkirmish(False)
                                Me.StartPaint()
                            End Sub
-        AddHandler btnMissionSelect.MouseEnter, tmpMouseEnter
-        AddHandler btnMissionSelect.MouseLeave, tmpMouseLeave
         AddHandler btnMissionSelect.MouseDown, tmpMouseDown
 
         Dim btnSetting As New GameFlatButton
         With btnSetting
             .BindDeviceContext(Me.CameraD2DContext)
-            .BorderColour = New SolidColorBrush(Me.CameraD2DContext, New RawColor4(0.9, 0.9, 0.9, 1))
+            .BorderColour = BLACK_COLOUR_BRUSH(2)
             .BasicRect = New RawRectangleF(Camera.Resolve.X / 2 - 200, 460, Camera.Resolve.X / 2 + 200, 510)
             .InitializeControlCanvas()
             .InitializeCursorLightBrush()
+            .InitializeBorderStyle()
             .Text = "Settings"
         End With
         Dim settingBtn_MouseDown = Sub()
@@ -96,10 +90,11 @@ Public Class MainGameLoop
         Dim btnExitGame As New GameFlatButton
         With btnExitGame
             .BindDeviceContext(Me.CameraD2DContext)
-            .BorderColour = New SolidColorBrush(Me.CameraD2DContext, New RawColor4(0.9, 0.9, 0.9, 1))
+            .BorderColour = BLACK_COLOUR_BRUSH(2)
             .BasicRect = New RawRectangleF(Camera.Resolve.X / 2 - 200, 520, Camera.Resolve.X / 2 + 200, 570)
             .InitializeControlCanvas()
             .InitializeCursorLightBrush()
+            .InitializeBorderStyle()
             .Text = "End Game"
         End With
 
@@ -118,10 +113,11 @@ Public Class MainGameLoop
         Dim menu_1 As New GameFlatButton
         With menu_1
             .BindDeviceContext(Me.CameraD2DContext)
-            .BorderColour = New SolidColorBrush(Me.CameraD2DContext, New RawColor4(0.9, 0.9, 0.9, 1))
+            .BorderColour = BLACK_COLOUR_BRUSH(2)
             .BasicRect = New RawRectangleF(100, 300, 500, 350)
             .InitializeControlCanvas()
             .InitializeCursorLightBrush()
+            .InitializeBorderStyle()
             .Text = "Graphics"       'TODO： 使用TextResource
         End With
         Dim menu_1_click = Sub()
@@ -139,10 +135,11 @@ Public Class MainGameLoop
         Dim menu_2 As New GameFlatButton
         With menu_2
             .BindDeviceContext(Me.CameraD2DContext)
-            .BorderColour = New SolidColorBrush(Me.CameraD2DContext, New RawColor4(0.9, 0.9, 0.9, 1))
+            .BorderColour = BLACK_COLOUR_BRUSH(2)
             .BasicRect = New RawRectangleF(100, 360, 500, 410)
             .InitializeControlCanvas()
             .InitializeCursorLightBrush()
+            .InitializeBorderStyle()
             .Text = "Audio"       'TODO： 使用TextResource
         End With
         Dim menu_2_click = Sub()
@@ -156,45 +153,73 @@ Public Class MainGameLoop
         Dim scrollLeft As Integer = CInt((Me.Camera.Resolve.X - scrollWidth) / 2)
         With scrollPage1
             .BasicRect = New RawRectangleF(scrollLeft, 0, scrollLeft + scrollWidth, Me.Camera.Resolve.Y)
+            .AbsoluteRect = .BasicRect
             .BindingContext = Me.CameraD2DContext
             .InitializeControlCanvas()
         End With
 
         '1-1 窗口设置
+        Dim menu_1_shadow As New GameShadowPad
+        With menu_1_shadow
+            .BasicRect = Camera.ResolveRectangle
+            .BindingContext = Me.CameraD2DContext
+            .InitializeControlCanvas()
+            .DefaultBackground = BLACK_COLOUR_BRUSH(3)
+            .Visible = False
+        End With
+
         Dim menu_1_1 As New GameComboBox
         With menu_1_1
-            .BasicRect = New RawRectangleF(0, 0, 800, 100)
+            .BasicRect = New RawRectangleF(0, 0, 800, 50)
             .TitleString = "显示模式"
             .SelectionStrings.Add("窗口模式")
             .SelectionStrings.Add("全屏模式")
             .SelectedIndex = 0
             .BindingContext = Me.CameraD2DContext
             .InitializeComboBox(500)
+            .ImportShadowPad(menu_1_shadow, GraphicsSettingPage.UIElements)
         End With
 
         Dim menu_1_2 As New GameComboBox
         With menu_1_2
-            .BasicRect = New RawRectangleF(0, 100, 800, 200)
+            .BasicRect = New RawRectangleF(0, 50, 800, 100)
             .TitleString = "分辨率"
             .SelectionStrings.Add("800*600")
             .SelectionStrings.Add("1024*768")
             .SelectionStrings.Add("1280*768")
             .SelectionStrings.Add("1280*800")
             .SelectionStrings.Add("1440*900")
+            .SelectedIndex = 0
             .BindingContext = Me.CameraD2DContext
             .InitializeComboBox(500)
+            .ImportShadowPad(menu_1_shadow, GraphicsSettingPage.UIElements)
+        End With
+
+        Dim menu_1_3 As New GameComboBox
+        With menu_1_3
+            .BasicRect = New RawRectangleF(0, 100, 800, 150)
+            .TitleString = "图像绘制帧速率"
+            .SelectionStrings.Add("30")
+            .SelectionStrings.Add("60")
+            .SelectedIndex = 0
+            .BindingContext = Me.CameraD2DContext
+            .InitializeComboBox(500)
+            .ImportShadowPad(menu_1_shadow, GraphicsSettingPage.UIElements)
         End With
 
         menu_1_1.RelativeNextItem = menu_1_2
         menu_1_2.RelativeLastItem = menu_1_1
-
+        menu_1_2.RelativeNextItem = menu_1_3
+        menu_1_3.RelativeLastItem = menu_1_2
 
         With scrollPage1
             .Children.Add(menu_1_1)
             .Children.Add(menu_1_2)
+            .Children.Add(menu_1_3)
             .GenerateShownChildren()
         End With
 
+        GraphicsSettingPage.UIElements.Add(menu_1_shadow)
         GraphicsSettingPage.UIElements.Add(scrollPage1)
         GraphicsSettingPage.GenerateElementsQuadtree(Me.Camera.Resolve)
         GraphicsSettingPage.InitializeCursor(Me.Camera.CurrentCursorPosition)
