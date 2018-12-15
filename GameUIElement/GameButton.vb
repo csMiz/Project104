@@ -28,15 +28,10 @@ Public MustInherit Class GameButton
         End Set
     End Property
     Protected TextImage As TextItem = Nothing
-    Protected HaveFocus As Boolean = False
-
-    Public Sub BindDeviceContext(context As DeviceContext)
-        Me.BindingContext = context
-    End Sub
 
     Private Sub ResetTextImage(value As String)
         If Me.TextImage Is Nothing Then
-            Me.TextImage = New TextItem(value, New PointI(Me.BasicRect.Right - Me.BasicRect.Left, Me.BasicRect.Bottom - Me.BasicRect.Top))
+            Me.TextImage = New TextItem(value, New PointI(Me.Width, Me.Height))
             Me.TextImage.LoadFont(GameFontHelper.GetFontFamily(0), 18, Brushes.White, Color.Gray)
             Me.TextImage.GenerateImage(Me.BindingContext)
         Else

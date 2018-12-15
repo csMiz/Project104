@@ -34,16 +34,14 @@ Public Class GamePageProperty
         Dim ElementCount As Integer = Me.UIElements.Count
         If CBool(ElementCount) Then
             context.EndDraw()
-            For i = 0 To ElementCount - 1
-                Dim element As GameBasicUIElement = Me.UIElements(i)
+            For Each element As GameBasicUIElement In Me.UIElements
                 If element.Visible Then
                     element.DrawControlAtSelfCanvas(context, spec, canvasBitmap)
                 End If
             Next
             context.Target = canvasBitmap
             context.BeginDraw()
-            For i = 0 To ElementCount - 1
-                Dim element As GameBasicUIElement = Me.UIElements(i)
+            For Each element As GameBasicUIElement In Me.UIElements
                 If element.Visible Then
                     element.DrawControl(context, spec, canvasBitmap)
                 End If
@@ -59,39 +57,31 @@ Public Class GamePageProperty
         Next
     End Sub
 
-    Public Sub InitializeCursor(setX As Integer, setY As Integer)
+    Public Sub InitializeCursor(setX As Integer, setY As Integer, resolve As PointI)
         Dim cursorPoint As PointI = New PointI(setX, setY)
         'System.Windows.Forms.Cursor.Position = cursorPoint    'not correct
-        Call Me.InitializeCursor(cursorPoint)
+        Call Me.InitializeCursor(cursorPoint, resolve)
     End Sub
 
-    Public Sub InitializeCursor(cursorPoint As PointI)
+    Public Sub InitializeCursor(cursorPoint As PointI, resolve As PointI)
         'Me.MouseLastPosition = cursorPoint
         Dim cursorResult As List(Of IQuadtreeRecognizable) = ElementsQuadtree.Find(cursorPoint)
         If cursorResult.Count Then
             For Each element As GameBasicUIElement In cursorResult
                 If element.IsValid Then
-                    element.RaiseMouseEnter(New GameMouseEventArgs With {.Position = cursorPoint})
+                    element.RaiseMouseEnter(GameMouseEventArgs.GetCentreArgs(resolve))
                     Me.ElementsMouseInside.Add(element)
                 End If
             Next
         End If
     End Sub
 
-    Public Function ConvertQuadElements(input As List(Of IQuadtreeRecognizable)) As List(Of GameBasicUIElement)
-        Dim result As New List(Of GameBasicUIElement)
-        For Each element As GameBasicUIElement In input
-            result.Add(element)
-        Next
-        Return result
-    End Function
-
     ''' <summary>
     ''' 触发MouseMove, MouseEnter, MouseLeave。
     ''' 一旦将e.Deliver赋值为False，MouseMove, Enter, Leave都将停止传递
     ''' </summary>
     Public Sub TriggerMouseMove(e As GameMouseEventArgs)
-        Dim cursorResult As List(Of GameBasicUIElement) = ConvertQuadElements(ElementsQuadtree.Find(e.Position))
+        Dim cursorResult As List(Of GameBasicUIElement) = GameBasicUIElement.ConvertQuadElements(ElementsQuadtree.Find(e.Position))
         cursorResult.Sort(GameBasicUIElement.ZIndexComparisonReverse)
         If cursorResult.Count Then
             Dim refreshElementsInside As New List(Of GameBasicUIElement)
@@ -121,7 +111,7 @@ Public Class GamePageProperty
 
     Public Sub TriggerGlobalMouseMove(e As GameMouseEventArgs)
         If Me.UIElements.Count Then
-            For i = 0 To Me.UIElements.Count - 1
+            For i = Me.UIElements.Count - 1 To 0 Step -1
                 If Not e.Deliver Then Exit For
                 Dim element As GameBasicUIElement = Me.UIElements(i)
                 If element.IsValid Then element.RaiseGlobalMouseMove(e)
@@ -130,7 +120,7 @@ Public Class GamePageProperty
     End Sub
 
     Public Sub TriggerMouseDown(e As GameMouseEventArgs)
-        Dim cursorResult As List(Of GameBasicUIElement) = ConvertQuadElements(ElementsQuadtree.Find(e.Position))
+        Dim cursorResult As List(Of GameBasicUIElement) = GameBasicUIElement.ConvertQuadElements(ElementsQuadtree.Find(e.Position))
         cursorResult.Sort(GameBasicUIElement.ZIndexComparisonReverse)
         If cursorResult.Count Then
             For i = 0 To cursorResult.Count - 1
@@ -142,7 +132,7 @@ Public Class GamePageProperty
     End Sub
 
     Public Sub TriggerMouseUp(e As GameMouseEventArgs)
-        Dim cursorResult As List(Of GameBasicUIElement) = ConvertQuadElements(ElementsQuadtree.Find(e.Position))
+        Dim cursorResult As List(Of GameBasicUIElement) = GameBasicUIElement.ConvertQuadElements(ElementsQuadtree.Find(e.Position))
         cursorResult.Sort(GameBasicUIElement.ZIndexComparisonReverse)
         If cursorResult.Count Then
             For i = 0 To cursorResult.Count - 1

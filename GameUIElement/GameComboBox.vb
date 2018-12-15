@@ -58,10 +58,7 @@ Public Class GameComboBox
     ''' 弹出子菜单阴影层控件
     ''' </summary>
     Public FlyoutShadowPad As GameShadowPad = Nothing
-    ''' <summary>
-    ''' 当前鼠标是否在控件内
-    ''' </summary>
-    Public HaveFocus As Boolean = False
+
 
     ''' <summary>
     ''' 选项数
@@ -81,19 +78,20 @@ Public Class GameComboBox
             .Editable = Me.Editable,
             .BackgroundBrush = BLACK_COLOUR_BRUSH(2)}
         If defaultEvent Then
-            Me.RegisterRelativeMouseEvents()
+            Me.RegisterDefaultMouseEvents()
 
         End If
     End Sub
 
-    Private Sub RegisterRelativeMouseEvents()
-        AddHandler Me.GlobalMouseMove, AddressOf RelativeGlobalMouseMove
+    Private Sub RegisterDefaultMouseEvents()
+        'AddHandler Me.GlobalMouseMove, AddressOf RelativeGlobalMouseMove
+        AddHandler Me.GlobalMouseMove, AddressOf DefaultGlobalMouseMove
         AddHandler Me.MouseEnter, AddressOf DefaultMouseEnter
         AddHandler Me.MouseLeave, AddressOf DefaultMouseLeave
         AddHandler Me.MouseDown, AddressOf DefaultMouseDown
         AddHandler Me.MouseUp, AddressOf DefaultMouseUp
-        AddHandler Me.MouseMove, AddressOf Me.RelativeMouseMove
-
+        'AddHandler Me.MouseMove, AddressOf RelativeMouseMove
+        AddHandler Me.MouseMove, AddressOf DefaultMouseMove
     End Sub
 
     Public Sub InitializeComboBox(labelWidth As Single)
@@ -118,20 +116,22 @@ Public Class GameComboBox
             .InitializeLightBrush()
         End With
 
-        Me.FlyoutRect = New RawRectangleF(Me.SelectedBox.AbsoluteRect.Left, Me.SelectedBox.AbsoluteRect.Bottom + 1, Me.SelectedBox.AbsoluteRect.Right, Me.SelectedBox.AbsoluteRect.Bottom + 1 + Me.SelectedBox.Height * SelectionStrings.Count)
+        Me.FlyoutRect = New RawRectangleF(Me.SelectedBox.AbsoluteRect.Left, Me.SelectedBox.AbsoluteRect.Bottom + 1, Me.SelectedBox.AbsoluteRect.Right, Me.SelectedBox.AbsoluteRect.Bottom + 1 + Me.SelectedBox.Height * Me.SelectionCount)
         'Me.FlyoutRect = New RawRectangleF(0, 0, 200, Me.SelectedBox.Height * SelectionStrings.Count)
 
         Me.FlyoutControl = New GameListBox
         With Me.FlyoutControl
             .BindingContext = Me.BindingContext
             .BasicRect = Me.FlyoutRect
-            .DefaultBackground = WHITE_COLOUR_BRUSH(2)
+            .AbsoluteRect = .BasicRect
+            .DefaultBackground = WHITE_COLOUR_BRUSH(1)
             .InitializeControlCanvas()
             .Z_Index = 5
             .Visible = False
             .Items = Me.SelectionStrings
             .GenerateTextItems()
         End With
+        AddHandler Me.FlyoutControl.MouseDown, AddressOf Me.FLyoutMouseDown
 
         Me.TitleImage = New TextItem(Me.TitleString, labelSize)
         With Me.TitleImage
@@ -150,6 +150,7 @@ Public Class GameComboBox
         End With
         Me.FlyoutRect = New RawRectangleF(Me.SelectedBox.AbsoluteRect.Left, Me.SelectedBox.AbsoluteRect.Bottom + 1, Me.SelectedBox.AbsoluteRect.Right, Me.SelectedBox.AbsoluteRect.Bottom + 1 + Me.SelectedBox.Height * SelectionStrings.Count)
         Me.FlyoutControl.BasicRect = Me.FlyoutRect
+        Me.FlyoutControl.AbsoluteRect = Me.FlyoutRect
     End Sub
 
     ''' <summary>
@@ -230,32 +231,15 @@ Public Class GameComboBox
         End If
     End Sub
 
-    ''' <summary>
-    ''' 作为子对象时的默认GMM事件处理
-    ''' </summary>
-    ''' <param name="e">RelativeEventArgs，对应自己的FatherRect</param>
-    Public Sub RelativeGlobalMouseMove(e As GameMouseEventArgs)
-        'TODO
-        Dim relativeCursorX As Single = e.X - Me.FatherViewRect.Left
-        Dim relativeCursorY As Single = e.Y - Me.FatherViewRect.Top
-        Dim position2 As New PointI(CInt(relativeCursorX), CInt(relativeCursorY))
-        Dim relativeArgs As New GameMouseEventArgs With {.Position = position2}
-        '因为使用了New，所以在ComboBox的TextBox中令e.Deliver=False没有任何作用
-
-        Me.SelectedBox.RaiseGlobalMouseMove(relativeArgs)
+    Public Sub DefaultGlobalMouseMove(e As GameMouseEventArgs)
+        Me.SelectedBox.RaiseGlobalMouseMove(e)
     End Sub
 
-    Public Sub RelativeMouseMove(e As GameMouseEventArgs)
-        Dim relativeCursorX As Single = e.X - Me.FatherViewRect.Left
-        Dim relativeCursorY As Single = e.Y - Me.FatherViewRect.Top
-        'Dim position As New RawVector2(relativeCursorX, relativeCursorY)
-        Dim position2 As New PointI(CInt(relativeCursorX), CInt(relativeCursorY))
-        Dim relativeArgs As New GameMouseEventArgs With {.Position = position2}
-        Dim isInsideBox As Boolean = relativeCursorX >= Me.SelectedBox.BasicRect.Left AndAlso relativeCursorX <= Me.SelectedBox.BasicRect.Right
-        isInsideBox = isInsideBox AndAlso relativeCursorY >= Me.SelectedBox.BasicRect.Top AndAlso relativeCursorY <= Me.SelectedBox.BasicRect.Bottom
+    Public Sub DefaultMouseMove(e As GameMouseEventArgs)
+        Dim isInsideBox As Boolean = Me.SelectedBox.IsInside(e.Position)
         If isInsideBox Then
             If Me.SelectedBox.HaveFocus Then
-                Me.SelectedBox.RaiseMouseMove(relativeArgs)
+                Me.SelectedBox.RaiseMouseMove(e)
             Else
                 Me.SelectedBox.RaiseMouseEnter(e)
             End If
@@ -264,7 +248,55 @@ Public Class GameComboBox
                 Me.SelectedBox.RaiseMouseLeave(e)
             End If
         End If
+    End Sub
 
+    Public Sub FlyoutMouseDown(e As GameMouseEventArgs)
+        Dim tmpIndex As Integer = (e.Y - Me.FlyoutControl.AbsoluteRect.Top) \ Me.FlyoutControl.SelectionHeight
+        If tmpIndex >= 0 AndAlso tmpIndex < Me.FlyoutControl.Items.Count Then
+            Me.SelectedIndex = tmpIndex
+        Else
+            Me.SelectedIndex = -1
+        End If
+        If Me.SelectedIndex <> -1 Then
+            Me.SelectedBox.SetText(Me.SelectionStrings(Me.SelectedIndex), Me.FlyoutControl.TextItemImages(Me.SelectedIndex))
+        End If
+        Me.CloseSubMenu()
+        e.Deliver = False
+    End Sub
+
+    ''' <summary>
+    ''' 作为子对象时的默认GMM事件处理
+    ''' </summary>
+    ''' <param name="e">RelativeEventArgs，对应自己的FatherRect</param>
+    <Obsolete("GameMouseEventArgs不能从外部构造，改用DefaultGlobalMouseMove", True)>
+    Public Sub RelativeGlobalMouseMove(e As GameMouseEventArgs)
+        'Dim relativeCursorX As Single = e.X - Me.FatherViewRect.Left
+        'Dim relativeCursorY As Single = e.Y - Me.FatherViewRect.Top
+        'Dim position2 As New PointI(CInt(relativeCursorX), CInt(relativeCursorY))
+        'Dim relativeArgs As New GameMouseEventArgs With {.Position = position2}
+        ''因为使用了New，所以在ComboBox的TextBox中令e.Deliver=False没有任何作用
+        'Me.SelectedBox.RaiseGlobalMouseMove(relativeArgs)
+    End Sub
+    <Obsolete("GameMouseEventArgs不能从外部构造，改用DefaultMouseMove", True)>
+    Public Sub RelativeMouseMove(e As GameMouseEventArgs)
+        'Dim relativeCursorX As Single = e.X - Me.FatherViewRect.Left
+        'Dim relativeCursorY As Single = e.Y - Me.FatherViewRect.Top
+        ''Dim position As New RawVector2(relativeCursorX, relativeCursorY)
+        'Dim position2 As New PointI(CInt(relativeCursorX), CInt(relativeCursorY))
+        'Dim relativeArgs As New GameMouseEventArgs With {.Position = position2}
+        'Dim isInsideBox As Boolean = relativeCursorX >= Me.SelectedBox.BasicRect.Left AndAlso relativeCursorX <= Me.SelectedBox.BasicRect.Right
+        'isInsideBox = isInsideBox AndAlso relativeCursorY >= Me.SelectedBox.BasicRect.Top AndAlso relativeCursorY <= Me.SelectedBox.BasicRect.Bottom
+        'If isInsideBox Then
+        '    If Me.SelectedBox.HaveFocus Then
+        '        Me.SelectedBox.RaiseMouseMove(relativeArgs)
+        '    Else
+        '        Me.SelectedBox.RaiseMouseEnter(e)
+        '    End If
+        'Else
+        '    If Me.SelectedBox.HaveFocus Then
+        '        Me.SelectedBox.RaiseMouseLeave(e)
+        '    End If
+        'End If
     End Sub
 
 End Class

@@ -15,7 +15,6 @@ Public Class GameTextBox
 
     Public Text As String = vbNullString
     Public Editable As Boolean = True
-    Public HaveFocus As Boolean = False
     Public Pressed As Boolean = False
 
     Public BackgroundBrush As SolidColorBrush = Nothing
@@ -44,6 +43,11 @@ Public Class GameTextBox
     Public Sub SetText(inputText As String)
         Me.Text = inputText
         Call Me.RefreshTextImage()
+    End Sub
+
+    Public Sub SetText(inputText As String, importImage As TextItem)
+        Me.Text = inputText
+        Me.TextImage = importImage
     End Sub
 
     Public Sub RefreshTextImage()
@@ -137,8 +141,8 @@ Public Class GameTextBox
     End Sub
 
     Public Sub RelativeFluentCursorLight(e As GameMouseEventArgs)
-        Dim relativeCursorX As Single = e.X - Me.FatherViewRect.Left
-        Dim relativeCursorY As Single = e.Y - Me.FatherViewRect.Top
+        Dim relativeCursorX As Single = e.X - Me.AbsoluteRect.Left
+        Dim relativeCursorY As Single = e.Y - Me.AbsoluteRect.Top
         Dim position As New RawVector2(relativeCursorX, relativeCursorY)
         Me.ContentLightBrush.Center = position
         Me.BorderLightBrush.Center = position

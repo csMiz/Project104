@@ -26,7 +26,6 @@ Public Class GameFlatButton
     Private ContentRect As RawRectangleF = Nothing
 
     Public Sub New(Optional usingDefaultEvents As Boolean = True)
-        AddHandler Me.GlobalMouseMove, AddressOf Me.FluentCursorLight
         If usingDefaultEvents Then
             Call Me.UseDefaultMouseEnterLeaveEvents()
         End If
@@ -36,6 +35,8 @@ Public Class GameFlatButton
     Public Sub UseDefaultMouseEnterLeaveEvents()
         AddHandler Me.MouseEnter, AddressOf DefaultMouseEnter
         AddHandler Me.MouseLeave, AddressOf DefaultMouseLeave
+        AddHandler Me.GlobalMouseMove, AddressOf Me.FluentCursorLight
+
     End Sub
 
     Public Sub InitializeCursorLightBrush()
@@ -80,14 +81,6 @@ Public Class GameFlatButton
         Me.ContentRect = New RawRectangleF(2, 2, Me.SelfCanvasRect.Right - 2, Me.SelfCanvasRect.Bottom - 2)
     End Sub
 
-    Public Sub FluentCursorLight(e As GameMouseEventArgs)
-        Dim relativeCursorX As Single = e.X - Me.BasicRect.Left
-        Dim relativeCursorY As Single = e.Y - Me.BasicRect.Top
-        Dim position As New RawVector2(relativeCursorX, relativeCursorY)
-        Me.CursorLightBrush.Center = position
-        Me.CursorLightBorderBrush.Center = position
-    End Sub
-
     Public Overrides Sub DrawControlAtSelfCanvas(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
         With context
             .Target = Me.ControlCanvas
@@ -104,10 +97,16 @@ Public Class GameFlatButton
         End With
     End Sub
 
+    Public Sub FluentCursorLight(e As GameMouseEventArgs)
+        Dim relativeCursorX As Single = e.X - Me.AbsoluteRect.Left
+        Dim relativeCursorY As Single = e.Y - Me.AbsoluteRect.Top
+        Dim position As New RawVector2(relativeCursorX, relativeCursorY)
+        Me.CursorLightBrush.Center = position
+        Me.CursorLightBorderBrush.Center = position
+    End Sub
     Private Sub DefaultMouseEnter()
         Me.HaveFocus = True
     End Sub
-
     Private Sub DefaultMouseLeave()
         Me.HaveFocus = False
     End Sub

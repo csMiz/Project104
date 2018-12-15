@@ -3,15 +3,16 @@ Imports SharpDX.Direct2D1
 Imports System.Math
 
 Public Class SkirmishMap
-    Private Blocks(49, 49) As SkirmishMapBlock
-    Private MapSizeXMax As Short = 49
-    Private MapSizeYMax As Short = 49
+    Public Blocks(49, 49) As SkirmishMapBlock
+    Public MapSizeXMax As Short = 49
+    Public MapSizeYMax As Short = 49
 
     Private PaintOrderList As New List(Of SkirmishMapBlock)
 
     Public Property ResourcesLoaded As Boolean = False
 
     Public MovementGlance As New List(Of MovementGlanceNode)
+    Public MovementGlanceBorder As PathGeometry = Nothing
 
     Public Sub New()
         For i = 0 To 49
@@ -20,6 +21,7 @@ Public Class SkirmishMap
                 With Blocks(i, j)
                     .X = i
                     .Y = j
+                    .InitializeWorldPosition()
                 End With
             Next
         Next
@@ -134,12 +136,10 @@ Public Class SkirmishMap
 
         Dim cameraX As Single = spectator.CameraFocus.X
         Dim cameraY As Single = spectator.CameraFocus.Y
-        Dim centreX As Single = spectator.Resolve.X / 2
-        Dim centreY As Single = spectator.Resolve.Y / 2
         Dim zoom As Single = spectator.Zoom
 
-        Dim drawRangeX As Short = Truncate((cameraX - SIX_TWO_FIVE * zoom) / (THREE_SEVEN_FIVE * zoom))
-        Dim drawRangeY As Short = Truncate((cameraY - SIX_TWO_FIVE_ROOT3 * zoom) / (TWO_FIFTY_ROOT3 * zoom))
+        Dim drawRangeX As Short = Truncate((cameraX - SIX_TWO_FIVE) / THREE_SEVEN_FIVE)
+        Dim drawRangeY As Short = Truncate((cameraY - SIX_TWO_FIVE_ROOT3) / TWO_FIFTY_ROOT3)
         DivideLayers(drawRangeX - 5, drawRangeX + 5, drawRangeY - 5, drawRangeY + 5)
         UpdateBlocksInCamera(drawRangeX - 5, drawRangeX + 5, drawRangeY - 5, drawRangeY + 5, spectator.CameraFocus, spectator.Resolve, zoom)
 
@@ -259,6 +259,17 @@ Public Class SkirmishMap
             End If
 
         Next
+
+    End Sub
+
+    ''' <summary>
+    ''' 根据已生成的GlanceNodes绘制最大行动范围圈
+    ''' </summary>
+    Public Sub GenerateMoveRangeBorder()
+        If Me.MovementGlanceBorder IsNot Nothing Then
+            Me.MovementGlanceBorder.Dispose()    '销毁缓存
+        End If
+        'TODO
 
     End Sub
 

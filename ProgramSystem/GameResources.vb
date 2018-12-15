@@ -99,7 +99,6 @@ Module GameResources
                 .M31 = 0,
                 .M32 = 0}}
 
-
     Public ReadOnly ALL_GAME_STAGES As New List(Of SingleGameLoopStage) From {0, 1, 2, 3, 4, 5}
 
 
@@ -139,7 +138,7 @@ Module GameResources
         FragmentImages.LoadImages(context)
         UnitImages.LoadFromFiles(context)
         GameIcons.LoadFromFiles(context)
-        GameFontHelper.loadTextFromFiles()
+        GameFontHelper.LoadTextFromFiles()
 
         SIDE_COLOUR = SolidColorBrushSet.LoadFromXml(context, My.Resources.Colours)
 

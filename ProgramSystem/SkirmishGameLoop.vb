@@ -3,6 +3,7 @@ Imports System.Xml
 Imports p104
 Imports SharpDX.Direct2D1
 Imports SharpDX.Mathematics.Interop
+
 ''' <summary>
 ''' 遭遇战GameLoop
 ''' </summary>
@@ -21,14 +22,22 @@ Public Class SkirmishGameLoop
     ''' 处理控件面板等鼠标点击事件
     ''' </summary>
     Public SkirmishPage As GamePageProperty = Nothing
+    ''' <summary>
+    ''' 地图鼠标交互层
+    ''' </summary>
+    Public UI_SkirmishBoard As GameChessboard = Nothing
 
-    Public UI_BottomLeftUnitAvatar As GameContentFrame
+    Public UI_BottomLeftUnitAvatar As GameContentFrame = Nothing
 
-    Public UI_TopLeftResourceBar As GameContentFrame
+    Public UI_TopLeftResourceBar As GameContentFrame = Nothing
 
-    Public UI_BottomActionBar As GameContentFrame
+    Public UI_BottomActionBar As GameContentFrame = Nothing
 
-    Public UI_BottomRightMiniMap As GamePictureBox
+    Public UI_BottomRightMiniMap As GamePictureBox = Nothing
+    ''' <summary>
+    ''' MouseDown对应的Block坐标，用于检查与MouseUp时是否一致
+    ''' </summary>
+    Private SkirmishBoardMouseDownPosition As PointI = New PointI(-1, -1)
 
 
     ''' <summary>
@@ -193,10 +202,14 @@ Public Class SkirmishGameLoop
 
 
     Private Sub DrawUnitLayer(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As Bitmap1)
+
+        'TODO: 完善单位棋子显示
         Dim tmpUnit As GameUnit = Me.UnitList(0)
         Dim tmpImage As Bitmap1 = tmpUnit.GetSkirmishChessImage().GetImage
-
-        context.DrawBitmap(tmpImage, New RawRectangleF(220, 80, 320, 180), NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
+        Dim imageHalfSize As Single = 50
+        Dim tmpCentre As RawVector2 = SkirmishGameMap.Blocks(tmpUnit.Position.X, tmpUnit.Position.Y).V_O
+        Dim drawRect As New RawRectangleF(tmpCentre.X - imageHalfSize, tmpCentre.Y - imageHalfSize, tmpCentre.X + imageHalfSize, tmpCentre.Y + imageHalfSize)
+        context.DrawBitmap(tmpImage, drawRect, NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
 
 
     End Sub
@@ -380,24 +393,40 @@ Public Class SkirmishGameLoop
 
     Public Sub InitializeSkirmishPage()
         Me.SkirmishPage = New GamePageProperty
+        Dim myContext As DeviceContext = Me.BindingCamera.GetDevceContext
 
-        Dim tmpGameBoard As New GameInteractiveRectangle
-        With tmpGameBoard
-            .BasicRect = New RawRectangleF(0, 0, Me.BindingCamera.Resolve.X, Me.BindingCamera.Resolve.Y)
+        Me.UI_SkirmishBoard = New GameChessboard
+        With Me.UI_SkirmishBoard
+            .BasicRect = Me.BindingCamera.ResolveRectangle
+            .AbsoluteRect = .BasicRect
+            .BindingContext = myContext
+            .Z_Index = 0
         End With
-        AddHandler tmpGameBoard.MouseDown, AddressOf Me.GameBoardMouseDown
-        Me.SkirmishPage.UIElements.Add(tmpGameBoard)
+        AddHandler Me.UI_SkirmishBoard.MouseDown, AddressOf Me.GameBoardMouseDown
+        Me.SkirmishPage.UIElements.Add(Me.UI_SkirmishBoard)
+        'TODO
 
         Dim tmpBottomLeftUnitAvatar As New GameContentFrame
-        Dim tmpAvatarPicture As New GamePictureBox With {
-        .Visible = False,
-        .BasicRect = New RawRectangleF(0, 568, 200, 768),
-        .Opacity = NOT_TRANSPARENT,
-        .Z_Index = 1,
-        .ImageSource = Nothing}
+        With tmpBottomLeftUnitAvatar
+            .BindingContext = myContext
+            .BasicRect = New RawRectangleF(0, 568, 200, 768)
+            .AbsoluteRect = .BasicRect
+            .DefaultBackground = BLACK_COLOUR_BRUSH(2)
+            .InitializeControlCanvas()
+        End With
+
+        Dim tmpAvatarPicture As New GamePictureBox
+        With tmpAvatarPicture
+            .Visible = False
+            .BasicRect = New RawRectangleF(0, 568, 200, 768)
+            .AbsoluteRect = .BasicRect
+            .BindingContext = myContext
+            .Opacity = NOT_TRANSPARENT
+            .Z_Index = 1
+            .InitializeControlCanvas()
+            .ImageSource = Nothing
+        End With
         tmpBottomLeftUnitAvatar.Children.Add(tmpAvatarPicture)
-        tmpBottomLeftUnitAvatar.BasicRect = New RawRectangleF(0, 568, 200, 768)
-        tmpBottomLeftUnitAvatar.DefaultBackground = BLACK_COLOUR_BRUSH(2)
         Dim tmpLeftAvatarMouseDown = Sub()
                                          Debug.WriteLine("avatar clicked!")
                                      End Sub
@@ -406,7 +435,7 @@ Public Class SkirmishGameLoop
         'AddHandler tmpBottomLeftUnitAvatar .MouseMove , AddressOf ...
         Me.SkirmishPage.UIElements.Add(tmpBottomLeftUnitAvatar)
         Me.SkirmishPage.GenerateElementsQuadtree(Me.BindingCamera.Resolve)
-        Me.SkirmishPage.InitializeCursor(Me.BindingCamera.CurrentCursorPosition)
+        Me.SkirmishPage.InitializeCursor(Me.BindingCamera.CurrentCursorPosition, Me.BindingCamera.Resolve)
 
         Me.BindingCamera.PaintingLayers.Push(AddressOf Me.SkirmishPage.PaintElements)
         'TODO: Add painting description
@@ -414,7 +443,93 @@ Public Class SkirmishGameLoop
 
     End Sub
 
+    ''' <summary>
+    ''' 将鼠标点击位置转换为实际地图位置
+    ''' </summary>
+    ''' <param name="input">鼠标位置</param>
+    Public Function ConvertToWorldCursor(input As PointI) As PointF2
+        Dim focus As PointF2 = Me.BindingCamera.CameraTopLeft
+        Dim zoom As Single = Me.BindingCamera.Zoom
+        Return New PointF2(focus.X + input.X / zoom, focus.Y + input.Y / zoom)
+    End Function
+
+    ''' <summary>
+    ''' 将实际地图位置转换为坐标
+    ''' </summary>
+    <Obsolete("使用DrawPositionToChessboard"， False)>
+    Public Function MousePositionToChessboard(mouse As PointF2) As PointI
+        Dim estimateX As Integer = Math.Floor((mouse.X - SIX_TWO_FIVE) / THREE_SEVEN_FIVE)
+        Dim estimateY As Integer = Math.Floor((mouse.Y - SIX_TWO_FIVE_ROOT3) / TWO_FIFTY_ROOT3)
+        If estimateX < -1 OrElse estimateX > SkirmishGameMap.MapSizeXMax + 1 OrElse estimateY < -1 OrElse estimateY > SkirmishGameMap.MapSizeYMax + 1 Then
+            Return New PointI(-1, -1)
+        End If
+        Dim pX, pY As Integer
+        Dim minDistance As Single = 9999.9
+        Dim candidate As New PointI
+        For i = -1 To 1
+            pX = estimateX + i
+            If pX < 0 OrElse pX > SkirmishGameMap.MapSizeXMax Then Continue For
+            For j = -1 To 1
+                pY = estimateY + j
+                If pY < 0 OrElse pY > SkirmishGameMap.MapSizeYMax Then Continue For
+                Dim target As PointF2 = Me.SkirmishGameMap.Blocks(pX, pY).World_V_O
+                Dim tmpDistance As Single = Math.Sqrt((target.X - mouse.X) ^ 2 + (target.Y - mouse.Y) ^ 2)
+                If tmpDistance < minDistance Then
+                    minDistance = tmpDistance
+                    candidate.X = pX
+                    candidate.Y = pY
+                End If
+            Next
+        Next
+        If minDistance < TWO_FIFTY Then
+            Return candidate
+        Else
+            Return New PointI(-1, -1)
+        End If
+
+    End Function
+
+    ''' <summary>
+    ''' 将鼠标点击位置（绘图位置）直接转换为坐标
+    ''' </summary>
+    ''' <param name="mouse"></param>
+    ''' <returns></returns>
+    Public Function DrawPositionToChessboard(mouse As PointI) As PointI
+        Dim worldPos As PointF2 = ConvertToWorldCursor(mouse)
+        Dim estimateX As Integer = Math.Floor((worldPos.X - SIX_TWO_FIVE) / THREE_SEVEN_FIVE)
+        Dim estimateY As Integer = Math.Floor((worldPos.Y - SIX_TWO_FIVE_ROOT3) / TWO_FIFTY_ROOT3)
+        If estimateX < -1 OrElse estimateX > SkirmishGameMap.MapSizeXMax + 1 OrElse estimateY < -1 OrElse estimateY > SkirmishGameMap.MapSizeYMax + 1 Then
+            Return New PointI(-1, -1)
+        End If
+        Dim pX, pY As Integer
+        For i = 1 To -1 Step -1
+            pX = estimateX + i
+            If pX < 0 OrElse pX > SkirmishGameMap.MapSizeXMax Then Continue For
+            For j = 1 To -1 Step -1
+                pY = estimateY + j
+                If pY < 0 OrElse pY > SkirmishGameMap.MapSizeYMax Then Continue For
+                If Me.SkirmishGameMap.Blocks(pX, pY).Outline.IsInsideRaw(New PointF2(mouse.X, mouse.Y)) Then
+                    Return New PointI(pX, pY)
+                End If
+            Next
+        Next
+        Return New PointI(-1, -1)
+    End Function
+
     Public Sub GameBoardMouseDown(e As GameMouseEventArgs)
+        'Me.SkirmishBoardMouseDownPosition = Me.MousePositionToChessboard(Me.ConvertToWorldCursor(e.Position))
+        Me.SkirmishBoardMouseDownPosition = Me.DrawPositionToChessboard(e.Position)        '改用绘图坐标直接进行定位
+        Debug.WriteLine("Pos:" & SkirmishBoardMouseDownPosition.X & ", " & SkirmishBoardMouseDownPosition.Y)
+    End Sub
+
+    Public Sub GameBoardMouseUp(e As GameMouseEventArgs)
+        Dim position As PointI = Me.DrawPositionToChessboard(e.Position)
+        If position.X = Me.SkirmishBoardMouseDownPosition.X AndAlso position.Y = Me.SkirmishBoardMouseDownPosition.Y Then
+            'is click
+
+        Else    'is drag
+
+        End If
 
     End Sub
 

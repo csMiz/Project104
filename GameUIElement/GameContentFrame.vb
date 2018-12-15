@@ -20,7 +20,24 @@ Public Class GameContentFrame
     Public ChildrenQuadTree As Quadtree = Nothing
     Private ElementsMouseInside As New List(Of GameBasicUIElement)
 
+
+    Public Sub New(Optional defaultEvents As Boolean = True)
+        If defaultEvents Then
+            Me.UseDefaultMouseEvents()
+        End If
+    End Sub
+
+    Public Sub UseDefaultMouseEvents()
+        AddHandler Me.MouseEnter, AddressOf DefaultMouseEnter
+        AddHandler Me.MouseLeave, AddressOf DefaultMouseLeave
+        AddHandler Me.MouseMove, AddressOf DefaultMouseMove
+        AddHandler Me.MouseDown, AddressOf DefaultMouseDown
+        AddHandler Me.MouseUp, AddressOf DefaultMouseUp
+        AddHandler Me.GlobalMouseMove, AddressOf DefaultGlobalMouseMove
+    End Sub
+
     Public Sub InitializeQuadtree(pageSize As PointI)
+        Me.Children.Sort(GameBasicUIElement.ZIndexComparison)    'z_index由小到大
         Me.ChildrenQuadTree = New Quadtree(MathHelper.Size2RawRect(pageSize))
         For Each element As GameBasicUIElement In Children
             Me.ChildrenQuadTree.AddItem(element)
@@ -42,9 +59,9 @@ Public Class GameContentFrame
     End Function
 
     ''' <summary>
-    ''' 重新计算所有子元素的BasicRect
+    ''' 重新计算所有子元素的Rect
     ''' </summary>
-    Public Sub RefreshChildrenRelativeBasicRects()
+    Public Sub RefreshChildrenRelativeRects()
         'TODO
     End Sub
 
@@ -69,4 +86,70 @@ Public Class GameContentFrame
         context.EndDraw()
 
     End Sub
+
+    Public Sub DefaultMouseEnter()
+        Me.HaveFocus = True
+    End Sub
+    Public Sub DefaultMouseLeave()
+        Me.HaveFocus = False
+    End Sub
+    Public Sub DefaultMouseMove(e As GameMouseEventArgs)
+        Dim cursorResult As List(Of GameBasicUIElement) = GameBasicUIElement.ConvertQuadElements(ChildrenQuadTree.Find(e.Position))
+        cursorResult.Sort(GameBasicUIElement.ZIndexComparisonReverse)
+        If cursorResult.Count Then
+            Dim refreshElementsInside As New List(Of GameBasicUIElement)
+            For i = 0 To cursorResult.Count - 1
+                If Not e.Deliver Then Exit For
+                Dim element As GameBasicUIElement = cursorResult(i)
+                If Me.ElementsMouseInside.Contains(element) Then
+                    element.RaiseMouseMove(e)
+                    Me.ElementsMouseInside.Remove(element)
+                Else
+                    element.RaiseMouseEnter(e)
+                End If
+                refreshElementsInside.Add(element)
+            Next
+            For Each element As GameBasicUIElement In Me.ElementsMouseInside
+                element.RaiseMouseLeave(e)
+            Next
+            Me.ElementsMouseInside = refreshElementsInside
+        Else
+            For Each element As GameBasicUIElement In Me.ElementsMouseInside
+                element.RaiseMouseLeave(e)
+            Next
+            Me.ElementsMouseInside.Clear()
+        End If
+    End Sub
+    Public Sub DefaultGlobalMouseMove(e As GameMouseEventArgs)
+        If Me.Children.Count Then
+            For i = Me.Children.Count - 1 To 0 Step -1
+                If Not e.Deliver Then Exit For
+                Dim element As GameBasicUIElement = Me.Children(i)
+                If element.IsValid Then element.RaiseGlobalMouseMove(e)
+            Next
+        End If
+    End Sub
+    Public Sub DefaultMouseDown(e As GameMouseEventArgs)
+        Dim cursorResult As List(Of GameBasicUIElement) = GameBasicUIElement.ConvertQuadElements(ChildrenQuadTree.Find(e.Position))
+        cursorResult.Sort(GameBasicUIElement.ZIndexComparisonReverse)
+        If cursorResult.Count Then
+            For i = 0 To cursorResult.Count - 1
+                If Not e.Deliver Then Exit For
+                Dim element As GameBasicUIElement = cursorResult(i)
+                element.RaiseMouseDown(e)
+            Next
+        End If
+    End Sub
+    Public Sub DefaultMouseUp(e As GameMouseEventArgs)
+        Dim cursorResult As List(Of GameBasicUIElement) = GameBasicUIElement.ConvertQuadElements(ChildrenQuadTree.Find(e.Position))
+        cursorResult.Sort(GameBasicUIElement.ZIndexComparisonReverse)
+        If cursorResult.Count Then
+            For i = 0 To cursorResult.Count - 1
+                If Not e.Deliver Then Exit For
+                Dim element As GameBasicUIElement = cursorResult(i)
+                element.RaiseMouseUp(e)
+            Next
+        End If
+    End Sub
+
 End Class

@@ -49,17 +49,13 @@ Public Class GameScrollViewer
     Public ScrollBarWidth As Integer = 10
 
     ''' <summary>
-    ''' 按ZIndex从后到前（ZIndex递增）的显示的子控件
+    ''' 显示的子控件
     ''' </summary>
     Private RenderingItems As GameBasicUIElement()
     ''' <summary>
     ''' 顺序同RenderingItems，绘制子控件相对于ScrollViewer的ControlCanvas的位置
     ''' </summary>
     Private RenderingItemRects As RawRectangleF()
-    ''' <summary>
-    ''' 由上到下顺序排列的显示的子控件
-    ''' </summary>
-    Private RenderingItemsSource As GameBasicUIElement()
     ''' <summary>
     ''' 当前鼠标聚焦的子控件
     ''' </summary>
@@ -181,81 +177,61 @@ Public Class GameScrollViewer
             If loopCount >= 255 Then Throw New Exception("loop error 2")
         Loop
 
-        Dim resultBound As Integer = bottomIndex - topIndex
-        ReDim Me.RenderingItems(resultBound)
-        ReDim Me.RenderingItemRects(resultBound)
-        Dim shownItemSourceList As New List(Of GameBasicUIElement)
-        Dim maxLayer As Integer = 0
-        For i = 0 To resultBound
-            Dim tmpChild As GameBasicUIElement = Me.Children(topIndex + i)
-            shownItemSourceList.Add(tmpChild)
-            If tmpChild.Z_Index > maxLayer Then maxLayer = tmpChild.Z_Index
-        Next
-        RenderingItemsSource = shownItemSourceList.ToArray
-
-        Dim sortingCursor As Integer = 0
-        For j = 0 To maxLayer
-            For i = shownItemSourceList.Count - 1 To 0 Step -1
-                Dim item As GameBasicUIElement = shownItemSourceList(i)
-                If item.Z_Index = j Then
-                    Me.RenderingItems(sortingCursor) = item
-                    'TODO: 有问题 absoluteRect
-                    'Dim absoluteRect As New RawRectangleF(item.BasicRect.Left, item.BasicRect.Top - Me.CurrentScrollPosition, item.BasicRect.Right, item.BasicRect.Bottom - Me.CurrentScrollPosition)
-                    Dim fatherRect As New RawRectangleF(item.BasicRect.Left, item.BasicRect.Top - Me.CurrentScrollPosition, item.BasicRect.Right, item.BasicRect.Bottom - Me.CurrentScrollPosition)
-                    Me.RenderingItemRects(sortingCursor) = fatherRect
-                    item.FatherViewRect = fatherRect
-                    item.AbsoluteRect = New RawRectangleF(Me.AbsoluteRect.Left + fatherRect.Left, Me.AbsoluteRect.Top + fatherRect.Top, Me.AbsoluteRect.Left + fatherRect.Right, Me.AbsoluteRect.Top + fatherRect.Bottom)
-                    item.RefreshRects()
-                    sortingCursor += 1
-                End If
-            Next
+        Dim resultCount As Integer = bottomIndex - topIndex + 1
+        Me.RenderingItems = Me.Children.GetRange(topIndex, resultCount).ToArray
+        ReDim Me.RenderingItemRects(resultCount - 1)
+        Dim rectCursor As Integer = 0
+        For Each item As GameBasicUIElement In Me.RenderingItems
+            With item
+                Dim fatherRect As New RawRectangleF(.BasicRect.Left, .BasicRect.Top - Me.CurrentScrollPosition, .BasicRect.Right, .BasicRect.Bottom - Me.CurrentScrollPosition)
+                Me.RenderingItemRects(rectCursor) = fatherRect
+                .FatherViewRect = fatherRect
+                .AbsoluteRect = New RawRectangleF(Me.AbsoluteRect.Left + fatherRect.Left, Me.AbsoluteRect.Top + fatherRect.Top, Me.AbsoluteRect.Left + fatherRect.Right, Me.AbsoluteRect.Top + fatherRect.Bottom)
+                .RefreshRects()
+            End With
+            rectCursor += 1
         Next
 
     End Sub
 
     Public Sub ScrollViewerMouseDown(e As GameMouseEventArgs)
-        Dim relativeEventArgs As New GameMouseEventArgs With {
-            .Position = New PointI(e.X - Me.BasicRect.Left, e.Y - Me.BasicRect.Top)}
         If MouseFocusChild IsNot Nothing Then
-            MouseFocusChild.RaiseMouseDown(relativeEventArgs)
+            MouseFocusChild.RaiseMouseDown(e)
         End If
     End Sub
 
     Public Sub ScrollViewerMouseMove(e As GameMouseEventArgs)
-        Dim relativeEventArgs As New GameMouseEventArgs With {
-            .Position = New PointI(e.X - Me.BasicRect.Left, e.Y - Me.BasicRect.Top)}
-        Dim focusing As GameBasicUIElement = Me.FindFocusingChild(relativeEventArgs)
+        Dim relativePosition As New PointI(e.X - Me.AbsoluteRect.Left, e.Y - Me.AbsoluteRect.Top)
+        Dim focusing As GameBasicUIElement = Me.FindFocusingChild(relativePosition)
 
         If focusing IsNot MouseFocusChild Then
             If MouseFocusChild IsNot Nothing Then
-                MouseFocusChild.RaiseMouseLeave(relativeEventArgs)
+                MouseFocusChild.RaiseMouseLeave(e)
                 MouseFocusChild = focusing
                 If focusing IsNot Nothing Then
                     With MouseFocusChild
-                        .RaiseMouseEnter(relativeEventArgs)
-                        .RaiseMouseMove(relativeEventArgs)
+                        .RaiseMouseEnter(e)
+                        .RaiseMouseMove(e)
                     End With
                 End If
             ElseIf focusing IsNot Nothing Then
                 MouseFocusChild = focusing
                 With MouseFocusChild
-                    .RaiseMouseEnter(relativeEventArgs)
-                    .RaiseMouseMove(relativeEventArgs)
+                    .RaiseMouseEnter(e)
+                    .RaiseMouseMove(e)
                 End With
             End If
         Else
             If MouseFocusChild IsNot Nothing Then
-                MouseFocusChild.RaiseMouseMove(relativeEventArgs)
+                MouseFocusChild.RaiseMouseMove(e)
             End If
         End If
 
     End Sub
 
     Public Sub ScrollViewerMouseUp(e As GameMouseEventArgs)
-        Dim relativeEventArgs As New GameMouseEventArgs With {
-            .Position = New PointI(e.X - Me.BasicRect.Left, e.Y - Me.BasicRect.Top)}
         If MouseFocusChild IsNot Nothing Then
-            MouseFocusChild.RaiseMouseUp(relativeEventArgs)
+            MouseFocusChild.RaiseMouseUp(e)
         End If
     End Sub
 
@@ -263,10 +239,10 @@ Public Class GameScrollViewer
         Me.ScrollMouseLock = False
     End Sub
 
-    Public Sub ScrollViewerMouseLeave()
+    Public Sub ScrollViewerMouseLeave(e As GameMouseEventArgs)
         Me.ScrollMouseLock = True
         If MouseFocusChild IsNot Nothing Then
-            MouseFocusChild.RaiseMouseLeave(New GameMouseEventArgs)
+            MouseFocusChild.RaiseMouseLeave(e)
         End If
     End Sub
 
@@ -275,10 +251,8 @@ Public Class GameScrollViewer
     End Sub
 
     Public Sub ScrollViewerGlobalMouseMove(e As GameMouseEventArgs)
-        Dim relativeEventArgs As New GameMouseEventArgs With {
-            .Position = New PointI(e.X - Me.BasicRect.Left, e.Y - Me.BasicRect.Top)}
-        For Each element As GameBasicUIElement In Me.RenderingItemsSource
-            element.RaiseGlobalMouseMove(relativeEventArgs)
+        For Each element As GameBasicUIElement In Me.RenderingItems
+            element.RaiseGlobalMouseMove(e)
         Next
     End Sub
 
@@ -311,8 +285,8 @@ Public Class GameScrollViewer
         End If
     End Sub
 
-    Public Function FindFocusingChild(relativeArgs As GameMouseEventArgs) As GameBasicUIElement
-        Dim renderControlCount As Integer = Me.RenderingItemsSource.Count
+    Public Function FindFocusingChild(relativeCursor As PointI) As GameBasicUIElement
+        Dim renderControlCount As Integer = Me.RenderingItems.Count
         If Not CBool(renderControlCount) Then Return Nothing
         Dim lb As Integer = 0
         Dim ub As Integer = renderControlCount - 1
@@ -320,10 +294,10 @@ Public Class GameScrollViewer
         Dim loopCount As Integer = 0
         Do
             Dim middle As Integer = Math.Ceiling((lb + ub) / 2)
-            If relativeArgs.Y >= Me.RenderingItemsSource(middle).FatherViewRect.Bottom Then
+            If relativeCursor.Y >= Me.RenderingItems(middle).FatherViewRect.Bottom Then
                 If Not CBool(lb - ub) Then Return Nothing
                 lb = middle
-            ElseIf relativeArgs.Y < Me.RenderingItemsSource(middle).FatherViewRect.Top Then
+            ElseIf relativeCursor.Y < Me.RenderingItems(middle).FatherViewRect.Top Then
                 If ub - lb = 1 Then
                     ub -= 1
                 ElseIf Not CBool(lb - ub) Then
@@ -332,7 +306,7 @@ Public Class GameScrollViewer
                     ub = middle
                 End If
             Else
-                Return Me.RenderingItemsSource(middle)
+                Return Me.RenderingItems(middle)
             End If
             loopCount += 1
             If loopCount >= 255 Then Throw New Exception("loop error")

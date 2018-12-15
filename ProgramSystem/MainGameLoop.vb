@@ -23,12 +23,19 @@ Public Class MainGameLoop
     ''' 游戏主菜单页
     ''' </summary>
     Public MainMenuPage As New GamePageProperty
-    ''' <summary>
-    ''' 游戏设置菜单页
-    ''' </summary>
-    Public SettingPage As New GamePageProperty
-
-    Public GraphicsSettingPage As New GamePageProperty
+    Private MainMenuGrid As GameContentFrame = Nothing
+    Private MMG_Button1 As GameFlatButton = Nothing
+    Private MMG_Button2 As GameFlatButton = Nothing
+    Private MMG_Button3 As GameFlatButton = Nothing
+    Private SettingGrid As GameContentFrame = Nothing
+    Private SG_Button1 As GameFlatButton = Nothing
+    Private SG_Button2 As GameFlatButton = Nothing
+    Private GraphicsSettingGrid As GameContentFrame = Nothing
+    Private GG_Scroll1 As GameScrollViewer = Nothing
+    Private GG_Combo1 As GameComboBox = Nothing
+    Private GG_Combo2 As GameComboBox = Nothing
+    Private GG_Combo3 As GameComboBox = Nothing
+    Private GG_Shadow1 As GameShadowPad = Nothing
 
     Public Skirmish As SkirmishGameLoop
 
@@ -38,120 +45,180 @@ Public Class MainGameLoop
     Private PaintSuspended As Boolean = False
     Public PaintFPS As Integer = 0
 
-    Public Sub LoadMainMenu()
-        Dim btnMissionSelect As New GameFlatButton
-        With btnMissionSelect
-            .BindDeviceContext(Me.CameraD2DContext)
+    Public Sub LoadMainMenuControls()
+        Me.LoadMainGridControls()
+        Me.LoadMainGridEvents()
+        Me.LoadSettingGridControls()
+        Me.LoadSettingGridEvents()
+        Me.LoadGraphicsGridControls()
+        Me.LoadGraphicsGridEvents()
+
+        Me.MainMenuPage.GenerateElementsQuadtree(Me.Camera.Resolve)
+        Me.MainMenuPage.InitializeCursor(Me.Camera.CurrentCursorPosition, Me.Camera.Resolve)
+    End Sub
+
+    Private Sub LoadMainGridControls()
+        Me.MainMenuGrid = New GameContentFrame
+        With Me.MainMenuGrid
+            .BindingContext = Me.CameraD2DContext
+            .BasicRect = Camera.ResolveRectangle
+            .AbsoluteRect = .BasicRect
+            .InitializeControlCanvas()
+            .Visible = True
+        End With
+
+        'Start Game Button
+        Me.MMG_Button1 = New GameFlatButton
+        With Me.MMG_Button1
+            .BindingContext = Me.CameraD2DContext
             .BorderColour = BLACK_COLOUR_BRUSH(2)
             .BasicRect = New RawRectangleF(Camera.Resolve.X / 2 - 200, 400, Camera.Resolve.X / 2 + 200, 450)
+            .AbsoluteRect = .BasicRect
             .InitializeControlCanvas()
             .InitializeCursorLightBrush()
             .InitializeBorderStyle()
             .Text = "Start Game"
         End With
-        Dim tmpMouseDown = Async Sub()
-                               Debug.WriteLine("click!!")
-                               Me.SuspendPaint()
 
-                               Camera.ActivePages.Remove(Me.MainMenuPage)
-
-                               Me.StartLoadSave(-1)
-                               Dim loadResult As Integer = 0
-                               loadResult = Await Me.WaitForLoadSave()
-                               Me.StartLoadSkirmish()
-                               loadResult = Await Me.WaitForLoadSkirmish()
-                               'Me.Skirmish.SkirmishGameMap.GenerateMoveRange(Me.Skirmish.UnitList(0))
-                               Me.DrawSkirmish(False)
-                               Me.StartPaint()
-                           End Sub
-        AddHandler btnMissionSelect.MouseDown, tmpMouseDown
-
-        Dim btnSetting As New GameFlatButton
-        With btnSetting
-            .BindDeviceContext(Me.CameraD2DContext)
+        'Settings Button
+        Me.MMG_Button2 = New GameFlatButton
+        With Me.MMG_Button2
+            .BindingContext = Me.CameraD2DContext
             .BorderColour = BLACK_COLOUR_BRUSH(2)
             .BasicRect = New RawRectangleF(Camera.Resolve.X / 2 - 200, 460, Camera.Resolve.X / 2 + 200, 510)
+            .AbsoluteRect = .BasicRect
             .InitializeControlCanvas()
             .InitializeCursorLightBrush()
             .InitializeBorderStyle()
             .Text = "Settings"
         End With
-        Dim settingBtn_MouseDown = Sub()
-                                       Debug.WriteLine("进入设置页")
-                                       Me.SuspendPaint()
-                                       Camera.ActivePages.Remove(Me.MainMenuPage)
-                                       Camera.ActivePages.Add(Me.SettingPage)
-                                       Camera.PaintingLayers.Clear()
-                                       Camera.PaintingLayers.Push(AddressOf Me.SettingPage.PaintElements)
-                                       Me.StartPaint()
-                                   End Sub
-        AddHandler btnSetting.MouseDown, settingBtn_MouseDown
 
-        Dim btnExitGame As New GameFlatButton
-        With btnExitGame
-            .BindDeviceContext(Me.CameraD2DContext)
+        'Exit Button
+        Me.MMG_Button3 = New GameFlatButton
+        With Me.MMG_Button3
+            .BindingContext = Me.CameraD2DContext
             .BorderColour = BLACK_COLOUR_BRUSH(2)
             .BasicRect = New RawRectangleF(Camera.Resolve.X / 2 - 200, 520, Camera.Resolve.X / 2 + 200, 570)
+            .AbsoluteRect = .BasicRect
             .InitializeControlCanvas()
             .InitializeCursorLightBrush()
             .InitializeBorderStyle()
             .Text = "End Game"
         End With
 
-        Me.MainMenuPage.UIElements.Add(btnMissionSelect)
-        Me.MainMenuPage.UIElements.Add(btnSetting)
-        Me.MainMenuPage.UIElements.Add(btnExitGame)
-
-        Me.MainMenuPage.GenerateElementsQuadtree(Me.Camera.Resolve)
-        Me.MainMenuPage.InitializeCursor(Me.Camera.CurrentCursorPosition)
+        With Me.MainMenuGrid
+            .Children.Add(MMG_Button1)
+            .Children.Add(MMG_Button2)
+            .Children.Add(MMG_Button3)
+            .InitializeQuadtree(Me.Camera.Resolve)
+        End With
+        Me.MainMenuPage.UIElements.Add(Me.MainMenuGrid)
     End Sub
 
-    Public Sub LoadSettingPage()
+    Private Sub LoadMainGridEvents()
+        ' TODO: use MouseUp
+        AddHandler MMG_Button1.MouseDown, AddressOf Me.MMG_Button1_MouseDown
+        AddHandler MMG_Button2.MouseDown, AddressOf Me.MMG_Button2_MouseDown
 
+    End Sub
+
+    Private Async Sub MMG_Button1_MouseDown()
+        'Debug.WriteLine("click!!")
+        'TODO: Draw an image of 'Loading...'
+        Me.SuspendPaint()
+        Me.StartLoadSave(-1)
+        Dim loadResult As Integer = 0
+        loadResult = Await Me.WaitForLoadSave()
+        Me.StartLoadSkirmish()
+        loadResult = Await Me.WaitForLoadSkirmish()
+        'Me.Skirmish.SkirmishGameMap.GenerateMoveRange(Me.Skirmish.UnitList(0))
+        Me.DrawSkirmish(True)
+        Me.StartPaint()
+    End Sub
+    Private Sub MMG_Button2_MouseDown()
+        Debug.WriteLine("进入设置页")
+        Me.SuspendPaint()
+        MainMenuGrid.Visible = False
+        SettingGrid.Visible = True
+        Me.StartPaint()
+    End Sub
+
+    Private Sub LoadSettingGridControls()
+        Me.SettingGrid = New GameContentFrame
+        With Me.SettingGrid
+            .BindingContext = Me.CameraD2DContext
+            .BasicRect = Camera.ResolveRectangle
+            .AbsoluteRect = .BasicRect
+            .InitializeControlCanvas()
+            .Visible = False
+        End With
 
         '1 图像设置
-        Dim menu_1 As New GameFlatButton
-        With menu_1
-            .BindDeviceContext(Me.CameraD2DContext)
+        Me.SG_Button1 = New GameFlatButton
+        With SG_Button1
+            .BindingContext = Me.CameraD2DContext
             .BorderColour = BLACK_COLOUR_BRUSH(2)
             .BasicRect = New RawRectangleF(100, 300, 500, 350)
+            .AbsoluteRect = .BasicRect
             .InitializeControlCanvas()
             .InitializeCursorLightBrush()
             .InitializeBorderStyle()
             .Text = "Graphics"       'TODO： 使用TextResource
         End With
-        Dim menu_1_click = Sub()
-                               Debug.WriteLine("图像设置")
-                               Me.SuspendPaint()
-                               Camera.ActivePages.Remove(Me.SettingPage)
-                               Camera.ActivePages.Add(Me.GraphicsSettingPage)
-                               Camera.PaintingLayers.Clear()
-                               Camera.PaintingLayers.Push(AddressOf Me.GraphicsSettingPage.PaintElements)
-                               Me.StartPaint()
-                           End Sub
-        AddHandler menu_1.MouseDown, menu_1_click
 
         '1 声音设置
-        Dim menu_2 As New GameFlatButton
-        With menu_2
-            .BindDeviceContext(Me.CameraD2DContext)
+        Me.SG_Button2 = New GameFlatButton
+        With SG_Button2
+            .BindingContext = Me.CameraD2DContext
             .BorderColour = BLACK_COLOUR_BRUSH(2)
             .BasicRect = New RawRectangleF(100, 360, 500, 410)
+            .AbsoluteRect = .BasicRect
             .InitializeControlCanvas()
             .InitializeCursorLightBrush()
             .InitializeBorderStyle()
             .Text = "Audio"       'TODO： 使用TextResource
         End With
-        Dim menu_2_click = Sub()
-                               Debug.WriteLine("声音设置")
-                           End Sub
-        AddHandler menu_2.MouseDown, menu_2_click
 
+        With SettingGrid
+            .Children.Add(SG_Button1)
+            .Children.Add(SG_Button2)
+            .InitializeQuadtree(Me.Camera.Resolve)
+        End With
 
-        Dim scrollPage1 As New GameScrollViewer(True)
+        Me.MainMenuPage.UIElements.Add(Me.SettingGrid)
+    End Sub
+
+    Private Sub LoadSettingGridEvents()
+        AddHandler SG_Button1.MouseDown, AddressOf SG_Button1_MouseDown
+        AddHandler SG_Button2.MouseDown, AddressOf SG_Button2_MouseDown
+
+    End Sub
+
+    Private Sub SG_Button1_MouseDown()
+        Debug.WriteLine("图像设置")
+        Me.SuspendPaint()    '这里的Suspend&Start可以去掉
+        Me.SettingGrid.Visible = False
+        Me.GraphicsSettingGrid.Visible = True
+        Me.StartPaint()
+    End Sub
+    Private Sub SG_Button2_MouseDown()
+        Debug.WriteLine("声音设置")
+    End Sub
+
+    Private Sub LoadGraphicsGridControls()
+        Me.GraphicsSettingGrid = New GameContentFrame
+        With Me.GraphicsSettingGrid
+            .BindingContext = Me.CameraD2DContext
+            .BasicRect = Camera.ResolveRectangle
+            .AbsoluteRect = .BasicRect
+            .InitializeControlCanvas()
+            .Visible = False
+        End With
+
+        Me.GG_Scroll1 = New GameScrollViewer
         Dim scrollWidth As Integer = CInt(Me.Camera.Resolve.X * 0.8)
         Dim scrollLeft As Integer = CInt((Me.Camera.Resolve.X - scrollWidth) / 2)
-        With scrollPage1
+        With GG_Scroll1
             .BasicRect = New RawRectangleF(scrollLeft, 0, scrollLeft + scrollWidth, Me.Camera.Resolve.Y)
             .AbsoluteRect = .BasicRect
             .BindingContext = Me.CameraD2DContext
@@ -159,17 +226,18 @@ Public Class MainGameLoop
         End With
 
         '1-1 窗口设置
-        Dim menu_1_shadow As New GameShadowPad
-        With menu_1_shadow
-            .BasicRect = Camera.ResolveRectangle
+        Me.GG_Shadow1 = New GameShadowPad
+        With GG_Shadow1
+            .BasicRect = Me.Camera.ResolveRectangle
+            .AbsoluteRect = .BasicRect
             .BindingContext = Me.CameraD2DContext
             .InitializeControlCanvas()
             .DefaultBackground = BLACK_COLOUR_BRUSH(3)
             .Visible = False
         End With
 
-        Dim menu_1_1 As New GameComboBox
-        With menu_1_1
+        Me.GG_Combo1 = New GameComboBox
+        With GG_Combo1
             .BasicRect = New RawRectangleF(0, 0, 800, 50)
             .TitleString = "显示模式"
             .SelectionStrings.Add("窗口模式")
@@ -177,11 +245,11 @@ Public Class MainGameLoop
             .SelectedIndex = 0
             .BindingContext = Me.CameraD2DContext
             .InitializeComboBox(500)
-            .ImportShadowPad(menu_1_shadow, GraphicsSettingPage.UIElements)
+            .ImportShadowPad(GG_Shadow1, MainMenuPage.UIElements)
         End With
 
-        Dim menu_1_2 As New GameComboBox
-        With menu_1_2
+        Me.GG_Combo2 = New GameComboBox
+        With GG_Combo2
             .BasicRect = New RawRectangleF(0, 50, 800, 100)
             .TitleString = "分辨率"
             .SelectionStrings.Add("800*600")
@@ -192,11 +260,11 @@ Public Class MainGameLoop
             .SelectedIndex = 0
             .BindingContext = Me.CameraD2DContext
             .InitializeComboBox(500)
-            .ImportShadowPad(menu_1_shadow, GraphicsSettingPage.UIElements)
+            .ImportShadowPad(GG_Shadow1, MainMenuPage.UIElements)
         End With
 
-        Dim menu_1_3 As New GameComboBox
-        With menu_1_3
+        Me.GG_Combo3 = New GameComboBox
+        With GG_Combo3
             .BasicRect = New RawRectangleF(0, 100, 800, 150)
             .TitleString = "图像绘制帧速率"
             .SelectionStrings.Add("30")
@@ -204,30 +272,33 @@ Public Class MainGameLoop
             .SelectedIndex = 0
             .BindingContext = Me.CameraD2DContext
             .InitializeComboBox(500)
-            .ImportShadowPad(menu_1_shadow, GraphicsSettingPage.UIElements)
+            .ImportShadowPad(GG_Shadow1, MainMenuPage.UIElements)
         End With
 
-        menu_1_1.RelativeNextItem = menu_1_2
-        menu_1_2.RelativeLastItem = menu_1_1
-        menu_1_2.RelativeNextItem = menu_1_3
-        menu_1_3.RelativeLastItem = menu_1_2
+        GG_Combo1.RelativeNextItem = GG_Combo2
+        GG_Combo2.RelativeLastItem = GG_Combo1
+        GG_Combo2.RelativeNextItem = GG_Combo3
+        GG_Combo3.RelativeLastItem = GG_Combo2
 
-        With scrollPage1
-            .Children.Add(menu_1_1)
-            .Children.Add(menu_1_2)
-            .Children.Add(menu_1_3)
+        With GG_Scroll1
+            .Children.Add(GG_Combo1)
+            .Children.Add(GG_Combo2)
+            .Children.Add(GG_Combo3)
             .GenerateShownChildren()
         End With
 
-        GraphicsSettingPage.UIElements.Add(menu_1_shadow)
-        GraphicsSettingPage.UIElements.Add(scrollPage1)
-        GraphicsSettingPage.GenerateElementsQuadtree(Me.Camera.Resolve)
-        GraphicsSettingPage.InitializeCursor(Me.Camera.CurrentCursorPosition)
+        With GraphicsSettingGrid
+            .Children.Add(GG_Shadow1)
+            .Children.Add(GG_Scroll1)
+            .InitializeQuadtree(Me.Camera.Resolve)
+        End With
 
-        Me.SettingPage.UIElements.Add(menu_1)
-        Me.SettingPage.UIElements.Add(menu_2)
-        Me.SettingPage.GenerateElementsQuadtree(Me.Camera.Resolve)
-        Me.SettingPage.InitializeCursor(Me.Camera.CurrentCursorPosition)
+        Me.MainMenuPage.UIElements.Add(Me.GraphicsSettingGrid)
+
+    End Sub
+
+    Private Sub LoadGraphicsGridEvents()
+
     End Sub
 
     ''' <summary>
@@ -241,8 +312,8 @@ Public Class MainGameLoop
     Private Sub LoadGlobalResources()
         Me.GameLoaded = MapLoadStatus.Loading
         Call GameResources.LoadResources(CameraD2DContext)
-        Call Me.LoadMainMenu()
-        Call Me.LoadSettingPage()
+        Call Me.LoadMainMenuControls()
+
         Me.GameLoaded = MapLoadStatus.Loaded
     End Sub
 
@@ -342,14 +413,20 @@ Public Class MainGameLoop
         End With
     End Sub
 
+    ''' <summary>
+    ''' 绘制Skirmish图
+    ''' </summary>
+    ''' <param name="overwrite">清空所有图层</param>
     Public Sub DrawSkirmish(Optional overwrite As Boolean = True)
         With Me.Camera
             If overwrite Then
                 .PaintingLayers.Clear()
                 .PaintingLayersDescription.Clear()
+                .ActivePages.Clear()
             End If
             .PaintingLayers.Push(AddressOf Me.Skirmish.DrawSkirmishMapLayer)
             .PaintingLayersDescription.Push(GameImageLayer.SkirmishMap)
+            .ActivePages.Add(Me.Skirmish.SkirmishPage)
         End With
 
     End Sub

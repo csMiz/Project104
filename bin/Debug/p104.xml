@@ -554,11 +554,53 @@ p104
 <member name="F:p104.GameBasicUIElement.BasicRect">
  <summary>
  内容框矩形
+ <para>布局不发生动态改变时与FatherViewRect相同（大多数情况）。动态变化时表示相对于父对象的原始位置</para>
+ <para>例如GameScrollViewer(100,80,900,800)中第一个Button的BasicRect为(0,0,800,50)，AbsoluteRect为(100,80,900,130)，
+ 滚动条位置处于100时FatherViewRect为(0,-100,800,-50)，SelfCanvasRect为(0,0,800,50)</para>
+ </summary>
+</member>
+<member name="F:p104.GameBasicUIElement.AbsoluteRect">
+ <summary>
+ 控件位置绝对矩形
+ </summary>
+</member>
+<member name="F:p104.GameBasicUIElement.FatherViewRect">
+ <summary>
+ 父对象画布相对矩形
+ <para>例如子对象画在GameScrollViewer画布上的相对矩形，见<see cref="F:p104.GameBasicUIElement.BasicRect"/>的例子</para>
+ </summary>
+</member>
+<member name="F:p104.GameBasicUIElement.SkirtRect">
+ <summary>
+ 控件外围绝对矩形，主要用来控制全局光的刷新
+ <para>例如FlatButton的AbsoluteRect为(400,100,600,150)，全局光半径为30，则SkirtRect为(370,70,630,180)</para>
+ <para>如果需要实现“无论指针在哪都进行更新”的功能，可以将SkirtRect设置为(0,0,Resolve.X,Resolve.Y)</para>
+ </summary>
+</member>
+<member name="F:p104.GameBasicUIElement.SelfCanvasRect">
+ <summary>
+ 自身画布矩形
+ <para>一般情况下为(0,0,Width,Height)</para>
  </summary>
 </member>
 <member name="F:p104.GameBasicUIElement.BindingContext">
  <summary>
  绑定的D2dDeviceContext
+ </summary>
+</member>
+<member name="F:p104.GameBasicUIElement.HaveFocus">
+ <summary>
+ 当前鼠标是否在控件内
+ </summary>
+</member>
+<member name="F:p104.GameBasicUIElement.NeedRepaint">
+ <summary>
+ 控件参数更新后标记为NeedRepaint，在自己的ControlCanvas上重画
+ </summary>
+</member>
+<member name="M:p104.GameBasicUIElement.RefreshRects">
+ <summary>
+ 从外部更新Rect后，在这里调用对子对象Rect的更新
  </summary>
 </member>
 <member name="M:p104.GameBasicUIElement.DrawControlAtSelfCanvas(SharpDX.Direct2D1.DeviceContext@,p104.SpectatorCamera@,SharpDX.Direct2D1.Bitmap1)">
@@ -575,6 +617,18 @@ p104
  <summary>
  使用新的位置绘制控件
  </summary>
+</member>
+<member name="M:p104.GameBasicUIElement.IsInside(p104.PointF2)">
+ <summary>
+ 判断输入点是否在控件内
+ </summary>
+ <param name="input">绝对输入点</param>
+</member>
+<member name="M:p104.GameBasicUIElement.IsInside(p104.PointI)">
+ <summary>
+ 判断输入点是否在控件内
+ </summary>
+ <param name="input">绝对输入点</param>
 </member>
 <member name="T:p104.GameButton">
  <summary>
@@ -641,11 +695,6 @@ p104
  弹出子菜单阴影层控件
  </summary>
 </member>
-<member name="F:p104.GameComboBox.HaveFocus">
- <summary>
- 当前鼠标是否在控件内
- </summary>
-</member>
 <member name="P:p104.GameComboBox.SelectionCount">
  <summary>
  选项数
@@ -679,9 +728,9 @@ p104
  返回内容总高度，同时刷新BasicRect.Bottom
  </summary>
 </member>
-<member name="M:p104.GameContentFrame.RefreshChildrenRelativeBasicRects">
+<member name="M:p104.GameContentFrame.RefreshChildrenRelativeRects">
  <summary>
- 重新计算所有子元素的BasicRect
+ 重新计算所有子元素的Rect
  </summary>
 </member>
 <member name="T:p104.GameDialog">
@@ -706,6 +755,46 @@ p104
  <summary>
  销毁所有缓存的文字图片对象
  </summary>
+</member>
+<member name="T:p104.GameMouseEventArgs">
+ <summary>
+ 游戏鼠标输入参数类
+ <para>不允许从外部直接构造GameMouseEventArgs，应该使用FromMouseEventArgs</para>
+ </summary>
+</member>
+<member name="F:p104.GameMouseEventArgs.Position">
+ <summary>
+ 指针位置
+ <para>左上角为(0,0)，右下角为Camera的Resolve</para>
+ </summary>
+</member>
+<member name="F:p104.GameMouseEventArgs.MouseButton">
+ <summary>
+ 鼠标按键
+ </summary>
+</member>
+<member name="F:p104.GameMouseEventArgs.MouseWheel">
+ <summary>
+ 鼠标滚轮
+ </summary>
+</member>
+<member name="F:p104.GameMouseEventArgs.Deliver">
+ <summary>
+ 是否传递到下一层（指Z_Index）控件
+ </summary>
+</member>
+<member name="M:p104.GameMouseEventArgs.#ctor">
+ <summary>
+ 不允许从外部直接构造GameMouseEventArgs
+ </summary>
+</member>
+<member name="M:p104.GameMouseEventArgs.FromMouseEventArgs(System.Windows.Forms.MouseEventArgs,System.Drawing.Rectangle,p104.PointI)">
+ <summary>
+ 从系统鼠标事件参数生成GameMouseEventArgs
+ </summary>
+ <param name="source">系统鼠标事件参数</param>
+ <param name="windowsRect">当前窗体大小</param>
+ <param name="cameraRect">游戏Camera分辨率</param>
 </member>
 <member name="T:p104.GamePageProperty">
  <summary>
@@ -770,17 +859,12 @@ p104
 </member>
 <member name="F:p104.GameScrollViewer.RenderingItems">
  <summary>
- 按ZIndex从后到前（ZIndex递增）的显示的子控件
+ 显示的子控件
  </summary>
 </member>
 <member name="F:p104.GameScrollViewer.RenderingItemRects">
  <summary>
  顺序同RenderingItems，绘制子控件相对于ScrollViewer的ControlCanvas的位置
- </summary>
-</member>
-<member name="F:p104.GameScrollViewer.RenderingItemsSource">
- <summary>
- 由上到下顺序排列的显示的子控件
  </summary>
 </member>
 <member name="F:p104.GameScrollViewer.MouseFocusChild">
@@ -966,6 +1050,11 @@ p104
 <member name="M:p104.SkirmishMap.PrintMovementGlance">
  <summary>
  打印角色行动范围结果
+ </summary>
+</member>
+<member name="M:p104.SkirmishMap.GenerateMoveRangeBorder">
+ <summary>
+ 根据已生成的GlanceNodes绘制最大行动范围圈
  </summary>
 </member>
 <member name="T:p104.MovementGlanceNode">
@@ -1309,11 +1398,6 @@ p104
  游戏主菜单页
  </summary>
 </member>
-<member name="F:p104.MainGameLoop.SettingPage">
- <summary>
- 游戏设置菜单页
- </summary>
-</member>
 <member name="M:p104.MainGameLoop.StartLoadGlobalResources">
  <summary>
  加载全局资源，用户设置，不载入存档
@@ -1333,6 +1417,12 @@ p104
  <summary>
  载入遭遇战资源
  </summary>
+</member>
+<member name="M:p104.MainGameLoop.DrawSkirmish(System.Boolean)">
+ <summary>
+ 绘制Skirmish图
+ </summary>
+ <param name="overwrite">清空所有图层</param>
 </member>
 <member name="T:p104.MathHelper">
  <summary>
@@ -1397,6 +1487,16 @@ p104
 <member name="F:p104.SkirmishGameLoop.SkirmishPage">
  <summary>
  处理控件面板等鼠标点击事件
+ </summary>
+</member>
+<member name="F:p104.SkirmishGameLoop.UI_SkirmishBoard">
+ <summary>
+ 地图鼠标交互层
+ </summary>
+</member>
+<member name="F:p104.SkirmishGameLoop.SkirmishBoardMouseDownPosition">
+ <summary>
+ MouseDown对应的Block坐标，用于检查与MouseUp时是否一致
  </summary>
 </member>
 <member name="F:p104.SkirmishGameLoop.Sides">
@@ -1484,6 +1584,24 @@ p104
  <summary>
  检查所有单位状态已更改
  </summary>
+ <returns></returns>
+</member>
+<member name="M:p104.SkirmishGameLoop.ConvertToWorldCursor(p104.PointI)">
+ <summary>
+ 将鼠标点击位置转换为实际地图位置
+ </summary>
+ <param name="input">鼠标位置</param>
+</member>
+<member name="M:p104.SkirmishGameLoop.MousePositionToChessboard(p104.PointF2)">
+ <summary>
+ 将实际地图位置转换为坐标
+ </summary>
+</member>
+<member name="M:p104.SkirmishGameLoop.DrawPositionToChessboard(p104.PointI)">
+ <summary>
+ 将鼠标点击位置（绘图位置）直接转换为坐标
+ </summary>
+ <param name="mouse"></param>
  <returns></returns>
 </member>
 <member name="M:p104.SkirmishGameLoop.MouseTryClickUnit(p104.PointI)">

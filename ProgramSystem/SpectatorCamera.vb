@@ -11,6 +11,11 @@ Public Class SpectatorCamera
     ''' 视图中心
     ''' </summary>
     Public CameraFocus As PointF2
+    Public ReadOnly Property CameraTopLeft As PointF2
+        Get
+            Return New PointF2(CameraFocus.X - 0.5 * Resolve.X / Zoom, CameraFocus.Y - 0.5 * Resolve.Y / Zoom)
+        End Get
+    End Property
     ''' <summary>
     ''' 缩放倍率，大于零并且小于等于1
     ''' </summary>
@@ -18,12 +23,13 @@ Public Class SpectatorCamera
     ''' <summary>
     ''' 分辨率
     ''' </summary>
-    Public Resolve As PointI
+    Public Resolve As PointI = Nothing
     Public ReadOnly Property ResolveRectangle As Mathematics.Interop.RawRectangleF
         Get
             Return New Mathematics.Interop.RawRectangleF(0, 0, Me.Resolve.X, Me.Resolve.Y)
         End Get
     End Property
+    Public Diagonal As Single = 0
     ''' <summary>
     ''' 定义绘图委托
     ''' </summary>
@@ -118,6 +124,10 @@ Public Class SpectatorCamera
         'Call GameResources.LoadResources(d2dContext)   单独放到mainGameloop里了
     End Sub
 
+    Public Sub RefreshResolve()
+        Me.Diagonal = Math.Sqrt(Me.Resolve.X ^ 2 + Me.Resolve.Y ^ 2)
+    End Sub
+
     Public Sub PaintImage()
         If CBool(PaintingLayers.Count) Then
             d2dContext.Target = BitmapForOriginalSkirmishMap
@@ -156,6 +166,14 @@ Public Class SpectatorCamera
 
     Public Function GetCenter() As PointI
         Return New PointI(CInt(Me.Resolve.X / 2), CInt(Me.Resolve.Y / 2))
+    End Function
+
+    Public Function IsMouseClick(startPosition As PointI, endPosition As PointI) As Boolean
+        Dim distance As Single = Math.Sqrt((startPosition.X - endPosition.X) ^ 2 + (startPosition.Y - endPosition.Y) ^ 2)
+        If distance <= Me.Diagonal / 500 Then
+            Return True
+        End If
+        Return False
     End Function
 
     Public Sub Dispose() Implements IDisposable.Dispose

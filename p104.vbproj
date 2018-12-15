@@ -117,12 +117,14 @@
     <Compile Include="GameObject\UnitTemplateRepository.vb" />
     <Compile Include="GameUIElement\GameBasicUIElement.vb" />
     <Compile Include="GameUIElement\GameButton.vb" />
+    <Compile Include="GameUIElement\GameChessboard.vb" />
     <Compile Include="GameUIElement\GameComboBox.vb" />
     <Compile Include="GameUIElement\GameContentFrame.vb" />
     <Compile Include="GameUIElement\GameDialog.vb" />
     <Compile Include="GameUIElement\GameFlatButton.vb" />
     <Compile Include="GameUIElement\GameInteractiveRectangle.vb" />
     <Compile Include="GameUIElement\GameListBox.vb" />
+    <Compile Include="GameUIElement\GameMouseEventArgs.vb" />
     <Compile Include="GameUIElement\GamePageProperty.vb" />
     <Compile Include="GameUIElement\GamePictureBox.vb" />
     <Compile Include="GameUIElement\GameScrollViewer.vb" />
@@ -158,6 +160,7 @@
     <Compile Include="ProgramSystem\GameAchievement.vb" />
     <Compile Include="ProgramSystem\GameAchievementRecord.vb" />
     <Compile Include="ProgramSystem\GameEndInfo.vb" />
+    <Compile Include="ProgramSystem\IGameGeometryArea.vb" />
     <Compile Include="ProgramSystem\GameIconRepository.vb" />
     <Compile Include="ProgramSystem\GameLive2dAnimation.vb" />
     <Compile Include="ProgramSystem\GameLive2dImage.vb" />

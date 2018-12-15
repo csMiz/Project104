@@ -20,7 +20,7 @@ Public Class GameTest
         Dim myCamera As New SpectatorCamera
         With myCamera
             .Resolve = New PointI(1024, 768)
-            .CameraFocus = New PointF2(300, 300)
+            .CameraFocus = New PointF2(600, 600)
             .Zoom = 0.25
             .InitializeDirect2d()
         End With
@@ -107,18 +107,36 @@ Public Class GameTest
 
     Public Sub AreaTest()
         Dim area As New PolygonArea
-        With area.Points
+        Dim points As New List(Of PointF2)
+        With points
+            .Clear()
             .Add(New PointF2(0, 1))
             .Add(New PointF2(1, 1))
             .Add(New PointF2(1, -1))
             .Add(New PointF2(0, -0.5))
             .Add(New PointF2(-1, -1))
             .Add(New PointF2(-1, 0))
-
         End With
+        area.Points = points.ToArray
 
         Dim testPoint As New PointF2(0, 0)
         If Not (area.IsInside(testPoint)) Then
+            Throw New Exception("assertion failed")
+        End If
+
+        Dim pointsRaw As New List(Of SharpDX.Mathematics.Interop.RawVector2)
+        With pointsRaw
+            .Clear()
+            .Add(New SharpDX.Mathematics.Interop.RawVector2(0, 1))
+            .Add(New SharpDX.Mathematics.Interop.RawVector2(1, 1))
+            .Add(New SharpDX.Mathematics.Interop.RawVector2(1, -1))
+            .Add(New SharpDX.Mathematics.Interop.RawVector2(0, -0.5))
+            .Add(New SharpDX.Mathematics.Interop.RawVector2(-1, -1))
+            .Add(New SharpDX.Mathematics.Interop.RawVector2(-1, 0))
+        End With
+        area.PointsRaw = pointsRaw.ToArray
+
+        If Not (area.IsInsideRaw(testPoint)) Then
             Throw New Exception("assertion failed")
         End If
 

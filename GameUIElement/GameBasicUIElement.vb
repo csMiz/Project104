@@ -18,8 +18,30 @@ Public MustInherit Class GameBasicUIElement
 
     ''' <summary>
     ''' 内容框矩形
+    ''' <para>布局不发生动态改变时与FatherViewRect相同（大多数情况）。动态变化时表示相对于父对象的原始位置</para>
+    ''' <para>例如GameScrollViewer(100,80,900,800)中第一个Button的BasicRect为(0,0,800,50)，AbsoluteRect为(100,80,900,130)，
+    ''' 滚动条位置处于100时FatherViewRect为(0,-100,800,-50)，SelfCanvasRect为(0,0,800,50)</para>
     ''' </summary>
     Public BasicRect As RawRectangleF = Nothing
+    ''' <summary>
+    ''' 控件位置绝对矩形
+    ''' </summary>
+    Public AbsoluteRect As RawRectangleF = Nothing
+    ''' <summary>
+    ''' 父对象画布相对矩形
+    ''' <para>例如子对象画在GameScrollViewer画布上的相对矩形，见<see cref="BasicRect"/>的例子</para>
+    ''' </summary>
+    Public FatherViewRect As RawRectangleF = Nothing
+    ''' <summary>
+    ''' 控件外围绝对矩形，主要用来控制全局光的刷新
+    ''' <para>例如FlatButton的AbsoluteRect为(400,100,600,150)，全局光半径为30，则SkirtRect为(370,70,630,180)</para>
+    ''' <para>如果需要实现“无论指针在哪都进行更新”的功能，可以将SkirtRect设置为(0,0,Resolve.X,Resolve.Y)</para>
+    ''' </summary>
+    Public SkirtRect As RawRectangleF = Nothing
+    ''' <summary>
+    ''' 自身画布矩形
+    ''' <para>一般情况下为(0,0,Width,Height)</para>
+    ''' </summary>
     Protected SelfCanvasRect As RawRectangleF = Nothing
     Public ReadOnly Property Height As Integer
         Get
@@ -31,9 +53,6 @@ Public MustInherit Class GameBasicUIElement
             Return CInt(BasicRect.Right - BasicRect.Left)
         End Get
     End Property
-    Public AbsoluteRect As RawRectangleF = Nothing
-    Public FatherViewRect As RawRectangleF = Nothing
-    Public InteractiveRect As RawRectangleF = Nothing
     Public Z_Index As Short = 0
     Public DefaultBackground As Brush = TRANSPARENT_BRUSH
     Public Visible As Boolean = True
@@ -56,6 +75,14 @@ Public MustInherit Class GameBasicUIElement
     ''' </summary>
     Public BindingContext As DeviceContext = Nothing
     Protected ControlCanvas As Bitmap1 = Nothing
+    ''' <summary>
+    ''' 当前鼠标是否在控件内
+    ''' </summary>
+    Public HaveFocus As Boolean = False
+    ''' <summary>
+    ''' 控件参数更新后标记为NeedRepaint，在自己的ControlCanvas上重画
+    ''' </summary>
+    Public NeedRepaint As Boolean = True
 
     Public Shared ZIndexComparison As New Comparison(Of GameBasicUIElement)(AddressOf CompareZIndex)
     Public Shared ZIndexComparisonReverse As New Comparison(Of GameBasicUIElement)(AddressOf CompareZIndexReverse)
@@ -63,10 +90,13 @@ Public MustInherit Class GameBasicUIElement
     Public Sub InitializeControlCanvas()
         Me.ControlCanvas = New Bitmap1(Me.BindingContext, New SharpDX.Size2(Me.Width, Me.Height), NORMAL_BITMAP_PROPERTY)
         Me.SelfCanvasRect = New RawRectangleF(0, 0, Me.Width, Me.Height)
+
     End Sub
 
+    ''' <summary>
+    ''' 从外部更新Rect后，在这里调用对子对象Rect的更新
+    ''' </summary>
     Public Overridable Sub RefreshRects()
-        '从外部更新Rect后，在这里调用对子对象Rect的更新
     End Sub
 
     ''' <summary>
@@ -88,11 +118,19 @@ Public MustInherit Class GameBasicUIElement
         context.DrawBitmap(Me.ControlCanvas, newRect, NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
     End Sub
 
+    ''' <summary>
+    ''' 判断输入点是否在控件内
+    ''' </summary>
+    ''' <param name="input">绝对输入点</param>
     Public Function IsInside(input As PointF2) As Boolean Implements IMouseArea.IsInside
-        Return (input.X >= Me.BasicRect.Left AndAlso input.X <= Me.BasicRect.Right AndAlso input.Y >= Me.BasicRect.Top AndAlso input.Y <= Me.BasicRect.Bottom)
+        Return (input.X >= Me.AbsoluteRect.Left AndAlso input.X <= Me.AbsoluteRect.Right AndAlso input.Y >= Me.AbsoluteRect.Top AndAlso input.Y <= Me.AbsoluteRect.Bottom)
     End Function
+    ''' <summary>
+    ''' 判断输入点是否在控件内
+    ''' </summary>
+    ''' <param name="input">绝对输入点</param>
     Public Function IsInside(input As PointI) As Boolean Implements IQuadtreeRecognizable.IsInside
-        Return (input.X >= Me.BasicRect.Left AndAlso input.X <= Me.BasicRect.Right AndAlso input.Y >= Me.BasicRect.Top AndAlso input.Y <= Me.BasicRect.Bottom)
+        Return (input.X >= Me.AbsoluteRect.Left AndAlso input.X <= Me.AbsoluteRect.Right AndAlso input.Y >= Me.AbsoluteRect.Top AndAlso input.Y <= Me.AbsoluteRect.Bottom)
     End Function
 
     Public Function CompareRegionDirection(inputPivot As PointI) As QuadtreeDirection Implements IQuadtreeRecognizable.CompareRegionDirection
@@ -148,6 +186,14 @@ Public MustInherit Class GameBasicUIElement
 
     Public Shared Function CompareZIndexReverse(a As GameBasicUIElement, b As GameBasicUIElement) As Integer
         Return b.Z_Index - a.Z_Index
+    End Function
+
+    Public Shared Function ConvertQuadElements(input As List(Of IQuadtreeRecognizable)) As List(Of GameBasicUIElement)
+        Dim result As New List(Of GameBasicUIElement)
+        For Each element As GameBasicUIElement In input
+            result.Add(element)
+        Next
+        Return result
     End Function
 
 End Class
