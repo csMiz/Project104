@@ -20,6 +20,8 @@ Public Class Form1
         'Dim waitResult As Integer = Await test.TestGameLoop.WaitForLoad()
         'PaintThread.Start()
 
+        'test.GoLTest()
+
         Await test.MainGameLoopTest()
 
         'test.OOPTest()

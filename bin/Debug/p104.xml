@@ -1052,14 +1052,16 @@ p104
  打印角色行动范围结果
  </summary>
 </member>
-<member name="M:p104.SkirmishMap.GenerateMoveRangeBorder">
- <summary>
- 根据已生成的GlanceNodes绘制最大行动范围圈
- </summary>
-</member>
 <member name="T:p104.MovementGlanceNode">
  <summary>
  行动预览节点类
+ </summary>
+</member>
+<member name="F:p104.MovementGlanceNode.NeighbourType">
+ <summary>
+ 用6bits表示周围六格，从右到左分别为T, TR, BR, B, BL, TL
+ <para> 如(binary)00111111表示周围六格均有效
+ </para>
  </summary>
 </member>
 <member name="T:p104.SkirmishMapBlock">

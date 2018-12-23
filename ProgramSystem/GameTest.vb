@@ -200,6 +200,29 @@ Public Class GameTest
         Application.DoEvents()
     End Sub
 
+    Public Sub GoLTest()
+        Dim gol As New TheGameOfLife
+        gol.Initialize(16, 16)
+        For j = 0 To 15
+            For i = 0 To 1
+                gol.MapBuffer(i, j) = 0
+            Next
+        Next
+        gol.MapBuffer(0, 5) = &H8
+        gol.MapBuffer(0, 6) = &H4
+        gol.MapBuffer(0, 7) = &H1C
+
+        For i = 0 To 60
+            gol.Process()
+            If i > 40 Then
+                Debug.WriteLine("turn:" & i)
+                gol.DebugResult()
+            End If
+        Next
+
+
+    End Sub
+
     Public Sub OOPTest()
         'Dim animalList As New List(Of Animal)
         'Dim tmpAnimal As New Animal

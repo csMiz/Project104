@@ -174,7 +174,8 @@ Public Class SkirmishMapBlock
                 End With
             End If
 
-            .DrawingBox = New RawRectangleF(.ImgLeft, .ImgTop, .ImgLeft + .ImgSideLength, .ImgTop + .ImgSideLength)
+            '这里的0.5px修复了图块与基底之间存在白隙的bug
+            .DrawingBox = New RawRectangleF(.ImgLeft + 0.5, .ImgTop + 0.5, .ImgLeft + .ImgSideLength + 0.5, .ImgTop + .ImgSideLength + 0.5)
             .DrawingBaseBox = New RawRectangleF(.ImgLeft, .ImgTop - 0.5 * .ImgSideLength, .DrawingBox.Right, .DrawingBox.Bottom)
 
         End With

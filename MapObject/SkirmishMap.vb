@@ -12,7 +12,6 @@ Public Class SkirmishMap
     Public Property ResourcesLoaded As Boolean = False
 
     Public MovementGlance As New List(Of MovementGlanceNode)
-    Public MovementGlanceBorder As PathGeometry = Nothing
 
     Public Sub New()
         For i = 0 To 49
@@ -197,6 +196,83 @@ Public Class SkirmishMap
         Debug.Print(result & "]" & vbCrLf)
     End Sub
 
+    Public Sub DrawMovementGlanceLayer(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As Bitmap1)
+
+        '单向描边：
+        '1. 从所有可到达的格子中随机取出一个格子
+        '2. 如果此格子所有边缘均有相邻的格子，则将其标记为“内部”，否则为“边缘”
+        '若为内部， 则标记完后重新取。若为边缘， 标记所有裸露的边， 随机取裸露边上一点作为起点。
+        '3. 按顺时针方向检测下一个点，走完每一条裸露边后立即标记已走过，遇到非裸露边时按边的方向计算下一个格子
+        '4. 若检测到下一个点为起点，则这条边缘检测结束，将其加入边缘列表
+        '5. 遍历所有格子，若存在格子有裸露边未被标记为已走过，则说明存在空洞
+        '6. 将所有未走完的格子组成新的集合，从过程1开始重复，直到所有格子都走完
+        '7. 绘制边缘列表中的所有边缘
+
+
+        'calculate outlines
+        Dim edgeList As New List(Of List(Of SharpDX.Mathematics.Interop.RawVector2))
+        Dim outlineList As New List(Of List(Of MovementGlanceNode))
+        Dim allGlanceNodes As New List(Of MovementGlanceNode)(Me.MovementGlance)
+        outlineList.Add(allGlanceNodes)
+        Do
+            Dim tmpList As List(Of MovementGlanceNode) = outlineList.First
+            outlineList.RemoveAt(0)
+            Call Me.ExtractGlanceOutline(tmpList, outlineList, edgeList)
+        Loop While outlineList.Count
+        'draw
+
+
+    End Sub
+
+    Private Sub ExtractGlanceOutline(nodes As List(Of MovementGlanceNode), hollowList As List(Of List(Of MovementGlanceNode)), edgeList As List(Of List(Of SharpDX.Mathematics.Interop.RawVector2)))
+        'Remove all 'Inside' Block
+        For j = nodes.Count - 1 To 0 Step -1
+            Dim getNode As MovementGlanceNode = nodes(j)
+            For i As HexBlockDirection = HexBlockDirection.Top To HexBlockDirection.TopLeft
+                If GlanceContains(GetNextBlockPosition(getNode.Position, i)) IsNot Nothing Then
+                    getNode.NeighbourType += 2 ^ i
+                End If
+            Next
+            If getNode.NeighbourType = 63 Then    '是内部块
+                nodes.RemoveAt(j)
+            End If
+        Next
+        'Choose 'Start' Block
+        Dim startNode As MovementGlanceNode = nodes.First
+        Dim allNodePoints As New List(Of SharpDX.Mathematics.Interop.RawVector2)
+        With allNodePoints
+            Dim tmpBlock As SkirmishMapBlock = Blocks(startNode.Position.X, startNode.Position.Y)
+            .Add(tmpBlock.V_TR)
+            .Add(tmpBlock.V_R)
+            .Add(tmpBlock.V_BR)
+            .Add(tmpBlock.V_BL)
+            .Add(tmpBlock.V_L)
+            .Add(tmpBlock.V_TL)
+            .Add(tmpBlock.V3D_TR)
+            .Add(tmpBlock.V3D_R)
+            .Add(tmpBlock.V3D_BR)
+            .Add(tmpBlock.V3D_BL)
+            .Add(tmpBlock.V3D_L)
+            .Add(tmpBlock.V3D_TL)
+        End With
+        Dim nodePoints As New List(Of SharpDX.Mathematics.Interop.RawVector2)
+        For i = 0 To 5
+            If i <> 5 Then
+                If (startNode.NeighbourType >> (4 - i)) = 3 Then
+                    nodePoints.Add(allNodePoints(i))
+                    nodePoints.Add(allNodePoints(i + 6))
+                End If
+            Else
+
+            End If
+        Next
+
+
+        'HACK: 不可行
+
+
+    End Sub
+
     Public Function GlanceContains(position As PointI) As MovementGlanceNode
         For Each item In Me.MovementGlance
             If item.Position.X = position.X AndAlso item.Position.Y = position.Y Then
@@ -206,7 +282,7 @@ Public Class SkirmishMap
         Return Nothing
     End Function
 
-    Public Sub ExpandMovementNode(targetNode As MovementGlanceNode, targetUnit As GameUnit)
+    Private Sub ExpandMovementNode(targetNode As MovementGlanceNode, targetUnit As GameUnit)
         Dim nodePosition As PointI = targetNode.Position
         Dim cumulativePoint As Single = targetNode.CumulativeMovePoint
         Dim pointUBound As Single = targetUnit.FinalMovePoint
@@ -262,21 +338,42 @@ Public Class SkirmishMap
 
     End Sub
 
-    ''' <summary>
-    ''' 根据已生成的GlanceNodes绘制最大行动范围圈
-    ''' </summary>
-    Public Sub GenerateMoveRangeBorder()
-        If Me.MovementGlanceBorder IsNot Nothing Then
-            Me.MovementGlanceBorder.Dispose()    '销毁缓存
-        End If
-        'TODO
-
-    End Sub
-
 
     Public Sub Dispose()
-
+        'TODO
     End Sub
+
+    Public Shared Function GetNextBlockPosition(inputPosition As PointI, direction As HexBlockDirection) As PointI
+        If direction = HexBlockDirection.Top Then
+            Return New PointI(inputPosition.X, inputPosition.Y - 1)
+        ElseIf direction = HexBlockDirection.Bottom Then
+            Return New PointI(inputPosition.X, inputPosition.Y + 1)
+        Else
+            If inputPosition.X Mod 2 Then    '奇数列
+                Select Case direction
+                    Case HexBlockDirection.TopLeft
+                        Return New PointI(inputPosition.X - 1, inputPosition.Y)
+                    Case HexBlockDirection.BottomLeft
+                        Return New PointI(inputPosition.X - 1, inputPosition.Y + 1)
+                    Case HexBlockDirection.TopRight
+                        Return New PointI(inputPosition.X + 1, inputPosition.Y)
+                    Case Else
+                        Return New PointI(inputPosition.X + 1, inputPosition.Y + 1)
+                End Select
+            Else    '偶数列
+                Select Case direction
+                    Case HexBlockDirection.TopLeft
+                        Return New PointI(inputPosition.X - 1, inputPosition.Y - 1)
+                    Case HexBlockDirection.BottomLeft
+                        Return New PointI(inputPosition.X - 1, inputPosition.Y)
+                    Case HexBlockDirection.TopRight
+                        Return New PointI(inputPosition.X + 1, inputPosition.Y - 1)
+                    Case Else
+                        Return New PointI(inputPosition.X + 1, inputPosition.Y)
+                End Select
+            End If
+        End If
+    End Function
 
 End Class
 
@@ -288,4 +385,20 @@ Public Class MovementGlanceNode
     Public Parent As MovementGlanceNode = Nothing
     Public CumulativeMovePoint As Single = 0.0F
 
+    ''' <summary>
+    ''' 用6bits表示周围六格，从右到左分别为T, TR, BR, B, BL, TL
+    ''' <para> 如(binary)00111111表示周围六格均有效
+    ''' </para>
+    ''' </summary>
+    Public NeighbourType As Byte = 0
+
 End Class
+
+Public Enum HexBlockDirection As Byte
+    Top = 0
+    TopRight = 1
+    BottomRight = 2
+    Bottom = 3
+    BottomLeft = 4
+    TopLeft = 5
+End Enum

@@ -115,6 +115,7 @@
     <Compile Include="GameObject\SkillSystem\SkillRepository.vb" />
     <Compile Include="GameObject\UnitImageRepository.vb" />
     <Compile Include="GameObject\UnitTemplateRepository.vb" />
+    <Compile Include="GameOfLife\TheGameOfLife.vb" />
     <Compile Include="GameUIElement\GameBasicUIElement.vb" />
     <Compile Include="GameUIElement\GameButton.vb" />
     <Compile Include="GameUIElement\GameChessboard.vb" />
@@ -127,6 +128,7 @@
     <Compile Include="GameUIElement\GameMouseEventArgs.vb" />
     <Compile Include="GameUIElement\GamePageProperty.vb" />
     <Compile Include="GameUIElement\GamePictureBox.vb" />
+    <Compile Include="GameUIElement\GameProgressBar.vb" />
     <Compile Include="GameUIElement\GameScrollViewer.vb" />
     <Compile Include="GameUIElement\GameShadowPad.vb" />
     <Compile Include="GameUIElement\GameTextBlock.vb" />
