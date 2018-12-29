@@ -99,25 +99,25 @@ Public Class UnitDetailDialog
     Public Sub BindUnit(unit As GameUnit)
         If unit Is Nothing Then Throw New Exception("input unit is null!")
         Me.BindingUnit = unit
+        Me.InitializeColor()
     End Sub
 
-    Public Sub InitializeColor()
+    Private Sub InitializeColor()
         If Me.BindingUnit Is Nothing Then Throw New Exception("binding unit is null!")
         Me.UsingColorSet = Me.BindingUnit.GetSideColorSet
-
-        Dim lineProperty As StrokeStyleProperties = New StrokeStyleProperties() With {
-            .StartCap = CapStyle.Round,
-            .EndCap = CapStyle.Round}
-
-        Me.LineStyle = New StrokeStyle(Me.Camera.GetDevceContext.Factory, lineProperty)
     End Sub
 
     Public Sub InitializeConetentBox()
 
-        If Me.Camera Is Nothing Then Throw New Exception("camera is null!")
+        If Me.BindingCamera Is Nothing Then Throw New Exception("camera is null!")
 
-        Dim top_left_x As Integer = Camera.Resolve.X / 2 - Me.DialogWidth / 2
-        Dim top_left_y As Integer = Camera.Resolve.Y / 2 - Me.DialogHeight / 2
+        Dim lineProperty As StrokeStyleProperties = New StrokeStyleProperties() With {
+            .StartCap = CapStyle.Round,
+            .EndCap = CapStyle.Round}
+        Me.LineStyle = New StrokeStyle(Me.BindingCamera.GetDevceContext.Factory, lineProperty)
+
+        Dim top_left_x As Integer = BindingCamera.Resolve.X / 2 - Me.DialogWidth / 2
+        Dim top_left_y As Integer = BindingCamera.Resolve.Y / 2 - Me.DialogHeight / 2
 
         Rect_BG = New RawRectangleF(top_left_x, top_left_y, top_left_x + Me.DialogWidth, top_left_y + Me.DialogHeight)
 
@@ -134,8 +134,8 @@ Public Class UnitDetailDialog
         End If
 
         '内容边界
-        Dim content_left As Integer = Camera.Resolve.X / 2 - content_width / 2
-        Dim content_top As Integer = Camera.Resolve.Y / 2 - content_height / 2
+        Dim content_left As Integer = BindingCamera.Resolve.X / 2 - content_width / 2
+        Dim content_top As Integer = BindingCamera.Resolve.Y / 2 - content_height / 2
         Dim content_right As Integer = content_left + content_width
         Dim content_bottom As Integer = content_top + content_height
         Rect_Content = New RawRectangleF(content_left, content_top, content_right, content_bottom)
@@ -206,9 +206,9 @@ Public Class UnitDetailDialog
     End Sub
 
     Public Sub InitializeEffects()
-        Dim context As DeviceContext = Me.Camera.GetDevceContext
-        Me.DialogBitmap = New Bitmap1(context, New SharpDX.Size2(Me.Camera.Resolve.X, Me.Camera.Resolve.Y), NORMAL_BITMAP_PROPERTY)
-        Me.BlurBitmap = New Bitmap1(context, New SharpDX.Size2(Me.Camera.Resolve.X, Me.Camera.Resolve.Y), NORMAL_BITMAP_PROPERTY)
+        Dim context As DeviceContext = Me.BindingCamera.GetDevceContext
+        Me.DialogBitmap = New Bitmap1(context, New SharpDX.Size2(Me.BindingCamera.Resolve.X, Me.BindingCamera.Resolve.Y), NORMAL_BITMAP_PROPERTY)
+        Me.BlurBitmap = New Bitmap1(context, New SharpDX.Size2(Me.BindingCamera.Resolve.X, Me.BindingCamera.Resolve.Y), NORMAL_BITMAP_PROPERTY)
         Me.BlurEffectLayer = New Effects.GaussianBlur(context)
         Me.BlurEffectLayer.SetInput(0, Me.DialogBitmap, True)
         Me.BlurEffectLayer.StandardDeviation = 10.0F
@@ -219,7 +219,6 @@ Public Class UnitDetailDialog
     ''' </summary>
     Public Overrides Sub DrawControl(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
         With context
-
             '绘制模糊效果
             .EndDraw()
 
@@ -288,7 +287,7 @@ Public Class UnitDetailDialog
     End Sub
 
     Public Overrides Sub DrawControlAtSelfCanvas(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
-        'TODO
+        '不适用
     End Sub
 
     ''' <summary>

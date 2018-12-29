@@ -13,7 +13,7 @@ Public Class GameTest
 
     Public MainGame As MainGameLoop
 
-
+    <Obsolete>
     Public Async Function MainGameLoopTest() As Task
         MainGame = New MainGameLoop
 
@@ -59,7 +59,7 @@ Public Class GameTest
         'TODO: put initialize codes into LoadResources
         Dialog.InitializeDialog(myCamera.Resolve.X, myCamera.Resolve.Y, myCamera)
         Dialog.BindUnit(UnitTemplates.GetWrappedHeroTemplate(0))
-        Dialog.InitializeColor()
+        'Dialog.InitializeColor()
         Dialog.InitializeConetentBox()
         Dialog.InitializeEffects()
 
@@ -191,7 +191,7 @@ Public Class GameTest
     Public Sub DialogTest()
         Dialog.InitializeDialog(900, 400, User)
         Dialog.BindUnit(UnitTemplates.GetHeroTemplate(0))
-        Dialog.InitializeColor()
+        'Dialog.InitializeColor()
         Dialog.InitializeConetentBox()
 
         User.PaintingLayers.Push(AddressOf Dialog.DrawControl)

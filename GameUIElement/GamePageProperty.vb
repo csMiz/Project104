@@ -36,7 +36,7 @@ Public Class GamePageProperty
             context.EndDraw()
             For Each element As GameBasicUIElement In Me.UIElements
                 If element.Visible Then
-                    element.DrawControlAtSelfCanvas(context, spec, canvasBitmap)
+                    element.TriggerDrawSelfCanvas(context, spec, canvasBitmap)
                 End If
             Next
             context.Target = canvasBitmap

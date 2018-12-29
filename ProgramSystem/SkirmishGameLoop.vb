@@ -118,6 +118,15 @@ Public Class SkirmishGameLoop
         '初始化流程状态机
         Me.InitializeSkirmishGamePhases()
 
+        '初始化单位详情面板
+        Dim dialog As UnitDetailDialog = UnitDetailDialog.Instance
+        With dialog
+            .InitializeDialog(BindingCamera.Resolve.X, BindingCamera.Resolve.Y, BindingCamera)
+            .InitializeConetentBox()
+            .InitializeEffects()
+        End With
+
+
         SkirmishGameMap.ResourcesLoaded = True
         MapLoaded = MapLoadStatus.Loaded
     End Sub
@@ -564,6 +573,14 @@ Public Class SkirmishGameLoop
         'Me.SkirmishBoardMouseDownPosition = Me.MousePositionToChessboard(Me.ConvertToWorldCursor(e.Position))
         Me.SkirmishBoardMouseDownPosition = Me.DrawPositionToChessboard(e.Position)        '改用绘图坐标直接进行定位
         Debug.WriteLine("Pos:" & SkirmishBoardMouseDownPosition.X & ", " & SkirmishBoardMouseDownPosition.Y)
+
+        'test
+        'open unit detail dialog
+        Dim dialog As UnitDetailDialog = UnitDetailDialog.Instance
+        dialog.BindUnit(Me.UnitList(0))
+        BindingCamera.PaintingLayers.Push(AddressOf dialog.DrawControl)
+        BindingCamera.PaintingLayersDescription.Push(GameImageLayer.Skirmish_UnitDetail)
+
     End Sub
 
     Public Sub GameBoardMouseUp(e As GameMouseEventArgs)

@@ -256,13 +256,17 @@ Public Class GameScrollViewer
         Next
     End Sub
 
+    Public Overrides Sub TriggerDrawSelfCanvas(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
+        Me.DrawControlAtSelfCanvas(context, spec, canvasBitmap)
+    End Sub
+
     Public Overrides Sub DrawControlAtSelfCanvas(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
         If Me.Children.Count Then
             With context
                 '预画子控件
                 For i = 0 To RenderingItems.Count - 1
                     Dim item As GameBasicUIElement = Me.RenderingItems(i)
-                    item.DrawControlAtSelfCanvas(context, spec, Me.ControlCanvas)
+                    item.TriggerDrawSelfCanvas(context, spec, Me.ControlCanvas)
                 Next
                 '切换context.target
                 .Target = Me.ControlCanvas

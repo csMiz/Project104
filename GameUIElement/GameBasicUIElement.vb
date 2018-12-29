@@ -99,6 +99,13 @@ Public MustInherit Class GameBasicUIElement
     Public Overridable Sub RefreshRects()
     End Sub
 
+    Public Overridable Sub TriggerDrawSelfCanvas(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
+        If Me.NeedRepaint Then
+            Me.DrawControlAtSelfCanvas(context, spec, canvasBitmap)
+            Me.NeedRepaint = False
+        End If
+    End Sub
+
     ''' <summary>
     ''' 在控件独立画布上绘制控件
     ''' </summary>

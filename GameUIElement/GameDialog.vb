@@ -7,9 +7,9 @@ Imports SharpDX.Direct2D1
 Public MustInherit Class GameDialog
     Inherits GameBasicUIElement
 
-    Protected Property DialogWidth As Integer
-    Protected Property DialogHeight As Integer
-    Protected Camera As SpectatorCamera = Nothing
+    Protected DialogWidth As Integer
+    Protected DialogHeight As Integer
+    Protected BindingCamera As SpectatorCamera = Nothing
 
     ''' <summary>
     ''' 初始化对话框
@@ -21,7 +21,7 @@ Public MustInherit Class GameDialog
         With Me
             .DialogWidth = inputWidth
             .DialogHeight = inputHeight
-            .Camera = spec
+            .BindingCamera = spec
         End With
     End Sub
 

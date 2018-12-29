@@ -103,12 +103,18 @@ Public Class GameFlatButton
         Dim position As New RawVector2(relativeCursorX, relativeCursorY)
         Me.CursorLightBrush.Center = position
         Me.CursorLightBorderBrush.Center = position
+
+        Me.NeedRepaint = True
     End Sub
     Private Sub DefaultMouseEnter()
         Me.HaveFocus = True
+        Me.NeedRepaint = True
+
     End Sub
     Private Sub DefaultMouseLeave()
         Me.HaveFocus = False
+        Me.NeedRepaint = True
+
     End Sub
 
 End Class

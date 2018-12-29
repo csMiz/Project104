@@ -106,10 +106,21 @@ Public Class MainGameLoop
             .Text = "End Game"
         End With
 
+        'Dim tmpTB As New GameTextBlock(True)
+        'With tmpTB
+        '    .BindingContext = Me.CameraD2DContext
+        '    .DWFontBrush = BLACK_COLOUR_BRUSH(4)
+        '    .BasicRect = New RawRectangleF(20, 20, 300, 300)
+        '    .AbsoluteRect = .BasicRect
+        '    .InitializeControlCanvas()
+        '    .Text = "My TextBlock"
+        'End With
+
         With Me.MainMenuGrid
             .Children.Add(MMG_Button1)
             .Children.Add(MMG_Button2)
             .Children.Add(MMG_Button3)
+            '.Children.Add(tmpTB)
             .InitializeQuadtree(Me.Camera.Resolve)
         End With
         Me.MainMenuPage.UIElements.Add(Me.MainMenuGrid)

@@ -34,6 +34,8 @@ Module GameResources
     ''' </summary>
     Public GameFontHelper As FontHelper = FontHelper.Instance
 
+    Public DirectWriteFactoryInstance As DirectWrite.Factory = New DirectWrite.Factory
+
     ''' <summary>
     ''' 六边形地形块图片
     ''' </summary>
@@ -70,6 +72,7 @@ Module GameResources
     Public Const ONE_THIRD As Single = 1 / 3
     Public Const TERRAIN_COST_MAX As Single = 999.9F
 
+    Public SystemDefaultFontFamilyName As String = "Segoe UI"
     ''' <summary>
     ''' 阵营颜色预设列表
     ''' </summary>

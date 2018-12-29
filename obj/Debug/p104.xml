@@ -897,6 +897,33 @@ p104
  阴影层控件类
  </summary>
 </member>
+<member name="T:p104.GameTextBlock">
+ <summary>
+ 游戏文本标签控件类
+ </summary>
+</member>
+<member name="F:p104.GameTextBlock.Text">
+ <summary>
+ 文本
+ </summary>
+</member>
+<member name="F:p104.GameTextBlock.DWFontBrush">
+ <summary>
+ DW模式下绘制文本的笔刷
+ </summary>
+</member>
+<member name="F:p104.GameTextBlock.TextImage">
+ <summary>
+ TextItem模式下的TI对象
+ </summary>
+</member>
+<member name="M:p104.GameTextBlock.#ctor(System.Boolean,System.Single)">
+ <summary>
+ 构造函数
+ </summary>
+ <param name="useDirectWrite">是否使用DW直接绘制</param>
+ <param name="DWFontSize">使用DW时的字号</param>
+</member>
 <member name="T:p104.UnitDetailDialog">
  <summary>
  Skirmish模式下的单位详细信息面板类

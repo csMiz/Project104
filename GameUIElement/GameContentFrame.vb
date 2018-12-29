@@ -65,12 +65,16 @@ Public Class GameContentFrame
         'TODO
     End Sub
 
+    Public Overrides Sub TriggerDrawSelfCanvas(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
+        Me.DrawControlAtSelfCanvas(context, spec, canvasBitmap)
+    End Sub
+
     Public Overrides Sub DrawControlAtSelfCanvas(ByRef context As DeviceContext, ByRef spec As SpectatorCamera, canvasBitmap As Bitmap1)
         'context.FillRectangle(Me.SelfCanvasRect, Me.DefaultBackground)
 
         For Each element As GameBasicUIElement In Me.Children
             If element.IsValid Then
-                element.DrawControlAtSelfCanvas(context, spec, canvasBitmap)
+                element.TriggerDrawSelfCanvas(context, spec, canvasBitmap)
             End If
         Next
         With context
