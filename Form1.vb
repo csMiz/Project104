@@ -21,6 +21,9 @@ Public Class Form1
         'PaintThread.Start()
 
         'test.GoLTest()
+        'test.MonitorValueTest()
+        'test.MatrixTest()
+
 
         Await test.MainGameLoopTest()
 

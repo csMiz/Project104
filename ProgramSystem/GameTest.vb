@@ -13,7 +13,6 @@ Public Class GameTest
 
     Public MainGame As MainGameLoop
 
-    <Obsolete>
     Public Async Function MainGameLoopTest() As Task
         MainGame = New MainGameLoop
 
@@ -148,6 +147,35 @@ Public Class GameTest
         Dim testYoukai As GameUnit = UnitTemplates.GetUnitTemplate(2)
 
         Dim testReimu As GameHero = UnitTemplates.GetHeroTemplate(0)
+
+    End Sub
+
+    Public Async Sub MonitorValueTest()
+
+        Dim target As New IntegerProperty(9979)
+        While target.GetValue = 9979
+            Await Task.Delay(1000)
+        End While
+        MsgBox("changed!")
+
+    End Sub
+
+    Public Sub MatrixTest()
+        Dim a As New MathMatrixS(4, 2)
+        For j = 0 To 1
+            For i = 0 To 3
+                a.Value(i, j) = i + j * 4
+            Next
+        Next
+        Dim b As New MathMatrixS(1, 4)
+        For i = 0 To 3
+            b.Value(0, i) = 1
+        Next
+        Dim r As MathMatrixS = a * b
+        Debug.Assert(r.Width = 1)
+        Debug.Assert(r.Height = 2)
+        Debug.Assert(r.Value(0, 0) = 6)
+        Debug.Assert(r.Value(0, 1) = 22)
 
     End Sub
 

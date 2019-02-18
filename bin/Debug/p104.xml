@@ -618,13 +618,13 @@ p104
  使用新的位置绘制控件
  </summary>
 </member>
-<member name="M:p104.GameBasicUIElement.IsInside(p104.PointF2)">
+<member name="M:p104.GameBasicUIElement.IsInside(p104.MathHelper.PointF2)">
  <summary>
  判断输入点是否在控件内
  </summary>
  <param name="input">绝对输入点</param>
 </member>
-<member name="M:p104.GameBasicUIElement.IsInside(p104.PointI)">
+<member name="M:p104.GameBasicUIElement.IsInside(p104.MathHelper.PointI)">
  <summary>
  判断输入点是否在控件内
  </summary>
@@ -751,6 +751,56 @@ p104
  扁平化按钮控件类
  </summary>
 </member>
+<member name="T:p104.GameIconButton">
+ <summary>
+ 游戏图标按钮类，用于详情面板的切换主副武器等
+ </summary>
+</member>
+<member name="F:p104.GameIconButton.PlainIconImage">
+ <summary>
+ 未激活完整图标图片
+ </summary>
+</member>
+<member name="F:p104.GameIconButton.ActiveIconImage">
+ <summary>
+ 激活完整图标图片
+ </summary>
+</member>
+<member name="F:p104.GameIconButton.CoverColorBrush">
+ <summary>
+ 进度遮罩画笔
+ </summary>
+</member>
+<member name="F:p104.GameIconButton.HoverCoverColorBrush">
+ <summary>
+ 鼠标悬停时进度遮罩画笔
+ </summary>
+</member>
+<member name="F:p104.GameIconButton.LightBrush">
+ <summary>
+ 鼠标光影画笔
+ </summary>
+</member>
+<member name="F:p104.GameIconButton.IconButtonProgressMode">
+ <summary>
+ 按钮进度模式
+ </summary>
+</member>
+<member name="F:p104.GameIconButton.IconButtonShape">
+ <summary>
+ 按钮形状
+ </summary>
+</member>
+<member name="F:p104.GameIconButton.IconButtonActive">
+ <summary>
+ 是否被选中（激活）
+ </summary>
+</member>
+<member name="F:p104.GameIconButton.Progress">
+ <summary>
+ 进度值，区间为[0,1]，Button模式下无效
+ </summary>
+</member>
 <member name="M:p104.GameListBox.DisposeTextImages">
  <summary>
  销毁所有缓存的文字图片对象
@@ -788,7 +838,7 @@ p104
  不允许从外部直接构造GameMouseEventArgs
  </summary>
 </member>
-<member name="M:p104.GameMouseEventArgs.FromMouseEventArgs(System.Windows.Forms.MouseEventArgs,System.Drawing.Rectangle,p104.PointI)">
+<member name="M:p104.GameMouseEventArgs.FromMouseEventArgs(System.Windows.Forms.MouseEventArgs,System.Drawing.Rectangle,p104.MathHelper.PointI)">
  <summary>
  从系统鼠标事件参数生成GameMouseEventArgs
  </summary>
@@ -1055,7 +1105,7 @@ p104
  按高度分层
  </summary>
 </member>
-<member name="M:p104.SkirmishMap.UpdateBlocksInCamera(System.Int16,System.Int16,System.Int16,System.Int16,p104.PointF2,p104.PointI,System.Single)">
+<member name="M:p104.SkirmishMap.UpdateBlocksInCamera(System.Int16,System.Int16,System.Int16,System.Int16,p104.MathHelper.PointF2,p104.MathHelper.PointI,System.Single)">
  <summary>
  更新基底绘制参数
  </summary>
@@ -1152,9 +1202,96 @@ p104
  用户成就记录类
  </summary>
 </member>
+<member name="T:p104.GameCamera3D">
+ <summary>
+ 游戏三维摄像机类
+ </summary>
+</member>
+<member name="F:p104.GameCamera3D.Position">
+ <summary>
+ 摄像机位置
+ </summary>
+</member>
+<member name="F:p104.GameCamera3D.Rotation">
+ <summary>
+ 摄像机方向，旋转顺序依次为XYZ，逆时针，弧度
+ </summary>
+</member>
+<member name="F:p104.GameCamera3D.FOV">
+ <summary>
+ 摄像机视野角，使用弧度(rad)
+ </summary>
+</member>
+<member name="F:p104.GameCamera3D.ZNear">
+ <summary>
+ 近处屏幕，即最近可见位置（显示屏位置）
+ </summary>
+</member>
+<member name="F:p104.GameCamera3D.ZFar">
+ <summary>
+ 远处屏幕，即最远可见位置
+ </summary>
+</member>
+<member name="F:p104.GameCamera3D.WVP">
+ <summary>
+ 提供给GPU的WVP变换矩阵
+ </summary>
+</member>
 <member name="T:p104.GameEndInfo">
  <summary>
  游戏结束信息类
+ </summary>
+</member>
+<member name="F:p104.GameLive2dImageAnimation.AnimationName">
+ <summary>
+ 动画名称
+ </summary>
+</member>
+<member name="F:p104.GameLive2dImageAnimation.AnimationLength">
+ <summary>
+ 动画一个循环的帧数
+ </summary>
+</member>
+<member name="F:p104.GameLive2dImageAnimation.AnimationFPS">
+ <summary>
+ 每秒播放帧数，默认60
+ </summary>
+</member>
+<member name="F:p104.GameLive2dImageAnimation.KeyFrames">
+ <summary>
+ 每张精灵素材的关键帧列表
+ </summary>
+</member>
+<member name="F:p104.GameLive2dImageAnimation.AnimationBuffer">
+ <summary>
+ 存放所有帧的缓存图像
+ </summary>
+</member>
+<member name="M:p104.GameLive2dImageAnimation.ClearBuffer">
+ <summary>
+ 销毁缓存中所有的bitmap1
+ </summary>
+</member>
+<member name="M:p104.GameLive2dImageAnimation.RenderFrame(SharpDX.Direct2D1.DeviceContext,System.Int32)">
+ <summary>
+ 单独渲染一帧
+ </summary>
+ <param name="context">d2dContext对象</param>
+ <param name="frameIndex">帧序号</param>
+</member>
+<member name="T:p104.GameLive2dObject">
+ <summary>
+ 可互动Live2d对象类
+ </summary>
+</member>
+<member name="P:p104.GameLive2dBone.BoneDirection">
+ <summary>
+ 获取骨骼方向（弧度）
+ </summary>
+</member>
+<member name="P:p104.GameLive2dBone.BoneLength">
+ <summary>
+ 获取骨骼长度
  </summary>
 </member>
 <member name="T:p104.GameIconRepository">
@@ -1172,9 +1309,9 @@ p104
  从程序根目录下加载资源
  </summary>
 </member>
-<member name="T:p104.GameLive2dAnimation">
+<member name="T:p104.GameSimpleImageAnimation">
  <summary>
- Live2d动画类
+ 普通图片动画类
  </summary>
 </member>
 <member name="T:p104.GameLive2dImage">
@@ -1182,19 +1319,29 @@ p104
  Live2d图像，用于立绘等
  </summary>
 </member>
-<member name="F:p104.GameLive2dImage.FullImage">
+<member name="F:p104.GameLive2dImage.Description">
  <summary>
- 原始图像
+ 图像描述
  </summary>
 </member>
-<member name="F:p104.GameLive2dImage.FullPos">
+<member name="F:p104.GameLive2dImage.FullImage">
  <summary>
- 原始坐标
+ 整张图像的画布
+ </summary>
+</member>
+<member name="F:p104.GameLive2dImage.PaintPosition">
+ <summary>
+ 绘图位置
  </summary>
 </member>
 <member name="F:p104.GameLive2dImage.MeshAtlas">
  <summary>
  分割后的所有图片素材
+ </summary>
+</member>
+<member name="F:p104.GameLive2dImage.ReadOnlyMesh">
+ <summary>
+ 用数组存放的MeshAtlas
  </summary>
 </member>
 <member name="T:p104.GameResources">
@@ -1249,7 +1396,7 @@ p104
 </member>
 <member name="M:p104.GameResources.LoadResources(SharpDX.Direct2D1.DeviceContext)">
  <summary>
- 加载资源
+ 加载所有全局资源，应当异步调用此方法
  </summary>
 </member>
 <member name="M:p104.GameResources.LoadBitmap(SharpDX.Direct2D1.RenderTarget,System.Drawing.Bitmap)">
@@ -1383,6 +1530,21 @@ p104
  鼠标判定区接口
  </summary>
 </member>
+<member name="T:p104.LiveImageRepository">
+ <summary>
+ 动态图片仓库类
+ </summary>
+</member>
+<member name="M:p104.LiveImageRepository.LoadSpritesFromFile(SharpDX.Direct2D1.DeviceContext)">
+ <summary>
+ 载入所有精灵素材
+ </summary>
+</member>
+<member name="M:p104.LiveImageRepository.LoadLiveConfigFromFiles">
+ <summary>
+ 解析所有动态图像，需要先载入完精灵素材
+ </summary>
+</member>
 <member name="T:p104.LoggingService">
  <summary>
  监听服务类
@@ -1455,10 +1617,10 @@ p104
 </member>
 <member name="T:p104.MathHelper">
  <summary>
- 数学助手类
+ 数学助手模块
  </summary>
 </member>
-<member name="M:p104.MathHelper.GetDistance(p104.PointF2,p104.PointF2)">
+<member name="M:p104.MathHelper.GetDistance(p104.MathHelper.PointF2,p104.MathHelper.PointF2)">
  <summary>
  计算两点间距离
  </summary>
@@ -1478,25 +1640,66 @@ p104
  按英文逗号分隔符转换PointI对象
  </summary>
 </member>
-<member name="T:p104.PointF2">
+<member name="T:p104.MathHelper.PointF2">
  <summary>
  简化的PointF结构体
  </summary>
 </member>
-<member name="T:p104.PointF2M">
+<member name="T:p104.MathHelper.PointF2M">
  <summary>
  受监控的PointF2类
  </summary>
 </member>
-<member name="T:p104.PointI">
+<member name="T:p104.MathHelper.PointI">
  <summary>
  XY均为Short类型的Point结构体
  </summary>
 </member>
-<member name="T:p104.PointI3">
+<member name="T:p104.MathHelper.PointI3">
  <summary>
  XYZ均为Short类型的Point结构体
  </summary>
+</member>
+<member name="T:p104.MathHelper.PointF3">
+ <summary>
+ XYZ均为Single类型的Point结构体
+ </summary>
+</member>
+<member name="T:p104.MathHelper.KVP_IF">
+ <summary>
+ 简化的整形-浮点型键值对
+ </summary>
+</member>
+<member name="T:p104.MathHelper.ThreePointF2">
+ <summary>
+ 三个PointF2结构体
+ </summary>
+</member>
+<member name="T:p104.MathHelper.FourPointF2">
+ <summary>
+ 四个PointF2结构体
+ </summary>
+</member>
+<member name="T:p104.MathHelper.MathMatrix">
+ <summary>
+ 矩阵类
+ </summary>
+</member>
+<member name="T:p104.MathHelper.BezierPenCurve">
+ <summary>
+ 贝塞尔钢笔曲线
+ </summary>
+</member>
+<member name="F:p104.MathHelper.BezierPenCurve.Anchor">
+ <summary>
+ 从(0,0)到(1,1)的锚点
+ </summary>
+</member>
+<member name="M:p104.MathHelper.BezierPenCurve.GetValue(System.Single)">
+ <summary>
+ 根据x计算y，y属于[0,1]
+ </summary>
+ <param name="x">横坐标，x属于[0,1]</param>
 </member>
 <member name="T:p104.MonitoredProperty">
  <summary>
@@ -1615,25 +1818,25 @@ p104
  </summary>
  <returns></returns>
 </member>
-<member name="M:p104.SkirmishGameLoop.ConvertToWorldCursor(p104.PointI)">
+<member name="M:p104.SkirmishGameLoop.ConvertToWorldCursor(p104.MathHelper.PointI)">
  <summary>
  将鼠标点击位置转换为实际地图位置
  </summary>
  <param name="input">鼠标位置</param>
 </member>
-<member name="M:p104.SkirmishGameLoop.MousePositionToChessboard(p104.PointF2)">
+<member name="M:p104.SkirmishGameLoop.MousePositionToChessboard(p104.MathHelper.PointF2)">
  <summary>
  将实际地图位置转换为坐标
  </summary>
 </member>
-<member name="M:p104.SkirmishGameLoop.DrawPositionToChessboard(p104.PointI)">
+<member name="M:p104.SkirmishGameLoop.DrawPositionToChessboard(p104.MathHelper.PointI)">
  <summary>
  将鼠标点击位置（绘图位置）直接转换为坐标
  </summary>
  <param name="mouse"></param>
  <returns></returns>
 </member>
-<member name="M:p104.SkirmishGameLoop.MouseTryClickUnit(p104.PointI)">
+<member name="M:p104.SkirmishGameLoop.MouseTryClickUnit(p104.MathHelper.PointI)">
  <summary>
  尝试用鼠标选中一个单位
  </summary>
@@ -1804,9 +2007,14 @@ p104
  Live2d精灵图片类
  </summary>
 </member>
-<member name="M:p104.SpriteLive2dImage.CalculateRect">
+<member name="F:p104.SpriteLive2dImage.Vertices">
  <summary>
- 通过三个顶点计算外围矩形
+ 四个控制点，包括原始点和变形后点
+ </summary>
+</member>
+<member name="F:p104.SpriteLive2dImage.SourceImage">
+ <summary>
+ 原始图像
  </summary>
 </member>
 <member name="T:p104.StateMachine">

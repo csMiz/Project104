@@ -124,6 +124,7 @@ Public Class SkirmishGameLoop
             .InitializeDialog(BindingCamera.Resolve.X, BindingCamera.Resolve.Y, BindingCamera)
             .InitializeConetentBox()
             .InitializeEffects()
+            .Visible = False
         End With
 
 
@@ -207,6 +208,7 @@ Public Class SkirmishGameLoop
     Public Sub DrawSkirmishMapLayer(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As Bitmap1)
         Me.SkirmishGameMap.DrawHexMap(context, spectator, canvasBitmap)
         Me.DrawUnitLayer(context, spectator, canvasBitmap)
+        Me.SkirmishPage.PaintElements(context, spectator, canvasBitmap)
     End Sub
 
 
@@ -487,6 +489,9 @@ Public Class SkirmishGameLoop
         AddHandler tmpBottomLeftUnitAvatar.MouseDown, tmpLeftAvatarMouseDown
         'AddHandler tmpBottomLeftUnitAvatar .MouseMove , AddressOf ...
         Me.SkirmishPage.UIElements.Add(tmpBottomLeftUnitAvatar)
+
+        Me.SkirmishPage.UIElements.Add(UnitDetailDialog.Instance)
+
         Me.SkirmishPage.GenerateElementsQuadtree(Me.BindingCamera.Resolve)
         Me.SkirmishPage.InitializeCursor(Me.BindingCamera.CurrentCursorPosition, Me.BindingCamera.Resolve)
 
@@ -578,8 +583,9 @@ Public Class SkirmishGameLoop
         'open unit detail dialog
         Dim dialog As UnitDetailDialog = UnitDetailDialog.Instance
         dialog.BindUnit(Me.UnitList(0))
-        BindingCamera.PaintingLayers.Push(AddressOf dialog.DrawControl)
-        BindingCamera.PaintingLayersDescription.Push(GameImageLayer.Skirmish_UnitDetail)
+        dialog.Visible = True
+        'BindingCamera.PaintingLayers.Push(AddressOf dialog.DrawControl)
+        'BindingCamera.PaintingLayersDescription.Push(GameImageLayer.Skirmish_UnitDetail)
 
     End Sub
 

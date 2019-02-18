@@ -19,7 +19,6 @@ Public Class UnitImageRepository
     Private SkirmishChess As New List(Of ThreeStatesImageSet)
 
 
-
     Private Sub New()
     End Sub
 
@@ -36,7 +35,6 @@ Public Class UnitImageRepository
     ''' </summary>
     Public Sub LoadFromFiles(context As SharpDX.Direct2D1.DeviceContext)
 
-        'TODO:
         'load XML.
         'analyze rects of fragments which decides the rect of the wrapped image.
         'paint fragments in layers -> return bitmap1 object

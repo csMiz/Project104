@@ -9,21 +9,33 @@ Public Class GameLive2dImage
     Implements IGameImage
 
     ''' <summary>
-    ''' 原始图像
+    ''' 图像描述
+    ''' </summary>
+    Public Description As String = vbNullString
+    ''' <summary>
+    ''' 整张图像的画布
     ''' </summary>
     Private FullImage As Bitmap1 = Nothing
     ''' <summary>
-    ''' 原始坐标
+    ''' 绘图位置
     ''' </summary>
-    Private FullPos As RawVector2
+    Public PaintPosition As PointF2
+
+    Public CanvasSize As SharpDX.Size2
     ''' <summary>
     ''' 分割后的所有图片素材
     ''' </summary>
-    Private MeshAtlas As New List(Of SpriteLive2dImage)
+    Public MeshAtlas As New List(Of SpriteLive2dImage)
+    ''' <summary>
+    ''' 用数组存放的MeshAtlas
+    ''' </summary>
+    Private ReadOnlyMesh As SpriteLive2dImage()
+
+    Public Animations As New List(Of GameLive2dImageAnimation)
 
     Public Sub PaintFullImage(ByRef context As DeviceContext) Implements IGameImage.PaintFullImage
         For Each sprite In MeshAtlas
-            sprite.PaintSpriteImage(context)
+            sprite.PaintSourceSpriteImage(context, PaintPosition)
         Next
     End Sub
 

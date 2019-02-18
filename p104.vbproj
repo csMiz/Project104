@@ -141,6 +141,7 @@
     <Compile Include="MapObject\MapBlock.vb" />
     <Compile Include="MapObject\SkirmishMap.vb" />
     <Compile Include="MapObject\SkirmishMapBlock.vb" />
+    <Compile Include="MapObject\SkirmishMapBlock2.vb" />
     <Compile Include="MapObject\SkirmishMapBlockAccessory.vb" />
     <Compile Include="MapObject\SkirmishTerrain.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -160,12 +161,18 @@
     </Compile>
     <Compile Include="ProgramSystem\CircleArea.vb" />
     <Compile Include="ProgramSystem\FontHelper.vb" />
+    <Compile Include="ProgramSystem\Game3DObject.vb" />
+    <Compile Include="ProgramSystem\Game3DObjectReader.vb" />
     <Compile Include="ProgramSystem\GameAchievement.vb" />
     <Compile Include="ProgramSystem\GameAchievementRecord.vb" />
+    <Compile Include="ProgramSystem\GameCamera3D.vb" />
     <Compile Include="ProgramSystem\GameEndInfo.vb" />
+    <Compile Include="ProgramSystem\GameLive2dImageAnimation.vb" />
+    <Compile Include="ProgramSystem\GameLive2dObject.vb" />
+    <Compile Include="ProgramSystem\GeometryArithmetic.vb" />
     <Compile Include="ProgramSystem\IGameGeometryArea.vb" />
     <Compile Include="ProgramSystem\GameIconRepository.vb" />
-    <Compile Include="ProgramSystem\GameLive2dAnimation.vb" />
+    <Compile Include="ProgramSystem\GameSimpleImageAnimation.vb" />
     <Compile Include="ProgramSystem\GameLive2dImage.vb" />
     <Compile Include="ProgramSystem\GameResources.vb" />
     <Compile Include="ProgramSystem\GameSettingRepository.vb" />
@@ -177,6 +184,7 @@
     <Compile Include="GameUIElement\IMouseArea.vb" />
     <Compile Include="ProgramSystem\IntegerProperty.vb" />
     <Compile Include="ProgramSystem\ISaveProperty.vb" />
+    <Compile Include="ProgramSystem\LiveImageRepository.vb" />
     <Compile Include="ProgramSystem\LoggingService.vb" />
     <Compile Include="ProgramSystem\MainGameLoop.vb" />
     <Compile Include="ProgramSystem\MathHelper.vb" />

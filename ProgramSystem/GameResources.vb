@@ -29,6 +29,8 @@ Module GameResources
     Public GameIcons As GameIconRepository = GameIconRepository.Instance
 
     Public FragmentImages As BasicImageRepository = BasicImageRepository.Instance
+
+    Public Live2dImages As LiveImageRepository = LiveImageRepository.Instance
     ''' <summary>
     ''' 文字字体助手
     ''' </summary>
@@ -57,10 +59,12 @@ Module GameResources
     Public Const TWO_FIFTY As Single = 250
     Public Const ONE_TWO_FIVE As Single = 125
     Public Const COMMA As String = ","
+    Public Const SEMICOLON As String = ";"
     Public Const THIRTY_THOUSAND As Integer = 30000
     Public ReadOnly HALF_ROOT3 As Single = Sqrt(3) / 2
     Public Const DEFAULT_STRING As String = "Default"
     Public Const UNDERLINE As String = "_"
+    Public Const SPACE_STRING As String = " "
     Public Const ESCAPE_VERTICAL_LINE As String = "\|"
     Public Const TYPE_THREE_IMAGES As String = "three"
     Public Const SKIRMISH_FRAGMENT_DOMAIN As String = "skirmish_unit"
@@ -104,11 +108,14 @@ Module GameResources
 
     Public ReadOnly ALL_GAME_STAGES As New List(Of SingleGameLoopStage) From {0, 1, 2, 3, 4, 5}
 
+    Public DEFAULT_BEZIER As BezierPenCurve = Nothing
+
 
     ''' <summary>
-    ''' 加载资源
+    ''' 加载所有全局资源，应当异步调用此方法
     ''' </summary>
     Public Sub LoadResources(context As SharpDX.Direct2D1.DeviceContext)
+
 
         Dim bitmap_hex_grass As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\Map\hex_grass.png")
         Dim bitmap_hex_forest As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\Map\hex_forest.png")
@@ -135,12 +142,29 @@ Module GameResources
         Dim bitmap_tree2 As Bitmap1 = LoadBitmapUsingWIC(context, Application.StartupPath & "\Resources\Images\Map\tree2.png")
         ACCESSORY_TREE.Add(bitmap_tree2)
 
+        DEFAULT_BEZIER = New BezierPenCurve
+        Dim tmpBezPoints(1) As ThreePointF2
+        tmpBezPoints(0).Left = New PointF2(-0.2, -0.2)
+        tmpBezPoints(0).Middle = New PointF2(0, 0)
+        tmpBezPoints(0).Right = New PointF2(0.2, 0.2)
+        tmpBezPoints(1).Left = New PointF2(0.8, 0.8)
+        tmpBezPoints(1).Middle = New PointF2(1, 1)
+        tmpBezPoints(1).Right = New PointF2(1.2, 1.2)
+        DEFAULT_BEZIER.Anchor = tmpBezPoints
+
         Dim unitTemplatesString As String = My.Resources.UnitTemplates
         UnitTemplates.LoadTemplates(unitTemplatesString)
 
+        '载入碎片图像
         FragmentImages.LoadImages(context)
+        '载入单位立绘
         UnitImages.LoadFromFiles(context)
+        '载入图标
         GameIcons.LoadFromFiles(context)
+        '载入动态图像
+        Live2dImages.LoadSpritesFromFile(context)
+        Live2dImages.LoadLiveConfigFromFiles()
+        '载入字体助手
         GameFontHelper.LoadTextFromFiles()
 
         SIDE_COLOUR = SolidColorBrushSet.LoadFromXml(context, My.Resources.Colours)

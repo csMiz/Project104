@@ -2,9 +2,9 @@
 Imports SharpDX.Direct2D1
 Imports SharpDX.Mathematics.Interop
 ''' <summary>
-''' Live2d动画类
+''' 普通图片动画类
 ''' </summary>
-Public Class GameLive2dAnimation
+Public Class GameSimpleImageAnimation
     Implements IGameImage
 
     Private Frames As New List(Of Bitmap1)

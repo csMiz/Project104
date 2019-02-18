@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<content>
+  <mark livetype="simple" text="TEST LIVE IMAGE" fullsize="200,300" />
+  <images>
+    <!-- myindex指此图像中的素材序号 repoindex指引用的精灵素材库中的序号 position为左上右下 -->
+    <sprite myindex="0" repoindex="0" pos="0,0" size="200,300" />
+    <sprite myindex="1" repoindex="1" pos="8,34" size="191,191"/>
+  </images>
+  <animation name="standtest" fps="30" length="120" >
+    <!-- 第0帧默认undefined，可不写，同时也视为默认值，其它帧undefined表示由补间计算 -->
+    <!-- 补间曲线即贝塞尔曲线，每个锚点由分号隔开，表示为前臂，锚点，后臂，忽略则默认undefined，
+      undefined表示(0,0)到(1,1)的线段，也就是(-0.2,-0.2,0,0,0.2,0.2;0.8,0.8,1,1,1.2,1.2)-->
+    <target index="0">
+      <keyframe frame="0">
+        <position >undefined</position>
+        <rotation >undefined</rotation>
+        <scale >undefined</scale>
+        <perspective >undefined</perspective>
+      </keyframe>
+    </target>
+    <target index="1">
+      <keyframe frame="0">
+        <position tweenX="undefined" tweenY="undefined" >undefined</position>
+        <rotation tween="undefined" >undefined</rotation>
+        <scale tweenX="undefined" tweenY="undefined" >undefined</scale>
+        <perspective tweenTLX="undefined" tweenTLY="undefined" >undefined</perspective>
+      </keyframe>
+      <keyframe frame="29">
+        <rotation >15</rotation>
+      </keyframe>
+      <keyframe frame="89">
+        <rotation >-15</rotation>
+      </keyframe>
+      <keyframe frame="119">
+        <rotation >0</rotation>
+      </keyframe>
+    </target>
+
+
+  </animation>
+</content>
