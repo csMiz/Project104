@@ -15,7 +15,11 @@ Public Class SkirmishGameLoop
     Private GameEnded As GameEndInfo
 
     Private CampaignIndex As Short = -1
+
+    <Obsolete("use SkirmishMap2", True)>
     Public SkirmishGameMap As SkirmishMap = Nothing
+    Public SkirmishGameMap2 As SkirmishMap2 = Nothing
+
     Public BindingCamera As SpectatorCamera
 
     ''' <summary>
@@ -102,11 +106,25 @@ Public Class SkirmishGameLoop
 
         If CampaignIndex = 0 Then
             Dim stream As FileStream = New FileStream(Application.StartupPath & "\newmap.txt", FileMode.Open)
-            If SkirmishGameMap Is Nothing Then SkirmishGameMap = New SkirmishMap
-            SkirmishGameMap.LoadFromFile(stream)
-            End If
-            '预先绘制地图装饰物
-            SkirmishGameMap.LoadAccessories(BindingCamera.GetDevceContext, BindingCamera.Zoom)
+            'If SkirmishGameMap Is Nothing Then SkirmishGameMap = New SkirmishMap
+            'SkirmishGameMap.LoadFromFile(stream)
+            If SkirmishGameMap2 Is Nothing Then SkirmishGameMap2 = New SkirmishMap2
+            SkirmishGameMap2.LoadFromFile(stream, BindingCamera.GetDevceContext)
+            SkirmishGameMap2.Register3DObjects(BindingCamera.Camera3D)
+        End If
+        With BindingCamera.Camera3D
+            .Position = New PointF3(0, -1000, 2000)
+            .Rotation = New PointF3(-0.5236, 0, 0)
+            .CalculateViewP()
+            .CalculateViewRX()
+            .CalculateViewRY()
+            .CalculateViewRZ()
+            .RefreshProjection()
+            .CalculateWVP()
+        End With
+
+        ''预先绘制地图装饰物
+        'SkirmishGameMap.LoadAccessories(BindingCamera.GetDevceContext, BindingCamera.Zoom)
         '载入预设单位
         Me.LoadUnitsFromXMLAndTemplates(GetCampaignScript(0))
         '初始化选择单位字段为空(-1)
@@ -127,8 +145,8 @@ Public Class SkirmishGameLoop
             .Visible = False
         End With
 
-
-        SkirmishGameMap.ResourcesLoaded = True
+        'SkirmishGameMap.ResourcesLoaded = True
+        SkirmishGameMap2.ResourcesLoaded = True
         MapLoaded = MapLoadStatus.Loaded
     End Sub
 
@@ -206,8 +224,9 @@ Public Class SkirmishGameLoop
     End Sub
 
     Public Sub DrawSkirmishMapLayer(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As Bitmap1)
-        Me.SkirmishGameMap.DrawHexMap(context, spectator, canvasBitmap)
-        Me.DrawUnitLayer(context, spectator, canvasBitmap)
+        'Me.SkirmishGameMap.DrawHexMap(context, spectator, canvasBitmap)
+        spectator.Camera3D.DrawContainer(context, spectator, canvasBitmap)
+        'Me.DrawUnitLayer(context, spectator, canvasBitmap)
         Me.SkirmishPage.PaintElements(context, spectator, canvasBitmap)
     End Sub
 
@@ -218,9 +237,10 @@ Public Class SkirmishGameLoop
         Dim tmpUnit As GameUnit = Me.UnitList(0)
         Dim tmpImage As Bitmap1 = tmpUnit.GetSkirmishChessImage().GetImage
         Dim imageHalfSize As Single = 50
-        Dim tmpCentre As RawVector2 = SkirmishGameMap.Blocks(tmpUnit.Position.X, tmpUnit.Position.Y).V_O
-        Dim drawRect As New RawRectangleF(tmpCentre.X - imageHalfSize, tmpCentre.Y - imageHalfSize, tmpCentre.X + imageHalfSize, tmpCentre.Y + imageHalfSize)
-        context.DrawBitmap(tmpImage, drawRect, NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
+        'FIXME:
+        'Dim tmpCentre As RawVector2 = SkirmishGameMap.Blocks(tmpUnit.Position.X, tmpUnit.Position.Y).V_O
+        'Dim drawRect As New RawRectangleF(tmpCentre.X - imageHalfSize, tmpCentre.Y - imageHalfSize, tmpCentre.X + imageHalfSize, tmpCentre.Y + imageHalfSize)
+        'context.DrawBitmap(tmpImage, drawRect, NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
 
 
     End Sub
@@ -553,24 +573,25 @@ Public Class SkirmishGameLoop
     ''' <param name="mouse"></param>
     ''' <returns></returns>
     Public Function DrawPositionToChessboard(mouse As PointI) As PointI
-        Dim worldPos As PointF2 = ConvertToWorldCursor(mouse)
-        Dim estimateX As Integer = Math.Floor((worldPos.X - SIX_TWO_FIVE) / THREE_SEVEN_FIVE)
-        Dim estimateY As Integer = Math.Floor((worldPos.Y - SIX_TWO_FIVE_ROOT3) / TWO_FIFTY_ROOT3)
-        If estimateX < -1 OrElse estimateX > SkirmishGameMap.MapSizeXMax + 1 OrElse estimateY < -1 OrElse estimateY > SkirmishGameMap.MapSizeYMax + 1 Then
-            Return New PointI(-1, -1)
-        End If
-        Dim pX, pY As Integer
-        For i = 1 To -1 Step -1
-            pX = estimateX + i
-            If pX < 0 OrElse pX > SkirmishGameMap.MapSizeXMax Then Continue For
-            For j = 1 To -1 Step -1
-                pY = estimateY + j
-                If pY < 0 OrElse pY > SkirmishGameMap.MapSizeYMax Then Continue For
-                If Me.SkirmishGameMap.Blocks(pX, pY).Outline.IsInsideRaw(New PointF2(mouse.X, mouse.Y)) Then
-                    Return New PointI(pX, pY)
-                End If
-            Next
-        Next
+        'FIXME:
+        'Dim worldPos As PointF2 = ConvertToWorldCursor(mouse)
+        'Dim estimateX As Integer = Math.Floor((worldPos.X - SIX_TWO_FIVE) / THREE_SEVEN_FIVE)
+        'Dim estimateY As Integer = Math.Floor((worldPos.Y - SIX_TWO_FIVE_ROOT3) / TWO_FIFTY_ROOT3)
+        'If estimateX < -1 OrElse estimateX > SkirmishGameMap.MapSizeXMax + 1 OrElse estimateY < -1 OrElse estimateY > SkirmishGameMap.MapSizeYMax + 1 Then
+        '    Return New PointI(-1, -1)
+        'End If
+        'Dim pX, pY As Integer
+        'For i = 1 To -1 Step -1
+        '    pX = estimateX + i
+        '    If pX < 0 OrElse pX > SkirmishGameMap.MapSizeXMax Then Continue For
+        '    For j = 1 To -1 Step -1
+        '        pY = estimateY + j
+        '        If pY < 0 OrElse pY > SkirmishGameMap.MapSizeYMax Then Continue For
+        '        If Me.SkirmishGameMap.Blocks(pX, pY).Outline.IsInsideRaw(New PointF2(mouse.X, mouse.Y)) Then
+        '            Return New PointI(pX, pY)
+        '        End If
+        '    Next
+        'Next
         Return New PointI(-1, -1)
     End Function
 

@@ -23,7 +23,7 @@ Public Class Form1
         'test.GoLTest()
         'test.MonitorValueTest()
         'test.MatrixTest()
-
+        'test.StructureTest()
 
         Await test.MainGameLoopTest()
 

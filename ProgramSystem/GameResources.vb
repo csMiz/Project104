@@ -37,6 +37,10 @@ Module GameResources
     Public GameFontHelper As FontHelper = FontHelper.Instance
 
     Public DirectWriteFactoryInstance As DirectWrite.Factory = New DirectWrite.Factory
+    ''' <summary>
+    ''' 全局三维模型载入器
+    ''' </summary>
+    Public Object3DLoaderInstance As Game3DObjectReader = Game3DObjectReader.Instance
 
     ''' <summary>
     ''' 六边形地形块图片
@@ -166,6 +170,9 @@ Module GameResources
         Live2dImages.LoadLiveConfigFromFiles()
         '载入字体助手
         GameFontHelper.LoadTextFromFiles()
+
+        Object3DLoaderInstance.LoadTexture(context)
+        Object3DLoaderInstance.ReadObjectFromPath(Application.StartupPath & "\Resources\Models\SkirmishBlockTemplate.txt")
 
         SIDE_COLOUR = SolidColorBrushSet.LoadFromXml(context, My.Resources.Colours)
 

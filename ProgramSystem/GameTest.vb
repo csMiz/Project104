@@ -22,6 +22,7 @@ Public Class GameTest
             .CameraFocus = New PointF2(600, 600)
             .Zoom = 0.25
             .InitializeDirect2d()
+            .Camera3D.BindingHalfResolve = New PointF(.Resolve.X / 2, .Resolve.Y / 2)
         End With
         MainGame.InitializeCamera(myCamera)
 
@@ -179,6 +180,26 @@ Public Class GameTest
 
     End Sub
 
+    Public Sub StructureTest()
+        Dim tmpFace As New Game3dFace
+        With tmpFace
+            .Colour = New SharpDX.Mathematics.Interop.RawColor4(120, 120, 120, 255)
+            .TextureIndex = 5
+        End With
+
+        Dim array1 As Game3dFace() = {tmpFace}
+        Dim array2 As Game3dFace()
+        Dim tmpList As New List(Of Game3dFace)
+        tmpList.Add(array1(0))
+        array2 = tmpList.ToArray
+        array1(0).TextureIndex = 8
+        Debug.WriteLine("face1: tid = " & array1(0).TextureIndex)
+        ' result is 8
+        Debug.WriteLine("face2: tid = " & array2(0).TextureIndex)
+        ' result is 5
+
+    End Sub
+
     Public Sub CopyHeroTest()
         Dim testReimu As GameHero = UnitTemplates.GetHeroTemplate(0)
         Dim testReimu2 As GameHero = testReimu.Copy
@@ -206,7 +227,8 @@ Public Class GameTest
         'SkirmishMapAccessoryTest()
 
         'User.PaintingLayers.Push(AddressOf TestMap.DrawHexMap)
-        User.PaintingLayers.Push(AddressOf TestGameLoop.SkirmishGameMap.DrawHexMap)
+
+        'User.PaintingLayers.Push(AddressOf TestGameLoop.SkirmishGameMap.DrawHexMap)
         User.PaintingLayersDescription.Push(GameImageLayer.SkirmishMap)
 
         'user.PaintImage()

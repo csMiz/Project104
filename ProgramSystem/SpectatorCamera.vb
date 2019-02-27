@@ -68,6 +68,8 @@ Public Class SpectatorCamera
     Private BitmapForOriginalSkirmishMap As Bitmap1
     Private BitmapForBlurDialog As Bitmap1
 
+    Public Camera3D As New GameCamera3D
+
     Public Sub InitializeDirect2d()
         '-------d2d1.0初始化方法---------
         'Dim factory As New Factory
@@ -103,7 +105,7 @@ Public Class SpectatorCamera
         '现在变成如下语句：
         swapChain = New DXGI.SwapChain1(dxgiFactory2, device, Form1.Handle, description, Nothing)
         Dim d2dDevice As SharpDX.Direct2D1.Device = New SharpDX.Direct2D1.Device(dxgiDevice2)
-        d2dContext = New SharpDX.Direct2D1.DeviceContext(d2dDevice, SharpDX.Direct2D1.DeviceContextOptions.None)
+        d2dContext = New SharpDX.Direct2D1.DeviceContext(d2dDevice, SharpDX.Direct2D1.DeviceContextOptions.EnableMultithreadedOptimizations)
         'Dim Properties As BitmapProperties1 = New BitmapProperties1(New PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied), DisplayProperties.LogicalDpi, DisplayProperties.LogicalDpi, BitmapOptions.Target Or BitmapOptions.CannotDraw)
         Dim dpiX As Single, dpiY As Single
         Using myGraphics As Graphics = Form1.CreateGraphics()

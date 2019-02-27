@@ -47,19 +47,19 @@ Public Class GamePageProperty
                 End If
             Next
 
-            'HACK: delete these after test
-            'test live image
-            Dim testimage As GameLive2dImage = Live2dImages.LiveImages(0)
-            testimage.PaintPosition = New PointF2(200, 200)
-            'testimage.PaintFullImage(context)
-            If Not testimage.Animations(0).HaveRendered Then
-                testimage.Animations(0).RenderAllToBuffer(context)
-            End If
-            testimage.Animations(0).DrawFrame(context, testimage.Animations(0).PlayingCursor)
-            testimage.Animations(0).PlayingCursor += 1
-            If testimage.Animations(0).PlayingCursor >= 120 Then
-                testimage.Animations(0).PlayingCursor = 1
-            End If
+            ''HACK: delete these after test
+            ''test live image
+            'Dim testimage As GameLive2dImage = Live2dImages.LiveImages(0)
+            'testimage.PaintPosition = New PointF2(200, 200)
+            ''testimage.PaintFullImage(context)
+            'If Not testimage.Animations(0).HaveRendered Then
+            '    testimage.Animations(0).RenderAllToBuffer(context)
+            'End If
+            'testimage.Animations(0).DrawFrame(context, testimage.Animations(0).PlayingCursor)
+            'testimage.Animations(0).PlayingCursor += 1
+            'If testimage.Animations(0).PlayingCursor >= 120 Then
+            '    testimage.Animations(0).PlayingCursor = 1
+            'End If
 
         End If
     End Sub

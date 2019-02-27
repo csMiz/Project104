@@ -140,6 +140,7 @@
     <Compile Include="MapObject\GameMap.vb" />
     <Compile Include="MapObject\MapBlock.vb" />
     <Compile Include="MapObject\SkirmishMap.vb" />
+    <Compile Include="MapObject\SkirmishMap2.vb" />
     <Compile Include="MapObject\SkirmishMapBlock.vb" />
     <Compile Include="MapObject\SkirmishMapBlock2.vb" />
     <Compile Include="MapObject\SkirmishMapBlockAccessory.vb" />
