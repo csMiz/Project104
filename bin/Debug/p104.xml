@@ -2106,9 +2106,14 @@ p104
  d2d画布对象
  </summary>
 </member>
-<member name="F:p104.SpectatorCamera.d2dContext">
+<member name="F:p104.SpectatorCamera.D2DContext">
  <summary>
  Direct2D 1.1 画布对象
+ </summary>
+</member>
+<member name="F:p104.SpectatorCamera.D2DTarget">
+ <summary>
+ 用于Direct2d显示的画布
  </summary>
 </member>
 <member name="T:p104.GameImageLayer">

@@ -31,15 +31,15 @@ Public Class SpectatorCamera
     End Property
     Public Diagonal As Single = 0
     ''' <summary>
-    ''' 定义绘图委托
+    ''' 定义绘图委托，仅用于D2D
     ''' </summary>
     Public Delegate Sub Draw(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As Bitmap1)
     ''' <summary>
-    ''' 分层绘图，不考虑小窗口穿透的模式
+    ''' 分层绘图，不考虑小窗口穿透的模式，仅用于D2D
     ''' </summary>
     Public PaintingLayers As New Stack(Of Draw)
     ''' <summary>
-    ''' 图层说明
+    ''' 图层说明，仅用于D2D
     ''' </summary>
     Public PaintingLayersDescription As New Stack(Of GameImageLayer)
     ''' <summary>
@@ -56,20 +56,81 @@ Public Class SpectatorCamera
     <Obsolete("升级d2d1.1后不再使用，改用d2dContext（D2D.DeviceContext继承了RenderTarget）", True)>
     Private RT As WindowRenderTarget = Nothing
 
-    Private device As SharpDX.Direct3D11.Device1
-    Private d3dContext As SharpDX.Direct3D11.DeviceContext1
-    Private swapChain As DXGI.SwapChain1
+    Private GlobalDevice As SharpDX.Direct3D11.Device1
+    Private D3DContext As SharpDX.Direct3D11.DeviceContext1
+    Private GlobalSwapChain As DXGI.SwapChain1
     ''' <summary>
     ''' Direct2D 1.1 画布对象
     ''' </summary>
-    Private d2dContext As SharpDX.Direct2D1.DeviceContext
-    Private d2dTarget As SharpDX.Direct2D1.Bitmap1
+    Private D2DContext As SharpDX.Direct2D1.DeviceContext
+    ''' <summary>
+    ''' 用于Direct2d显示的画布
+    ''' </summary>
+    Private D2DTarget As SharpDX.Direct2D1.Bitmap1
 
     Private BitmapForOriginalSkirmishMap As Bitmap1
-    Private BitmapForBlurDialog As Bitmap1
 
     Public Camera3D As New GameCamera3D
 
+    Public Sub InitializeDirectComponents()
+        '-------setup d3d11--------
+        Dim tmpGlobalDevice As Direct3D11.Device
+        Dim tmpGlobalSwapChain As DXGI.SwapChain
+        Dim sc_description As New SharpDX.DXGI.SwapChainDescription
+        With sc_description
+            .BufferCount = 1
+            .ModeDescription = New DXGI.ModeDescription(Resolve.X, Resolve.Y, New DXGI.Rational(60, 1), DXGI.Format.B8G8R8A8_UNorm)
+            .SampleDescription = New DXGI.SampleDescription(1, 0)
+            .Usage = SharpDX.DXGI.Usage.BackBuffer Or DXGI.Usage.RenderTargetOutput
+            .Flags = DXGI.SwapChainFlags.AllowModeSwitch
+            .IsWindowed = True
+            .OutputHandle = Form1.Handle
+            .SwapEffect = DXGI.SwapEffect.Discard
+        End With
+        Direct3D11.Device.CreateWithSwapChain(SharpDX.Direct3D.DriverType.Hardware, Direct3D11.DeviceCreationFlags.BgraSupport, {SharpDX.Direct3D.FeatureLevel.Level_11_1}, sc_description, tmpGlobalDevice, tmpGlobalSwapChain)
+        GlobalDevice = tmpGlobalDevice.QueryInterface(Of SharpDX.Direct3D11.Device1)()
+        GlobalSwapChain = tmpGlobalSwapChain.QueryInterface(Of DXGI.SwapChain1)
+
+        Dim rtv As Direct3D11.RenderTargetView
+        Using resource = Direct3D11.Resource.FromSwapChain(Of Direct3D11.Texture2D)(GlobalSwapChain, 0)
+            rtv = New Direct3D11.RenderTargetView(GlobalDevice, resource)
+        End Using
+
+        D3DContext = GlobalDevice.ImmediateContext.QueryInterface(Of SharpDX.Direct3D11.DeviceContext1)()
+        Dim Viewport = New Mathematics.Interop.RawViewportF
+        With Viewport
+            .X = 0
+            .Y = 0
+            .Width = Resolve.X
+            .Height = Resolve.Y
+        End With
+        D3DContext.OutputMerger.SetTargets(rtv)
+        D3DContext.Rasterizer.SetViewports({Viewport})
+
+        '-------link to d2d1.1-----------
+        Dim backBuffer As DXGI.Surface = GlobalSwapChain.GetBackBuffer(Of DXGI.Surface)(0)
+
+        'Dim D3D11Device1 As Direct3D11.Device1 = GlobalDevice.QueryInterface(Of SharpDX.Direct3D11.Device1)()
+        Dim DXGIDevice2 As SharpDX.DXGI.Device2 = GlobalDevice.QueryInterface(Of SharpDX.DXGI.Device2)()
+        Dim d2dDevice As SharpDX.Direct2D1.Device = New SharpDX.Direct2D1.Device(DXGIDevice2)
+        D2DContext = New SharpDX.Direct2D1.DeviceContext(d2dDevice, SharpDX.Direct2D1.DeviceContextOptions.EnableMultithreadedOptimizations)
+
+        Dim dpiX As Single, dpiY As Single
+        Using myGraphics As Graphics = Form1.CreateGraphics()    'use Graphics class to get the Dpi args
+            dpiX = myGraphics.DpiX
+            dpiY = myGraphics.DpiY
+        End Using
+        Dim Properties As BitmapProperties1 = New BitmapProperties1(New PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied), dpiX, dpiY, BitmapOptions.Target Or BitmapOptions.CannotDraw)
+        D2DTarget = New Bitmap1(D2DContext, backBuffer, Properties)
+
+        '-------other stuff---------
+        BitmapForOriginalSkirmishMap = New Bitmap1(D2DContext, New Size2(Resolve.X, Resolve.Y), New BitmapProperties1() With {
+                      .PixelFormat = New SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied),
+                      .BitmapOptions = BitmapOptions.Target})
+
+    End Sub
+
+    <Obsolete("use 'InitializeDirectComponents' to initialize both d3d11 and d2d1.1", False)>
     Public Sub InitializeDirect2d()
         '-------d2d1.0初始化方法---------
         'Dim factory As New Factory
@@ -82,10 +143,10 @@ Public Class SpectatorCamera
         'RT = New WindowRenderTarget(factory, rtp, wrtp)
         '--------已改用d2d1.1--------
         Dim defaultDevice As SharpDX.Direct3D11.Device = New SharpDX.Direct3D11.Device(DriverType.Hardware, Direct3D11.DeviceCreationFlags.Debug Or Direct3D11.DeviceCreationFlags.BgraSupport)
-        device = defaultDevice.QueryInterface(Of SharpDX.Direct3D11.Device1)()
-        d3dContext = device.ImmediateContext.QueryInterface(Of SharpDX.Direct3D11.DeviceContext1)()
+        GlobalDevice = defaultDevice.QueryInterface(Of SharpDX.Direct3D11.Device1)()
+        D3DContext = GlobalDevice.ImmediateContext.QueryInterface(Of SharpDX.Direct3D11.DeviceContext1)()
 
-        Dim dxgiDevice2 As SharpDX.DXGI.Device2 = device.QueryInterface(Of SharpDX.DXGI.Device2)()
+        Dim dxgiDevice2 As SharpDX.DXGI.Device2 = GlobalDevice.QueryInterface(Of SharpDX.DXGI.Device2)()
         Dim dxgiAdapter As SharpDX.DXGI.Adapter = dxgiDevice2.Adapter
         Dim dxgiFactory2 As SharpDX.DXGI.Factory2 = dxgiAdapter.GetParent(Of SharpDX.DXGI.Factory2)()
 
@@ -103,9 +164,9 @@ Public Class SpectatorCamera
         End With
         '原来是这个： swapChain = dxgiFactory2.CreateSwapChainForCoreWindow(device, new ComObject(window), ref description, null);
         '现在变成如下语句：
-        swapChain = New DXGI.SwapChain1(dxgiFactory2, device, Form1.Handle, description, Nothing)
+        GlobalSwapChain = New DXGI.SwapChain1(dxgiFactory2, GlobalDevice, Form1.Handle, description, Nothing)
         Dim d2dDevice As SharpDX.Direct2D1.Device = New SharpDX.Direct2D1.Device(dxgiDevice2)
-        d2dContext = New SharpDX.Direct2D1.DeviceContext(d2dDevice, SharpDX.Direct2D1.DeviceContextOptions.EnableMultithreadedOptimizations)
+        D2DContext = New SharpDX.Direct2D1.DeviceContext(d2dDevice, SharpDX.Direct2D1.DeviceContextOptions.EnableMultithreadedOptimizations)
         'Dim Properties As BitmapProperties1 = New BitmapProperties1(New PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied), DisplayProperties.LogicalDpi, DisplayProperties.LogicalDpi, BitmapOptions.Target Or BitmapOptions.CannotDraw)
         Dim dpiX As Single, dpiY As Single
         Using myGraphics As Graphics = Form1.CreateGraphics()
@@ -113,15 +174,15 @@ Public Class SpectatorCamera
             dpiY = myGraphics.DpiY
         End Using
         Dim Properties As BitmapProperties1 = New BitmapProperties1(New PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied), dpiX, dpiY, BitmapOptions.Target Or BitmapOptions.CannotDraw)
-        Dim backBuffer As DXGI.Surface = swapChain.GetBackBuffer(Of DXGI.Surface)(0)
-        d2dTarget = New Bitmap1(d2dContext, backBuffer, Properties)
+        Dim backBuffer As DXGI.Surface = GlobalSwapChain.GetBackBuffer(Of DXGI.Surface)(0)
+        D2DTarget = New Bitmap1(D2DContext, backBuffer, Properties)
 
-        BitmapForOriginalSkirmishMap = New Bitmap1(d2dContext, New Size2(Resolve.X, Resolve.Y), New BitmapProperties1() With {
+        BitmapForOriginalSkirmishMap = New Bitmap1(D2DContext, New Size2(Resolve.X, Resolve.Y), New BitmapProperties1() With {
                               .PixelFormat = New SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied),
                               .BitmapOptions = BitmapOptions.Target})
-        BitmapForBlurDialog = New Bitmap1(d2dContext, New Size2(Resolve.X, Resolve.Y), New BitmapProperties1() With {
-                              .PixelFormat = New SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied),
-                              .BitmapOptions = BitmapOptions.Target})
+        'BitmapForBlurDialog = New Bitmap1(D2DContext, New Size2(Resolve.X, Resolve.Y), New BitmapProperties1() With {
+        '                      .PixelFormat = New SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied),
+        '                      .BitmapOptions = BitmapOptions.Target})
 
         'Call GameResources.LoadResources(d2dContext)   单独放到mainGameloop里了
     End Sub
@@ -132,14 +193,14 @@ Public Class SpectatorCamera
 
     Public Sub PaintImage()
         If CBool(PaintingLayers.Count) Then
-            d2dContext.Target = BitmapForOriginalSkirmishMap
-            d2dContext.BeginDraw()
-            d2dContext.Clear(WHITE_COLOUR)
+            D2DContext.Target = BitmapForOriginalSkirmishMap
+            D2DContext.BeginDraw()
+            D2DContext.Clear(WHITE_COLOUR)
             For i = PaintingLayers.Count - 1 To 0 Step -1
-                PaintingLayers(i).Invoke(d2dContext, Me, BitmapForOriginalSkirmishMap)
+                PaintingLayers(i).Invoke(D2DContext, Me, BitmapForOriginalSkirmishMap)
             Next
 
-            d2dContext.EndDraw()
+            D2DContext.EndDraw()
 
             'Dim bru As New BitmapBrush1(d2dContext, BitmapForOriginalSkirmishMap)
             'd2dContext.Target = BitmapForBlurDialog
@@ -152,13 +213,13 @@ Public Class SpectatorCamera
             'eff.SetInput(0, BitmapForBlurDialog, True)
             'eff.StandardDeviation = 5.0F
 
-            d2dContext.Target = d2dTarget
-            d2dContext.BeginDraw()
+            D2DContext.Target = D2DTarget
+            D2DContext.BeginDraw()
             d2dContext.DrawImage(BitmapForOriginalSkirmishMap)
             'd2dContext.DrawImage(eff)
             d2dContext.EndDraw()
 
-            swapChain.Present(0, DXGI.PresentFlags.None)    '0 or 1, I don't know
+            GlobalSwapChain.Present(0, DXGI.PresentFlags.None)    '0 or 1, I don't know
         End If
     End Sub
 

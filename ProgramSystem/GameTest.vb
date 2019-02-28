@@ -21,7 +21,7 @@ Public Class GameTest
             .Resolve = New PointI(1024, 768)
             .CameraFocus = New PointF2(600, 600)
             .Zoom = 0.25
-            .InitializeDirect2d()
+            .InitializeDirectComponents()
             .Camera3D.BindingHalfResolve = New PointF(.Resolve.X / 2, .Resolve.Y / 2)
         End With
         MainGame.InitializeCamera(myCamera)
