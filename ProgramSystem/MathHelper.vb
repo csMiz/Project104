@@ -73,6 +73,15 @@ Public Module MathHelper
         Return result
     End Function
 
+    Public Function ParseRawVector3(input As String) As SharpDX.Mathematics.Interop.RawVector3
+        Dim value() As String = Regex.Split(input, COMMA)
+        Dim result As New SharpDX.Mathematics.Interop.RawVector3 With {
+            .X = CSng(value(0)),
+            .Y = CSng(value(1)),
+            .Z = CSng(value(2))}
+        Return result
+    End Function
+
     Public Function ParseRawColor4(input As String) As SharpDX.Mathematics.Interop.RawColor4
         Dim value() As String = Regex.Split(input, COMMA)
         Dim result As New SharpDX.Mathematics.Interop.RawColor4 With {
@@ -105,6 +114,10 @@ Public Module MathHelper
     End Function
     Public Function PointF22RawVec(input As PointF2) As SharpDX.Mathematics.Interop.RawVector2
         Return New SharpDX.Mathematics.Interop.RawVector2(input.X, input.Y)
+    End Function
+
+    Public Function PointF32RV3(input As PointF3) As SharpDX.Mathematics.Interop.RawVector3
+        Return New SharpDX.Mathematics.Interop.RawVector3(input.X, input.Y, input.Z)
     End Function
 
     Public Function CalculatePerspMatrix(input() As KeyValuePair(Of PointF2, PointF2)) As Double()

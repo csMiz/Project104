@@ -435,8 +435,15 @@ Public Class MainGameLoop
                 .PaintingLayersDescription.Clear()
                 .ActivePages.Clear()
             End If
-            .PaintingLayers.Push(AddressOf Me.Skirmish.DrawSkirmishMapLayer)
-            .PaintingLayersDescription.Push(GameImageLayer.SkirmishMap)
+            '----------ver1.0 and 1.1-------------
+            '.PaintingLayers.Push(AddressOf Me.Skirmish.DrawSkirmishMapLayer)    
+            '.PaintingLayersDescription.Push(GameImageLayer.SkirmishMap)
+            '-------------ver1.2---------------
+            .Camera3D.Enable = True
+            .PaintingLayers.Push(AddressOf .DrawLink3DImage)
+            .PaintingLayers.Push(AddressOf Me.Skirmish.DrawSkirmish2DUILayer)
+            .PaintingLayersDescription.Push(GameImageLayer.SkirmishMap3DOnly)
+            .PaintingLayersDescription.Push(GameImageLayer.SkirmishMap2DUI)
             .ActivePages.Add(Me.Skirmish.SkirmishPage)
         End With
 

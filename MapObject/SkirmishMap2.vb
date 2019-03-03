@@ -65,7 +65,7 @@ Public Class SkirmishMap2
     ''' </summary>
     ''' <param name="camera">摄像机对象</param>
     Public Sub Register3DObjects(camera As GameCamera3D)
-        Dim container As List(Of Game3dObject) = camera.WorldContainer
+        Dim container As List(Of Game3DObject2) = camera.WorldContainer
         container.Clear()
         For j = 0 To MapSizeYMax
             For i = 0 To MapSizeXMax

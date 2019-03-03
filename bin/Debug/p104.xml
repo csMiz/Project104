@@ -1258,6 +1258,22 @@ p104
  返回复制各顶点的新模型，但材质库仍为指向材质库的指针
  </summary>
 </member>
+<member name="T:p104.Game3DObject2">
+ <summary>
+ Game3DObject ver1.2
+ <para>Fit the interface of '*.pob'</para>
+ </summary>
+</member>
+<member name="F:p104.Game3DObject2.RegionCheckSign">
+ <summary>
+ 用于检测是否处于视野外以避免多余绘制的顶点
+ </summary>
+</member>
+<member name="M:p104.Game3DObject2.CopyTemplate">
+ <summary>
+ 返回复制各顶点的新模型
+ </summary>
+</member>
 <member name="M:p104.Game3DObjectReader.Instance">
  <summary>
  单例模式
@@ -1276,6 +1292,11 @@ p104
 <member name="T:p104.GameCamera3D">
  <summary>
  游戏三维摄像机类
+ </summary>
+</member>
+<member name="F:p104.GameCamera3D.Enable">
+ <summary>
+ 是否开机
  </summary>
 </member>
 <member name="F:p104.GameCamera3D.Position">
@@ -1310,12 +1331,32 @@ p104
 </member>
 <member name="F:p104.GameCamera3D.WorldContainer">
  <summary>
- 世界容器，所有绘制的物体都要放在容器内
+ 世界容器，所有绘制的物体都要放在容器内(1)
+ </summary>
+</member>
+<member name="F:p104.GameCamera3D.ProcessingContainer">
+ <summary>
+ 临时处理容器(2)
+ </summary>
+</member>
+<member name="F:p104.GameCamera3D.RegionContainer">
+ <summary>
+ 区域容器(3)
+ </summary>
+</member>
+<member name="F:p104.GameCamera3D.ContainerLock">
+ <summary>
+ 区域容器锁，True时阻止对RegionContainer的修改
+ </summary>
+</member>
+<member name="M:p104.GameCamera3D.DrawContainer3D(SharpDX.Direct3D11.Device1,SharpDX.Direct3D11.DeviceContext1)">
+ <summary>
+ 绘制3号容器内的三维面，使用D3D11
  </summary>
 </member>
 <member name="M:p104.GameCamera3D.DrawContainer(SharpDX.Direct2D1.DeviceContext@,p104.SpectatorCamera@,SharpDX.Direct2D1.Bitmap1)">
  <summary>
- 绘制世界容器内的物体
+ 绘制世界容器内的物体，仅用于D2D
  </summary>
  <param name="context">d2dContext对象</param>
  <param name="spectator">观察者对象</param>
@@ -2078,17 +2119,17 @@ p104
 </member>
 <member name="T:p104.SpectatorCamera.Draw">
  <summary>
- 定义绘图委托
+ 定义绘图委托，仅用于D2D
  </summary>
 </member>
 <member name="F:p104.SpectatorCamera.PaintingLayers">
  <summary>
- 分层绘图，不考虑小窗口穿透的模式
+ 分层绘图，不考虑小窗口穿透的模式，仅用于D2D
  </summary>
 </member>
 <member name="F:p104.SpectatorCamera.PaintingLayersDescription">
  <summary>
- 图层说明
+ 图层说明，仅用于D2D
  </summary>
 </member>
 <member name="F:p104.SpectatorCamera.ActivePages">
@@ -2114,6 +2155,36 @@ p104
 <member name="F:p104.SpectatorCamera.D2DTarget">
  <summary>
  用于Direct2d显示的画布
+ </summary>
+</member>
+<member name="F:p104.SpectatorCamera.BitmapForOriginalSkirmishMap">
+ <summary>
+ D2D空白背景画布
+ </summary>
+</member>
+<member name="F:p104.SpectatorCamera.D3DRenderImage">
+ <summary>
+ D3D图像
+ </summary>
+</member>
+<member name="M:p104.SpectatorCamera.DrawLink3DImage(SharpDX.Direct2D1.DeviceContext@,p104.SpectatorCamera@,SharpDX.Direct2D1.Bitmap1)">
+ <summary>
+ 在当前D2D图层直接绘制D3D生成的图像
+ </summary>
+</member>
+<member name="M:p104.SpectatorCamera.PaintImage">
+ <summary>
+ 将图像绘制到窗体
+ </summary>
+</member>
+<member name="M:p104.SpectatorCamera.GetDevceContext">
+ <summary>
+ 获取D2DDeviceContext
+ </summary>
+</member>
+<member name="M:p104.SpectatorCamera.GetCenter">
+ <summary>
+ 获取一半的Resolve值，即屏幕中心
  </summary>
 </member>
 <member name="T:p104.GameImageLayer">

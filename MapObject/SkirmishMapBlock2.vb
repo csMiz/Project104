@@ -27,7 +27,7 @@ Public Class SkirmishMapBlock2
     ''' <summary>
     ''' 地图块模型
     ''' </summary>
-    Public Model As Game3dObject = Nothing
+    Public Model As Game3DObject2 = Nothing
 
     ''' <summary>
     ''' 生成地图块模型
@@ -37,15 +37,12 @@ Public Class SkirmishMapBlock2
             Me.Model = Nothing
         End If
         'generate object with X, Y, AltitudeB/T
-        Me.Model = Object3DLoaderInstance.ObjectRepository(0).CopyTemplate
-        Dim pos As New PointF3(150 * X, 173.2 * Y + 86.6 * (X Mod 2), 80 * AltitudeBottom)
+        Me.Model = Object3DLoaderInstance.ObjectRepository2(0).CopyTemplate
+        Dim pos As New PointF3(75 * X, 86.6 * Y + 43.3 * (X Mod 2), 19.1 * AltitudeBottom)
         Me.Model.RegionCheckSign = {pos}
         Dim scale_z As Integer = (AltitudeTop - AltitudeBottom + 1)
         For i = 0 To Me.Model.Faces.Length - 1
             For j = 0 To Me.Model.Faces(i).Vertices.Length - 1
-                'Dim tmpOldVtx As PointF3 = Me.Model.Faces(i).Vertices(j)
-                'Dim tmpNewVtx As New PointF3(tmpOldVtx.X + pos.X, tmpOldVtx.Y + pos.Y, tmpOldVtx.Z * scale_z + pos.Z)
-                'Me.Model.Faces(i).Vertices(j) = tmpNewVtx
                 With Me.Model.Faces(i).Vertices(j)
                     .Z *= scale_z
                     .X += pos.X
@@ -54,15 +51,6 @@ Public Class SkirmishMapBlock2
                 End With
             Next
         Next
-        For i = 8 To 9
-            If Me.Terrain = TerrainType.Grass Then
-                Me.Model.Faces(i).TextureIndex = 1
-                Me.Model.Faces(i).ApplyTexture(context)
-
-            End If
-        Next
-
-
         'bind texture
         'TODO: bind texture
 

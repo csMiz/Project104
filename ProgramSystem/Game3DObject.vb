@@ -9,6 +9,7 @@
 Imports SharpDX.Direct2D1
 Imports SharpDX.Mathematics.Interop
 
+<Obsolete("use Game3DObject2", False)>
 Public Class Game3dObject
 
     Public Faces As Game3dFace()
@@ -24,6 +25,8 @@ Public Class Game3dObject
     ''' 用于检测是否处于视野外以避免多余绘制的顶点
     ''' </summary>
     Public RegionCheckSign As PointF3()
+
+    Public ShaderIndex As Integer = 0
 
     ''' <summary>
     ''' 返回复制各顶点的新模型，但材质库仍为指向材质库的指针
@@ -55,9 +58,21 @@ Public Class Game3dObject
         Return result
     End Function
 
+    Public Function GetFace2() As Game3DFace2()
+        Dim result As New List(Of Game3DFace2)
+        For Each tmpFace As Game3dFace In Me.Faces
+            If tmpFace.FaceType = FaceType3D.Three Then
+                result.Add(tmpFace.ToFace2)
+            Else
+                'Throw New Exception("face type is not supported.")
+            End If
+        Next
+        Return result.ToArray
+    End Function
+
 
 End Class
-
+<Obsolete>
 Public Class Game3dObjectTexture
 
     Public FilenameIndex As String = vbNullString
@@ -66,7 +81,7 @@ Public Class Game3dObjectTexture
 
 End Class
 
-
+<Obsolete>
 Public Class Game3dFace
 
     Public FaceType As FaceType3D
@@ -83,6 +98,16 @@ Public Class Game3dFace
 
     Public FixedTexture As Bitmap1 = Nothing
     Public FixedTextureVertices As PointF2()
+
+    Public Function ToFace2() As Game3DFace2
+        Dim result As New Game3DFace2
+        With result
+            .Vertices = {MathHelper.PointF32RV3(Me.Vertices(0)), MathHelper.PointF32RV3(Me.Vertices(1)), MathHelper.PointF32RV3(Me.Vertices(2))}
+            .Normal = MathHelper.PointF32RV3(Me.Normal)
+            .Color = Me.Colour
+        End With
+        Return result
+    End Function
 
     Public Sub ApplyTexture(context As DeviceContext)
         Return    'testing
@@ -161,8 +186,34 @@ Public Class Game3dFace
     End Sub
 
 End Class
-
+<Obsolete>
 Public Enum FaceType3D
     Three = 3
     Four = 4
 End Enum
+<Obsolete("use Game3DFace2_1", False)>
+Public Structure Game3DFace2
+
+    Public Vertices As RawVector3()
+
+    Public Normal As RawVector3
+
+    Public Color As RawColor4
+
+End Structure
+<Obsolete>
+Public Class Game3DFace2Bundle
+
+    Public ShaderIndex As Integer = 0
+
+    'Public Faces As Game3DFace2()
+
+    Public Faces As New List(Of Game3DFace2)
+
+    Public Buffer As SharpDX.DataStream = Nothing
+
+    Public Sub Dispose()
+        If Buffer IsNot Nothing Then Buffer.Dispose()
+    End Sub
+
+End Class

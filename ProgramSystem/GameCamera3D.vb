@@ -6,12 +6,20 @@
 ' Date: 2019/1/12 10:29:23
 ' -----------------------------------------
 
+Imports SharpDX
+Imports SharpDX.Direct3D11
 Imports SharpDX.Direct2D1
 Imports SharpDX.Mathematics.Interop
+Imports SharpDX.D3DCompiler
+
 ''' <summary>
 ''' 游戏三维摄像机类
 ''' </summary>
 Public Class GameCamera3D
+    ''' <summary>
+    ''' 是否开机
+    ''' </summary>
+    Public Enable As Boolean = False
     ''' <summary>
     ''' 摄像机位置
     ''' </summary>
@@ -49,11 +57,77 @@ Public Class GameCamera3D
     ''' </summary>
     Public WVP As SharpDX.Mathematics.Interop.RawMatrix
     ''' <summary>
-    ''' 世界容器，所有绘制的物体都要放在容器内
+    ''' 世界容器，所有绘制的物体都要放在容器内(1)
     ''' </summary>
-    Public WorldContainer As New List(Of Game3dObject)
+    Public WorldContainer As New List(Of Game3DObject2)
+    ''' <summary>
+    ''' 临时处理容器(2)
+    ''' </summary>
+    Public ProcessingContainer As New List(Of Game3DFace2_1Bundle)
+    ''' <summary>
+    ''' 区域容器(3)
+    ''' </summary>
+    Public RegionContainer As Game3DFace2_1Bundle()
+    ''' <summary>
+    ''' 区域容器锁，True时阻止对RegionContainer的修改
+    ''' </summary>
+    Public ContainerLock As Boolean = False
+
 
     Public BindingHalfResolve As PointF
+
+    Public GlobalInputElement As Direct3D11.InputElement()
+
+    Public InputSignatureRepository As ShaderSignature()
+
+    Public HLSLFileEffectRepository As Direct3D11.Effect()
+
+    Public VertexShaderRepository As Direct3D11.VertexShader()
+
+    Public PixelShaderRepository As Direct3D11.PixelShader()
+
+    Public Sub LoadAllShaders(d3dDevice As Direct3D11.Device1, context As Direct3D11.DeviceContext1)
+        'set input element
+        Dim ie() As Direct3D11.InputElement = {
+            New Direct3D11.InputElement("POSITION", 0, DXGI.Format.R32G32B32_Float, 0, 0),
+            New Direct3D11.InputElement("NORMAL", 0, DXGI.Format.R32G32B32_Float, 12, 0),
+            New Direct3D11.InputElement("COLOR", 0, DXGI.Format.R32G32B32A32_Float, 24, 0)}
+        GlobalInputElement = ie
+        'set input signature and load vertex shaders, pixel shader
+        Dim fileList As New List(Of KeyValuePair(Of Integer, String))
+        Dim dirInfo As New System.IO.DirectoryInfo(Application.StartupPath & "\Resources\Models\ModelConfig\")
+        Dim allFiles() As System.IO.FileInfo = dirInfo.GetFiles
+        For Each file As System.IO.FileInfo In allFiles
+            Dim name As String = file.Name
+            Dim args() As String = name.Remove(name.Length - 4).Split("_")
+            Dim nameIndex As Integer = CInt(args.Last)
+            fileList.Add(New KeyValuePair(Of Integer, String)(nameIndex, name))
+        Next
+        fileList.Sort(New Comparison(Of KeyValuePair(Of Integer, String))(Function(a As KeyValuePair(Of Integer, String), b As KeyValuePair(Of Integer, String)) As Integer
+                                                                              Return a.Key - b.Key
+                                                                          End Function))
+
+        ReDim VertexShaderRepository(fileList.Count - 1)
+        ReDim InputSignatureRepository(fileList.Count - 1)
+        ReDim PixelShaderRepository(fileList.Count - 1)
+        ReDim HLSLFileEffectRepository(fileList.Count - 1)
+        For Each tmpPair In fileList
+            Dim tmpIndex As Integer = tmpPair.Key
+            Dim tmpName As String = Application.StartupPath & "\Resources\Models\ModelConfig\" & tmpPair.Value
+
+            Using bytecode As ShaderBytecode = SharpDX.D3DCompiler.ShaderBytecode.CompileFromFile(tmpName, "VShader", "vs_4_0", ShaderFlags.None, EffectFlags.None)
+                InputSignatureRepository(tmpIndex) = ShaderSignature.GetInputSignature(bytecode)
+                VertexShaderRepository(tmpIndex) = New VertexShader(d3dDevice, bytecode)
+            End Using
+            Using bytecode As ShaderBytecode = SharpDX.D3DCompiler.ShaderBytecode.CompileFromFile(tmpName, "PShader", "ps_4_0", ShaderFlags.None, EffectFlags.None)
+                PixelShaderRepository(tmpIndex) = New PixelShader(d3dDevice, bytecode)
+            End Using
+            Using bytecode As ShaderBytecode = SharpDX.D3DCompiler.ShaderBytecode.CompileFromFile(tmpName, "fx_5_0", ShaderFlags.None, EffectFlags.None)
+                HLSLFileEffectRepository(tmpIndex) = New Direct3D11.Effect(d3dDevice, bytecode)
+            End Using
+        Next
+
+    End Sub
 
     Public Sub CalculateViewP()
         With View_Position
@@ -63,7 +137,6 @@ Public Class GameCamera3D
             .Value(3, 2) = -Position.Z
         End With
     End Sub
-
     Public Sub CalculateViewRX()
         With View_RX
             .SetAsIdentity()
@@ -73,21 +146,18 @@ Public Class GameCamera3D
             .Value(2, 2) = Math.Cos(Rotation.X)
         End With
     End Sub
-
     Public Sub CalculateViewRY()
         With View_RY
             .SetAsIdentity()
         End With
         'TODO
     End Sub
-
     Public Sub CalculateViewRZ()
         With View_RZ
             .SetAsIdentity()
         End With
         'TODO
     End Sub
-
     Public Sub RefreshProjection()
         With Projection
             .Value(0, 0) = 1 / Math.Tan(FOV / 2)
@@ -98,12 +168,10 @@ Public Class GameCamera3D
             .Value(3, 2) = -(2 * ZFar * ZNear / (ZFar - ZNear))
         End With
     End Sub
-
     Public Sub CalculateWVP()
         WVP_Source = (Projection * (View_RZ * (View_RY * (View_RX * View_Position))))
         WVP = WVP_Source.ToRawMatrix
     End Sub
-
     Public Function ApplyWVP_PF2(input As PointF3) As PointF2
         Dim inputMat As MathMatrixS = New MathMatrixS(1, 4)
         With inputMat
@@ -118,7 +186,6 @@ Public Class GameCamera3D
         End If
         Return New PointF2(BindingHalfResolve.X * (1 + resultMat.Value(0, 0) / resultMat.Value(0, 3)), BindingHalfResolve.Y * (1 - resultMat.Value(0, 1) / resultMat.Value(0, 3)))
     End Function
-
     Public Function ApplyWVP_RV2(input As PointF3) As RawVector2
         Dim inputMat As MathMatrixS = New MathMatrixS(1, 4)
         With inputMat
@@ -134,19 +201,134 @@ Public Class GameCamera3D
         Return New RawVector2(BindingHalfResolve.X * (1 + resultMat.Value(0, 0) / resultMat.Value(0, 3)), BindingHalfResolve.Y * (1 - resultMat.Value(0, 1) / resultMat.Value(0, 3)))
     End Function
 
+    Public Sub FixContainer3D(d3dDevice As Direct3D11.Device1, context As Direct3D11.DeviceContext1)
+        '采用动态载入
+        '世界容器分3层：
+        '1-总世界容器，包含了所有3D对象
+        '2-临时区域容器，包含了正在载入的候选区3D对象
+        '3-区域容器，用于实际渲染
+        '当视角变化时，对1号总世界容器内的对象进行遍历，重新计算候选区，将处于候选区内的3D对象添加到2号临时容器内
+        '当计算完成后，将2号临时容器写入3号区域容器，清空2号容器
+
+        '此方法需要另开一个线程
+
+        ProcessingContainer.Clear()
+        For Each tmpObj As Game3DObject2 In Me.WorldContainer
+            '判断是否绘制
+            Dim checkArray As PointF3() = tmpObj.RegionCheckSign
+            Dim isInside As Boolean = False
+            Dim border As PointF = BindingHalfResolve
+            For Each tmpCheck As PointF3 In checkArray
+                Dim screenPoint As PointF2 = ApplyWVP_PF2(tmpCheck)
+                If Math.Abs(screenPoint.X - border.X) < 1.5 * border.X AndAlso Math.Abs(screenPoint.Y - border.Y) < 1.5 * border.Y Then
+                    isInside = True
+                    Exit For
+                End If
+            Next
+            '写入2号容器
+            If isInside Then
+                Dim matchShaderIndex As Integer = -1
+                If ProcessingContainer.Count Then
+                    For i = 0 To ProcessingContainer.Count - 1
+                        If ProcessingContainer(i).ShaderIndex = tmpObj.ShaderIndex Then
+                            matchShaderIndex = i
+                            Exit For
+                        End If
+                    Next
+                End If
+                If matchShaderIndex = -1 Then
+                    ProcessingContainer.Add(New Game3DFace2_1Bundle With {.ShaderIndex = tmpObj.ShaderIndex})
+                    matchShaderIndex = ProcessingContainer.Count - 1
+                End If
+                ProcessingContainer(matchShaderIndex).Faces.AddRange(tmpObj.Faces)
+            End If
+        Next
+        For Each tmpBundle As Game3DFace2_1Bundle In ProcessingContainer
+            tmpBundle.Buffer = New DataStream(120 * tmpBundle.Faces.Count, True, True)
+            With tmpBundle.Buffer
+                For Each tmpFace As Game3dFace2_1 In tmpBundle.Faces
+                    .Write(tmpFace.Vertices(0))
+                    .Write(tmpFace.Normal(0))
+                    .Write(tmpFace.Colour)
+                    .Write(tmpFace.Vertices(1))
+                    .Write(tmpFace.Normal(1))
+                    .Write(tmpFace.Colour)
+                    .Write(tmpFace.Vertices(2))
+                    .Write(tmpFace.Normal(1))
+                    .Write(tmpFace.Colour)
+                Next
+                .Position = 0
+            End With
+        Next
+        '写入3号容器
+        While ContainerLock
+            'wait
+        End While
+        ContainerLock = True
+        If RegionContainer IsNot Nothing Then
+            For Each oldBundle As Game3DFace2_1Bundle In RegionContainer
+                oldBundle.Dispose()
+            Next
+        End If
+        RegionContainer = ProcessingContainer.ToArray
+        ContainerLock = False
+
+    End Sub
+
     ''' <summary>
-    ''' 绘制世界容器内的物体
+    ''' 绘制3号容器内的三维面，使用D3D11
+    ''' </summary>
+    Public Sub DrawContainer3D(d3dDevice As Direct3D11.Device1, context As Direct3D11.DeviceContext1)
+        While ContainerLock
+            Application.DoEvents()    'wait
+        End While
+        ContainerLock = True
+
+        'Draw d3d11
+        For Each tmpBundle As Game3DFace2_1Bundle In RegionContainer
+            Dim shaderIndex As Integer = tmpBundle.ShaderIndex
+            Dim layout As InputLayout = New InputLayout(d3dDevice, InputSignatureRepository(shaderIndex).Data, GlobalInputElement)
+            Dim vertexBuffer As Buffer = New Buffer(d3dDevice, tmpBundle.Buffer, tmpBundle.Buffer.Length, ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0)
+
+            With context
+                'set input format
+                .InputAssembler.InputLayout = layout
+                .InputAssembler.PrimitiveTopology = Direct3D.PrimitiveTopology.TriangleList
+                .InputAssembler.SetVertexBuffers(0, New VertexBufferBinding(vertexBuffer, 40, 0))
+                '[method1: use VS/PS and set ConstantBuffer separately]-------------
+                'set VS/PS
+                '.VertexShader.Set(VertexShaderRepository(shaderIndex))
+                '.PixelShader.Set(PixelShaderRepository(shaderIndex))
+                '-------------------------------------------------------------------
+                '[method2: use direct3d11.effect class]-----------------------------
+                HLSLFileEffectRepository(shaderIndex).GetVariableByName("GlobalWVP").AsMatrix().SetMatrix(Me.WVP)
+                HLSLFileEffectRepository(shaderIndex).GetTechniqueByIndex(0).GetPassByIndex(0).Apply(context)
+                '-------------------------------------------------------------------
+                'render
+                .Draw(tmpBundle.Faces.Count * 3, 0)
+            End With
+
+            layout.Dispose()
+            vertexBuffer.Dispose()
+        Next
+
+        ContainerLock = False
+    End Sub
+
+    ''' <summary>
+    ''' 绘制世界容器内的物体，仅用于D2D
     ''' </summary>
     ''' <param name="context">d2dContext对象</param>
     ''' <param name="spectator">观察者对象</param>
     ''' <param name="canvasBitmap">原画布对象</param>
+    <Obsolete("bad performance", False)>
     Public Sub DrawContainer(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As SharpDX.Direct2D1.Bitmap1)
         Dim light As New PointF3(0, 0.5, -0.866)
         context.EndDraw()
 
         If WorldContainer.Count = 0 Then Exit Sub
         For objIndex As Integer = WorldContainer.Count - 1 To 0 Step -1
-            Dim tmpObject As Game3dObject = Me.WorldContainer(objIndex)
+            Dim tmpObject As Game3dObject = Nothing 'Me.WorldContainer(objIndex)
             '判断是否绘制
             Dim checkArray As PointF3() = tmpObject.RegionCheckSign
             Dim isInside As Boolean = False
@@ -170,7 +352,7 @@ Public Class GameCamera3D
                         Dim screenPoints(3) As RawVector2
                         screenPoints(0) = ApplyWVP_RV2(tmpFace.Vertices(0))
                         With sink
-                            .SetFillMode(FillMode.Winding)
+                            .SetFillMode(Direct2D1.FillMode.Winding)
                             .BeginFigure(screenPoints(0), FigureBegin.Filled)
                             Dim sinkPoints() As RawVector2
                             If tmpFace.FaceType = FaceType3D.Three Then
@@ -224,7 +406,6 @@ Public Class GameCamera3D
                         End If
 
                     End If
-
 
                     'context.BeginDraw()
                     'For Each tmpVertex As PointF3 In tmpFace.Vertices

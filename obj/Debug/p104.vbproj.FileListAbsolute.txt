@@ -27,4 +27,11 @@ C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.RawInput.pdb
 C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.RawInput.xml
 C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.XInput.pdb
 C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.XInput.xml
-C:\Users\asdfg\Desktop\Project104\p104\p104\obj\Debug\p104.vbprojAssemblyReference.cache
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.D3DCompiler.dll
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.D3DCompiler.pdb
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.D3DCompiler.xml
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.Direct3D11.Effects.dll
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.Direct3D11.Effects.pdb
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\SharpDX.Direct3D11.Effects.xml
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\p104.exe.CodeAnalysisLog.xml
+C:\Users\asdfg\Desktop\Project104\p104\p104\bin\Debug\p104.exe.lastcodeanalysissucceeded

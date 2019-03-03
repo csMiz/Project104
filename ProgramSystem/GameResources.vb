@@ -171,8 +171,7 @@ Module GameResources
         '载入字体助手
         GameFontHelper.LoadTextFromFiles()
 
-        Object3DLoaderInstance.LoadTexture(context)
-        Object3DLoaderInstance.ReadObjectFromPath(Application.StartupPath & "\Resources\Models\SkirmishBlockTemplate.txt")
+        Object3DLoaderInstance.ReadObject2FromPath(Application.StartupPath & "\Resources\Models\base3d_0.pob")
 
         SIDE_COLOUR = SolidColorBrushSet.LoadFromXml(context, My.Resources.Colours)
 

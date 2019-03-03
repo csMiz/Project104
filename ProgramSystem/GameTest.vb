@@ -180,6 +180,7 @@ Public Class GameTest
 
     End Sub
 
+    <Obsolete>
     Public Sub StructureTest()
         Dim tmpFace As New Game3dFace
         With tmpFace

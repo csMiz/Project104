@@ -113,15 +113,17 @@ Public Class SkirmishGameLoop
             SkirmishGameMap2.Register3DObjects(BindingCamera.Camera3D)
         End If
         With BindingCamera.Camera3D
-            .Position = New PointF3(0, -1000, 2000)
-            .Rotation = New PointF3(-0.5236, 0, 0)
+            .Position = New PointF3(0, -500, 1000)
+            .Rotation = New PointF3(-0.5, 0, 0)
             .CalculateViewP()
             .CalculateViewRX()
             .CalculateViewRY()
             .CalculateViewRZ()
             .RefreshProjection()
             .CalculateWVP()
+
         End With
+        BindingCamera.RefreshCamera3D()
 
         ''预先绘制地图装饰物
         'SkirmishGameMap.LoadAccessories(BindingCamera.GetDevceContext, BindingCamera.Zoom)
@@ -223,13 +225,20 @@ Public Class SkirmishGameLoop
 
     End Sub
 
+    <Obsolete("render 3d-skirmish map and 2d-ui separately", False)>
     Public Sub DrawSkirmishMapLayer(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As Bitmap1)
-        'Me.SkirmishGameMap.DrawHexMap(context, spectator, canvasBitmap)
-        spectator.Camera3D.DrawContainer(context, spectator, canvasBitmap)
+        'Me.SkirmishGameMap.DrawHexMap(context, spectator, canvasBitmap)    'this is ver1.0
+        spectator.Camera3D.DrawContainer(context, spectator, canvasBitmap)    'this is ver1.1
+
         'Me.DrawUnitLayer(context, spectator, canvasBitmap)
+
         Me.SkirmishPage.PaintElements(context, spectator, canvasBitmap)
     End Sub
 
+    Public Sub DrawSkirmish2DUILayer(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As Bitmap1)
+        'TODO: DrawSkirmish2DUILayer
+
+    End Sub
 
     Private Sub DrawUnitLayer(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As Bitmap1)
 

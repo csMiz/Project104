@@ -29,7 +29,6 @@ Public Class SpectatorCamera
             Return New Mathematics.Interop.RawRectangleF(0, 0, Me.Resolve.X, Me.Resolve.Y)
         End Get
     End Property
-    Public Diagonal As Single = 0
     ''' <summary>
     ''' 定义绘图委托，仅用于D2D
     ''' </summary>
@@ -58,6 +57,8 @@ Public Class SpectatorCamera
 
     Private GlobalDevice As SharpDX.Direct3D11.Device1
     Private D3DContext As SharpDX.Direct3D11.DeviceContext1
+    Private D3DRenderTargetView As SharpDX.Direct3D11.RenderTargetView
+    Private D3DDepthStencilView As Direct3D11.DepthStencilView
     Private GlobalSwapChain As DXGI.SwapChain1
     ''' <summary>
     ''' Direct2D 1.1 画布对象
@@ -67,13 +68,20 @@ Public Class SpectatorCamera
     ''' 用于Direct2d显示的画布
     ''' </summary>
     Private D2DTarget As SharpDX.Direct2D1.Bitmap1
-
+    ''' <summary>
+    ''' D2D空白背景画布
+    ''' </summary>
     Private BitmapForOriginalSkirmishMap As Bitmap1
+    ''' <summary>
+    ''' D3D图像
+    ''' </summary>
+    Public D3DRenderImage As Bitmap1
 
     Public Camera3D As New GameCamera3D
 
     Public Sub InitializeDirectComponents()
         '-------setup d3d11--------
+        'create device and swapchain
         Dim tmpGlobalDevice As Direct3D11.Device
         Dim tmpGlobalSwapChain As DXGI.SwapChain
         Dim sc_description As New SharpDX.DXGI.SwapChainDescription
@@ -90,22 +98,42 @@ Public Class SpectatorCamera
         Direct3D11.Device.CreateWithSwapChain(SharpDX.Direct3D.DriverType.Hardware, Direct3D11.DeviceCreationFlags.BgraSupport, {SharpDX.Direct3D.FeatureLevel.Level_11_1}, sc_description, tmpGlobalDevice, tmpGlobalSwapChain)
         GlobalDevice = tmpGlobalDevice.QueryInterface(Of SharpDX.Direct3D11.Device1)()
         GlobalSwapChain = tmpGlobalSwapChain.QueryInterface(Of DXGI.SwapChain1)
-
-        Dim rtv As Direct3D11.RenderTargetView
+        'create render target
         Using resource = Direct3D11.Resource.FromSwapChain(Of Direct3D11.Texture2D)(GlobalSwapChain, 0)
-            rtv = New Direct3D11.RenderTargetView(GlobalDevice, resource)
+            D3DRenderTargetView = New Direct3D11.RenderTargetView(GlobalDevice, resource)
         End Using
-
+        'get device context
         D3DContext = GlobalDevice.ImmediateContext.QueryInterface(Of SharpDX.Direct3D11.DeviceContext1)()
+        'create rasterizer
+        Dim rsd = New Direct3D11.RasterizerStateDescription With {
+            .CullMode = Direct3D11.CullMode.Front,
+            .FillMode = Direct3D11.FillMode.Solid}
+        D3DContext.Rasterizer.State = New Direct3D11.RasterizerState(GlobalDevice, rsd)
+        'create depth stencil
+        Dim depthBuffer_description As New Direct3D11.Texture2DDescription With {
+                .ArraySize = 1,
+                .BindFlags = Direct3D11.BindFlags.DepthStencil,
+                .Format = SharpDX.DXGI.Format.D32_Float,
+                .Width = Resolve.X,
+                .Height = Resolve.Y,
+                .MipLevels = 1,
+                .SampleDescription = New DXGI.SampleDescription(1, 0)
+            }
+        Using depthBuffer As Direct3D11.Texture2D = New Direct3D11.Texture2D(GlobalDevice, depthBuffer_description)
+            D3DDepthStencilView = New Direct3D11.DepthStencilView(GlobalDevice, depthBuffer)
+        End Using
+        'set viewport
         Dim Viewport = New Mathematics.Interop.RawViewportF
         With Viewport
             .X = 0
             .Y = 0
             .Width = Resolve.X
             .Height = Resolve.Y
+            .MaxDepth = 1.0F
+            .MinDepth = 0.0F
         End With
-        D3DContext.OutputMerger.SetTargets(rtv)
-        D3DContext.Rasterizer.SetViewports({Viewport})
+        D3DContext.OutputMerger.SetTargets(D3DDepthStencilView, D3DRenderTargetView)
+        D3DContext.Rasterizer.SetViewport(Viewport)
 
         '-------link to d2d1.1-----------
         Dim backBuffer As DXGI.Surface = GlobalSwapChain.GetBackBuffer(Of DXGI.Surface)(0)
@@ -123,10 +151,15 @@ Public Class SpectatorCamera
         Dim Properties As BitmapProperties1 = New BitmapProperties1(New PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied), dpiX, dpiY, BitmapOptions.Target Or BitmapOptions.CannotDraw)
         D2DTarget = New Bitmap1(D2DContext, backBuffer, Properties)
 
+        '-------load shaders-------
+        Me.Camera3D.LoadAllShaders(GlobalDevice, D3DContext)
+
         '-------other stuff---------
-        BitmapForOriginalSkirmishMap = New Bitmap1(D2DContext, New Size2(Resolve.X, Resolve.Y), New BitmapProperties1() With {
+        Dim normalProp As New BitmapProperties1() With {
                       .PixelFormat = New SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied),
-                      .BitmapOptions = BitmapOptions.Target})
+                      .BitmapOptions = BitmapOptions.Target}
+        D3DRenderImage = New Bitmap1(D2DContext, New Size2(Resolve.X, Resolve.Y), normalProp)
+        BitmapForOriginalSkirmishMap = New Bitmap1(D2DContext, New Size2(Resolve.X, Resolve.Y), normalProp)
 
     End Sub
 
@@ -187,59 +220,76 @@ Public Class SpectatorCamera
         'Call GameResources.LoadResources(d2dContext)   单独放到mainGameloop里了
     End Sub
 
-    Public Sub RefreshResolve()
-        Me.Diagonal = Math.Sqrt(Me.Resolve.X ^ 2 + Me.Resolve.Y ^ 2)
+    Public Sub RefreshCamera3D()
+        Me.Camera3D.FixContainer3D(Me.GlobalDevice, Me.D3DContext)
     End Sub
 
+    ''' <summary>
+    ''' 在当前D2D图层直接绘制D3D生成的图像
+    ''' </summary>
+    Public Sub DrawLink3DImage(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As Bitmap1)
+        context.DrawImage(D3DRenderImage)
+    End Sub
+
+    ''' <summary>
+    ''' 将图像绘制到窗体
+    ''' </summary>
     Public Sub PaintImage()
-        If CBool(PaintingLayers.Count) Then
-            D2DContext.Target = BitmapForOriginalSkirmishMap
-            D2DContext.BeginDraw()
-            D2DContext.Clear(WHITE_COLOUR)
-            For i = PaintingLayers.Count - 1 To 0 Step -1
-                PaintingLayers(i).Invoke(D2DContext, Me, BitmapForOriginalSkirmishMap)
-            Next
-
-            D2DContext.EndDraw()
-
-            'Dim bru As New BitmapBrush1(d2dContext, BitmapForOriginalSkirmishMap)
-            'd2dContext.Target = BitmapForBlurDialog
-            'd2dContext.BeginDraw()
-            'd2dContext.FillRectangle(New Mathematics.Interop.RawRectangleF(200, 200, 800, 550), bru)
-            'd2dContext.EndDraw()
-
-
-            'Dim eff As New Effects.GaussianBlur(d2dContext)
-            'eff.SetInput(0, BitmapForBlurDialog, True)
-            'eff.StandardDeviation = 5.0F
-
-            D2DContext.Target = D2DTarget
-            D2DContext.BeginDraw()
-            d2dContext.DrawImage(BitmapForOriginalSkirmishMap)
-            'd2dContext.DrawImage(eff)
-            d2dContext.EndDraw()
-
-            GlobalSwapChain.Present(0, DXGI.PresentFlags.None)    '0 or 1, I don't know
+        If Me.Camera3D.Enable Then
+            'clear canvas
+            D3DContext.ClearRenderTargetView(D3DRenderTargetView, New Mathematics.Interop.RawColor4(0.5, 0.8, 0.5, 1))
+            D3DContext.ClearDepthStencilView(D3DDepthStencilView, Direct3D11.DepthStencilClearFlags.Depth, 1, 0)
+            'draw d3d
+            Me.Camera3D.DrawContainer3D(GlobalDevice, D3DContext)
+            'copy the 3d image to memory in order to add further 2d graphics
+            D3DRenderImage.CopyFromBitmap(D2DTarget)
         End If
+        'draw d2d
+        If CBool(PaintingLayers.Count) Then
+            With D2DContext
+                .Target = BitmapForOriginalSkirmishMap
+                .BeginDraw()
+                .Clear(WHITE_COLOUR)
+                For i = PaintingLayers.Count - 1 To 0 Step -1
+                    PaintingLayers(i).Invoke(D2DContext, Me, BitmapForOriginalSkirmishMap)
+                Next
+                .EndDraw()
+
+                .Target = D2DTarget
+                .BeginDraw()
+                .Clear(WHITE_COLOUR)
+                .DrawImage(BitmapForOriginalSkirmishMap)
+                .EndDraw()
+            End With
+        End If
+        'display
+        GlobalSwapChain.Present(0, DXGI.PresentFlags.None)
     End Sub
 
+    ''' <summary>
+    ''' 获取D2DDeviceContext
+    ''' </summary>
     Public Function GetDevceContext() As DeviceContext
-        Return d2dContext
+        Return D2DContext
     End Function
 
+    ''' <summary>
+    ''' 获取一半的Resolve值，即屏幕中心
+    ''' </summary>
     Public Function GetCenter() As PointI
         Return New PointI(CInt(Me.Resolve.X / 2), CInt(Me.Resolve.Y / 2))
     End Function
 
     Public Function IsMouseClick(startPosition As PointI, endPosition As PointI) As Boolean
         Dim distance As Single = Math.Sqrt((startPosition.X - endPosition.X) ^ 2 + (startPosition.Y - endPosition.Y) ^ 2)
-        If distance <= Me.Diagonal / 500 Then
+        If distance <= 5 Then
             Return True
         End If
         Return False
     End Function
 
     Public Sub Dispose() Implements IDisposable.Dispose
+        'TODO: dispose all directx resources
         'RT.Dispose()
     End Sub
 End Class
@@ -258,8 +308,14 @@ Public Enum GameImageLayer As Byte
 
     WorldMap = 21
 
+    <Obsolete("use 34 and 35", False)>
     SkirmishMap = 32
+
     Skirmish_UnitDetail = 33
+
+    SkirmishMap3DOnly = 34
+
+    SkirmishMap2DUI = 35
 
     BattleAnimation = 64
 End Enum

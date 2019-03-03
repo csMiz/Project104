@@ -14,10 +14,12 @@ Imports SharpDX.Mathematics.Interop
 Public Class Game3DObjectReader
 
     Private Shared me_instance As Game3DObjectReader = Nothing
-
+    <Obsolete>
     Public TextureRepository As New List(Of Game3dObjectTexture)
-
+    <Obsolete>
     Public ObjectRepository As New List(Of Game3dObject)
+
+    Public ObjectRepository2 As New List(Of Game3DObject2)
 
     Private Sub New()
     End Sub
@@ -29,9 +31,61 @@ Public Class Game3DObjectReader
         Return me_instance
     End Function
 
+    Public Sub ReadObject2FromPath(path As String)
+        Dim fileStr As New FileStream(path, FileMode.Open)
+        Dim content As String = vbNullString
+        Using sr As New StreamReader(fileStr)
+            content = sr.ReadToEnd
+        End Using
+        fileStr.Close()
+        fileStr.Dispose()
+        ReadObject2(content)
+    End Sub
+
+    Public Sub ReadObject2(content As String)
+        Dim tmpObj As Game3DObject2 = Nothing
+        Dim faceList As New List(Of Game3dFace2_1)
+        Dim colourList As New List(Of RawColor4)
+        Dim regionCheckList As New List(Of PointF3)
+        Dim lines As String() = Regex.Split(content, vbCrLf)
+        For Each line As String In lines
+            Dim args As String() = Regex.Split(line, SPACE_STRING)
+            Dim cmd As String = args(0)
+            If cmd = "#object" Then
+                tmpObj = New Game3DObject2
+                faceList.Clear()
+                colourList.Clear()
+                regionCheckList.Clear()
+            ElseIf cmd = "#colorRGBA" Then
+                colourList.Add(ParseRawColor4(args(1)))
+            ElseIf cmd = "#f" Then
+                Dim tmpFace As New Game3dFace2_1
+                With tmpFace
+                    .Vertices = {ParseRawVector3(args(1)), ParseRawVector3(args(2)), ParseRawVector3(args(3))}
+                    .Normal = {ParseRawVector3(args(4)), ParseRawVector3(args(5)), ParseRawVector3(args(6))}
+                    .Colour = colourList(CInt(args(7)))
+                End With
+                faceList.Add(tmpFace)
+            ElseIf cmd = "#end" Then
+                tmpObj.Faces = faceList.ToArray
+                tmpObj.RegionCheckSign = regionCheckList.ToArray
+                If tmpObj.RegionCheckSign.Length = 0 Then
+                    tmpObj.RegionCheckSign = {New PointF3(0, 0, 0)}
+                End If
+                ObjectRepository2.Add(tmpObj)
+                faceList.Clear()
+                colourList.Clear()
+                regionCheckList.Clear()
+            End If
+        Next
+
+    End Sub
+
+
     ''' <summary>
     ''' 加载材质文件夹下的所有贴图
     ''' </summary>
+    <Obsolete>
     Public Sub LoadTexture(context As DeviceContext)
         TextureRepository.Clear()
         Dim dirInfo As New System.IO.DirectoryInfo(Application.StartupPath & "\Resources\Images\Texture\")
@@ -56,6 +110,7 @@ Public Class Game3DObjectReader
         Next
     End Sub
 
+    <Obsolete>
     Public Sub ReadObject(content As String)
         Dim tmpObj As Game3dObject = Nothing
         Dim faceList As New List(Of Game3dFace)
@@ -118,6 +173,7 @@ Public Class Game3DObjectReader
 
     End Sub
 
+    <Obsolete>
     Public Sub ReadObjectFromPath(path As String)
         Dim fileStr As New FileStream(path, FileMode.Open)
         Dim content As String = vbNullString
@@ -129,6 +185,7 @@ Public Class Game3DObjectReader
         ReadObject(content)
     End Sub
 
+    <Obsolete>
     Public Function GetTexture(index As Integer) As Bitmap1
         For Each tmpTexture As Game3dObjectTexture In Me.TextureRepository
             If CInt(tmpTexture.FilenameIndex) = index Then
