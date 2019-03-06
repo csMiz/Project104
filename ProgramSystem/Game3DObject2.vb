@@ -23,6 +23,8 @@ Public Class Game3DObject2
 
     Public ShaderIndex As Integer = 0
 
+    Public Tag As Integer = 0
+
     ''' <summary>
     ''' 返回复制各顶点的新模型
     ''' </summary>
@@ -57,6 +59,8 @@ Public Class Game3dFace2_1
     Public Normal As RawVector3()
 
     Public Colour As RawColor4
+
+    Public Tag As Integer = 0
 
 End Class
 

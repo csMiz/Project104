@@ -114,7 +114,7 @@ Public Class UnitDetailDialog
         Dim lineProperty As StrokeStyleProperties = New StrokeStyleProperties() With {
             .StartCap = CapStyle.Round,
             .EndCap = CapStyle.Round}
-        Me.LineStyle = New StrokeStyle(Me.BindingCamera.GetDevceContext.Factory, lineProperty)
+        Me.LineStyle = New StrokeStyle(Me.BindingCamera.GetDeviceContext.Factory, lineProperty)
 
         Dim top_left_x As Integer = BindingCamera.Resolve.X / 2 - Me.DialogWidth / 2
         Dim top_left_y As Integer = BindingCamera.Resolve.Y / 2 - Me.DialogHeight / 2
@@ -206,7 +206,7 @@ Public Class UnitDetailDialog
     End Sub
 
     Public Sub InitializeEffects()
-        Dim context As DeviceContext = Me.BindingCamera.GetDevceContext
+        Dim context As DeviceContext = Me.BindingCamera.GetDeviceContext
         Me.DialogBitmap = New Bitmap1(context, New SharpDX.Size2(Me.BindingCamera.Resolve.X, Me.BindingCamera.Resolve.Y), NORMAL_BITMAP_PROPERTY)
         Me.BlurBitmap = New Bitmap1(context, New SharpDX.Size2(Me.BindingCamera.Resolve.X, Me.BindingCamera.Resolve.Y), NORMAL_BITMAP_PROPERTY)
         Me.BlurEffectLayer = New Effects.GaussianBlur(context)

@@ -220,6 +220,9 @@ Public Class SpectatorCamera
         'Call GameResources.LoadResources(d2dContext)   单独放到mainGameloop里了
     End Sub
 
+    ''' <summary>
+    ''' 刷新摄像机容器
+    ''' </summary>
     Public Sub RefreshCamera3D()
         Me.Camera3D.FixContainer3D(Me.GlobalDevice, Me.D3DContext)
     End Sub
@@ -229,7 +232,26 @@ Public Class SpectatorCamera
     ''' </summary>
     Public Sub DrawLink3DImage(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As Bitmap1)
         context.DrawImage(D3DRenderImage)
+
     End Sub
+
+    ''' <summary>
+    ''' 获取3D图像左上角的像素点
+    ''' <para>返回值为RGBA</para>
+    ''' </summary>
+    ''' <param name="context">D2DContext</param>
+    Public Function GetLink3DImagePixelInfo(context As Direct2D1.DeviceContext) As Byte()
+        Dim tmpBitmap As Bitmap1 = New Bitmap1(context, New Size2(D3DRenderImage.Size.Width, D3DRenderImage.Size.Height), MAP_CPU_BITMAP_PROPERTY)
+        tmpBitmap.CopyFromBitmap(D3DRenderImage)
+
+        Dim data As DataRectangle = tmpBitmap.Map(MapOptions.Read)
+        Dim container(3) As Byte
+        Runtime.InteropServices.Marshal.Copy(data.DataPointer, container, 0, 4)
+        tmpBitmap.Unmap()
+
+        tmpBitmap.Dispose()
+        Return container
+    End Function
 
     ''' <summary>
     ''' 将图像绘制到窗体
@@ -243,6 +265,10 @@ Public Class SpectatorCamera
             Me.Camera3D.DrawContainer3D(GlobalDevice, D3DContext)
             'copy the 3d image to memory in order to add further 2d graphics
             D3DRenderImage.CopyFromBitmap(D2DTarget)
+
+            Dim firstPixel As Byte() = GetLink3DImagePixelInfo(D2DContext)
+            Camera3D.PointingAt = firstPixel(0) + firstPixel(1) * 256
+
         End If
         'draw d2d
         If CBool(PaintingLayers.Count) Then
@@ -269,7 +295,7 @@ Public Class SpectatorCamera
     ''' <summary>
     ''' 获取D2DDeviceContext
     ''' </summary>
-    Public Function GetDevceContext() As DeviceContext
+    Public Function GetDeviceContext() As DeviceContext
         Return D2DContext
     End Function
 

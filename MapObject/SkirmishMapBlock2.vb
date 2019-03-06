@@ -29,6 +29,8 @@ Public Class SkirmishMapBlock2
     ''' </summary>
     Public Model As Game3DObject2 = Nothing
 
+    Public GeneratedId As Integer = 0
+
     ''' <summary>
     ''' 生成地图块模型
     ''' </summary>
@@ -40,8 +42,10 @@ Public Class SkirmishMapBlock2
         Me.Model = Object3DLoaderInstance.ObjectRepository2(0).CopyTemplate
         Dim pos As New PointF3(75 * X, 86.6 * Y + 43.3 * (X Mod 2), 19.1 * AltitudeBottom)
         Me.Model.RegionCheckSign = {pos}
+        Me.Model.Tag = GeneratedId
         Dim scale_z As Integer = (AltitudeTop - AltitudeBottom + 1)
         For i = 0 To Me.Model.Faces.Length - 1
+            Me.Model.Faces(i).Tag = GeneratedId
             For j = 0 To Me.Model.Faces(i).Vertices.Length - 1
                 With Me.Model.Faces(i).Vertices(j)
                     .Z *= scale_z

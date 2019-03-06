@@ -373,7 +373,7 @@ Public Class MainGameLoop
     Public Sub InitializeCamera(inputCamera As SpectatorCamera)
         If Me.Camera IsNot Nothing Then Throw New Exception("camera has been initialized!")
         Me.Camera = inputCamera
-        Me.CameraD2DContext = inputCamera.GetDevceContext
+        Me.CameraD2DContext = inputCamera.GetDeviceContext
         Me.CameraPaint = AddressOf inputCamera.PaintImage
     End Sub
 

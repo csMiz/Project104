@@ -23,7 +23,7 @@ Public Class GameCamera3D
     ''' <summary>
     ''' 摄像机位置
     ''' </summary>
-    Public Position As PointF3
+    Public Position As RawVector3
     ''' <summary>
     ''' 摄像机方向，旋转顺序依次为XYZ，逆时针，弧度
     ''' </summary>
@@ -73,8 +73,17 @@ Public Class GameCamera3D
     ''' </summary>
     Public ContainerLock As Boolean = False
 
+    ''' <summary>
+    ''' 鼠标指针在屏幕上的位置偏移值，用于选取三维物体
+    ''' </summary>
+    Public ScreenCursorOffset As RawVector3
+    ''' <summary>
+    ''' 当前鼠标指针悬停的对象ID
+    ''' </summary>
+    Public PointingAt As Integer = -1
 
-    Public BindingHalfResolve As PointF
+
+    Public BindingHalfResolve As PointF2
 
     Public GlobalInputElement As Direct3D11.InputElement()
 
@@ -91,7 +100,8 @@ Public Class GameCamera3D
         Dim ie() As Direct3D11.InputElement = {
             New Direct3D11.InputElement("POSITION", 0, DXGI.Format.R32G32B32_Float, 0, 0),
             New Direct3D11.InputElement("NORMAL", 0, DXGI.Format.R32G32B32_Float, 12, 0),
-            New Direct3D11.InputElement("COLOR", 0, DXGI.Format.R32G32B32A32_Float, 24, 0)}
+            New Direct3D11.InputElement("COLOR", 0, DXGI.Format.R32G32B32A32_Float, 24, 0),
+            New Direct3D11.InputElement("Output", 0, DXGI.Format.R32_UInt, 40, 0)}
         GlobalInputElement = ie
         'set input signature and load vertex shaders, pixel shader
         Dim fileList As New List(Of KeyValuePair(Of Integer, String))
@@ -141,22 +151,28 @@ Public Class GameCamera3D
         With View_RX
             .SetAsIdentity()
             .Value(1, 1) = Math.Cos(Rotation.X)
-            .Value(2, 1) = -Math.Sin(Rotation.X)
             .Value(1, 2) = Math.Sin(Rotation.X)
-            .Value(2, 2) = Math.Cos(Rotation.X)
+            .Value(2, 1) = - .Value(1, 2)
+            .Value(2, 2) = .Value(1, 1)
         End With
     End Sub
     Public Sub CalculateViewRY()
         With View_RY
             .SetAsIdentity()
+            .Value(0, 0) = Math.Cos(Rotation.Y)
+            .Value(2, 0) = Math.Sin(Rotation.Y)
+            .Value(0, 2) = - .Value(2, 0)
+            .Value(2, 2) = .Value(0, 0)
         End With
-        'TODO
     End Sub
     Public Sub CalculateViewRZ()
         With View_RZ
             .SetAsIdentity()
+            .Value(0, 0) = Math.Cos(Rotation.Z)
+            .Value(0, 1) = Math.Sin(Rotation.Z)
+            .Value(1, 0) = - .Value(0, 1)
+            .Value(1, 1) = .Value(0, 0)
         End With
-        'TODO
     End Sub
     Public Sub RefreshProjection()
         With Projection
@@ -169,7 +185,7 @@ Public Class GameCamera3D
         End With
     End Sub
     Public Sub CalculateWVP()
-        WVP_Source = (Projection * (View_RZ * (View_RY * (View_RX * View_Position))))
+        WVP_Source = Projection * (View_RZ * View_RY) * (View_RX * View_Position)
         WVP = WVP_Source.ToRawMatrix
     End Sub
     Public Function ApplyWVP_PF2(input As PointF3) As PointF2
@@ -182,7 +198,7 @@ Public Class GameCamera3D
         End With
         Dim resultMat As MathMatrixS = WVP_Source * inputMat
         If resultMat.Value(0, 3) = 0 Then
-            Return New PointF2(BindingHalfResolve.X, BindingHalfResolve.Y)
+            Return BindingHalfResolve
         End If
         Return New PointF2(BindingHalfResolve.X * (1 + resultMat.Value(0, 0) / resultMat.Value(0, 3)), BindingHalfResolve.Y * (1 - resultMat.Value(0, 1) / resultMat.Value(0, 3)))
     End Function
@@ -201,6 +217,10 @@ Public Class GameCamera3D
         Return New RawVector2(BindingHalfResolve.X * (1 + resultMat.Value(0, 0) / resultMat.Value(0, 3)), BindingHalfResolve.Y * (1 - resultMat.Value(0, 1) / resultMat.Value(0, 3)))
     End Function
 
+    Public Sub SetCursorRayStatus(status As Single)
+        ScreenCursorOffset.Z = status
+    End Sub
+
     Public Sub FixContainer3D(d3dDevice As Direct3D11.Device1, context As Direct3D11.DeviceContext1)
         '采用动态载入
         '世界容器分3层：
@@ -217,7 +237,7 @@ Public Class GameCamera3D
             '判断是否绘制
             Dim checkArray As PointF3() = tmpObj.RegionCheckSign
             Dim isInside As Boolean = False
-            Dim border As PointF = BindingHalfResolve
+            Dim border As PointF2 = BindingHalfResolve
             For Each tmpCheck As PointF3 In checkArray
                 Dim screenPoint As PointF2 = ApplyWVP_PF2(tmpCheck)
                 If Math.Abs(screenPoint.X - border.X) < 1.5 * border.X AndAlso Math.Abs(screenPoint.Y - border.Y) < 1.5 * border.Y Then
@@ -244,18 +264,21 @@ Public Class GameCamera3D
             End If
         Next
         For Each tmpBundle As Game3DFace2_1Bundle In ProcessingContainer
-            tmpBundle.Buffer = New DataStream(120 * tmpBundle.Faces.Count, True, True)
+            tmpBundle.Buffer = New DataStream(44 * 3 * tmpBundle.Faces.Count, True, True)
             With tmpBundle.Buffer
                 For Each tmpFace As Game3dFace2_1 In tmpBundle.Faces
                     .Write(tmpFace.Vertices(0))
                     .Write(tmpFace.Normal(0))
                     .Write(tmpFace.Colour)
+                    .Write(tmpFace.Tag)
                     .Write(tmpFace.Vertices(1))
                     .Write(tmpFace.Normal(1))
                     .Write(tmpFace.Colour)
+                    .Write(tmpFace.Tag)
                     .Write(tmpFace.Vertices(2))
                     .Write(tmpFace.Normal(1))
                     .Write(tmpFace.Colour)
+                    .Write(tmpFace.Tag)
                 Next
                 .Position = 0
             End With
@@ -294,18 +317,26 @@ Public Class GameCamera3D
                 'set input format
                 .InputAssembler.InputLayout = layout
                 .InputAssembler.PrimitiveTopology = Direct3D.PrimitiveTopology.TriangleList
-                .InputAssembler.SetVertexBuffers(0, New VertexBufferBinding(vertexBuffer, 40, 0))
+                .InputAssembler.SetVertexBuffers(0, New VertexBufferBinding(vertexBuffer, 44, 0))
                 '[method1: use VS/PS and set ConstantBuffer separately]-------------
                 'set VS/PS
                 '.VertexShader.Set(VertexShaderRepository(shaderIndex))
                 '.PixelShader.Set(PixelShaderRepository(shaderIndex))
                 '-------------------------------------------------------------------
                 '[method2: use direct3d11.effect class]-----------------------------
-                HLSLFileEffectRepository(shaderIndex).GetVariableByName("GlobalWVP").AsMatrix().SetMatrix(Me.WVP)
-                HLSLFileEffectRepository(shaderIndex).GetTechniqueByIndex(0).GetPassByIndex(0).Apply(context)
+
+                With HLSLFileEffectRepository(shaderIndex)
+                    .GetVariableByName("GlobalWVP").AsMatrix().SetMatrix(Me.WVP)
+                    .GetVariableByName("CursorInput").AsVector().Set(Me.ScreenCursorOffset)
+                    .GetVariableByName("SelectedObjectId").AsScalar().Set(Me.PointingAt)
+                    .GetVariableByName("ScreenHHeight").AsScalar().Set(Me.BindingHalfResolve.Y)
+                    .GetVariableByName("ScreenHWidth").AsScalar().Set(Me.BindingHalfResolve.X)
+                    .GetTechniqueByIndex(0).GetPassByIndex(0).Apply(context)
+                End With
                 '-------------------------------------------------------------------
                 'render
                 .Draw(tmpBundle.Faces.Count * 3, 0)
+
             End With
 
             layout.Dispose()

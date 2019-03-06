@@ -42,6 +42,7 @@ Public Class SkirmishMap2
         Next
 
         Dim cur As Integer = 0
+        Dim counter As Integer = 0
         Do While cur < content.Length
             Dim tmpBlock As New SkirmishMapBlock2
             With tmpBlock
@@ -50,11 +51,13 @@ Public Class SkirmishMap2
                 .Terrain = content(cur + 2)
                 .AltitudeBottom = content(cur + 3) \ 16
                 .AltitudeTop = content(cur + 3) Mod 16
+                .GeneratedId = counter
                 .GenerateModel(context)    'must load template models in advance
 
             End With
             Blocks(tmpBlock.X, tmpBlock.Y).Add(tmpBlock)
             cur += 4
+            counter += 1
         Loop
 
         content = Nothing

@@ -22,7 +22,7 @@ Public Class GameTest
             .CameraFocus = New PointF2(600, 600)
             .Zoom = 0.25
             .InitializeDirectComponents()
-            .Camera3D.BindingHalfResolve = New PointF(.Resolve.X / 2, .Resolve.Y / 2)
+            .Camera3D.BindingHalfResolve = New PointF2(.Resolve.X / 2, .Resolve.Y / 2)
         End With
         MainGame.InitializeCamera(myCamera)
 
@@ -101,7 +101,7 @@ Public Class GameTest
     <Obsolete("已经集成在SkirmishGameloop里了", True)>
     Public Sub SkirmishMapAccessoryTest()
         'TestMap.LoadAccessories(User.GetDevceContext, User.Zoom)
-        TestGameLoop.SkirmishGameMap.LoadAccessories(User.GetDevceContext, User.Zoom)
+        TestGameLoop.SkirmishGameMap.LoadAccessories(User.GetDeviceContext, User.Zoom)
 
     End Sub
 

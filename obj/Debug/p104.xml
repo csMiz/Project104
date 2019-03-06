@@ -1349,6 +1349,16 @@ p104
  区域容器锁，True时阻止对RegionContainer的修改
  </summary>
 </member>
+<member name="F:p104.GameCamera3D.ScreenCursorOffset">
+ <summary>
+ 鼠标指针在屏幕上的位置偏移值，用于选取三维物体
+ </summary>
+</member>
+<member name="F:p104.GameCamera3D.PointingAt">
+ <summary>
+ 当前鼠标指针悬停的对象ID
+ </summary>
+</member>
 <member name="M:p104.GameCamera3D.DrawContainer3D(SharpDX.Direct3D11.Device1,SharpDX.Direct3D11.DeviceContext1)">
  <summary>
  绘制3号容器内的三维面，使用D3D11
@@ -2167,17 +2177,29 @@ p104
  D3D图像
  </summary>
 </member>
+<member name="M:p104.SpectatorCamera.RefreshCamera3D">
+ <summary>
+ 刷新摄像机容器
+ </summary>
+</member>
 <member name="M:p104.SpectatorCamera.DrawLink3DImage(SharpDX.Direct2D1.DeviceContext@,p104.SpectatorCamera@,SharpDX.Direct2D1.Bitmap1)">
  <summary>
  在当前D2D图层直接绘制D3D生成的图像
  </summary>
+</member>
+<member name="M:p104.SpectatorCamera.GetLink3DImagePixelInfo(SharpDX.Direct2D1.DeviceContext)">
+ <summary>
+ 获取3D图像左上角的像素点
+ <para>返回值为RGBA</para>
+ </summary>
+ <param name="context">D2DContext</param>
 </member>
 <member name="M:p104.SpectatorCamera.PaintImage">
  <summary>
  将图像绘制到窗体
  </summary>
 </member>
-<member name="M:p104.SpectatorCamera.GetDevceContext">
+<member name="M:p104.SpectatorCamera.GetDeviceContext">
  <summary>
  获取D2DDeviceContext
  </summary>

@@ -97,8 +97,12 @@ Module GameResources
     Public TRANSPARENT_BRUSH As SolidColorBrush = Nothing
 
     Public NORMAL_BITMAP_PROPERTY As BitmapProperties1 = New BitmapProperties1() With {
-                              .PixelFormat = New SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied),
-                              .BitmapOptions = BitmapOptions.Target}
+        .PixelFormat = New SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied),
+        .BitmapOptions = BitmapOptions.Target}
+
+    Public MAP_CPU_BITMAP_PROPERTY As BitmapProperties1 = New BitmapProperties1() With {
+        .PixelFormat = New SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied),
+        .BitmapOptions = BitmapOptions.CannotDraw Or BitmapOptions.CpuRead}
 
     Public NORMAL_BRUSH_PROPERTY As New BrushProperties() With {
         .Opacity = NOT_TRANSPARENT,

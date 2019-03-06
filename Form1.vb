@@ -26,6 +26,7 @@ Public Class Form1
         'test.StructureTest()
 
         Await test.MainGameLoopTest()
+        'Cursor.Hide()
 
         'test.OOPTest()
 

@@ -109,19 +109,19 @@ Public Class SkirmishGameLoop
             'If SkirmishGameMap Is Nothing Then SkirmishGameMap = New SkirmishMap
             'SkirmishGameMap.LoadFromFile(stream)
             If SkirmishGameMap2 Is Nothing Then SkirmishGameMap2 = New SkirmishMap2
-            SkirmishGameMap2.LoadFromFile(stream, BindingCamera.GetDevceContext)
+            SkirmishGameMap2.LoadFromFile(stream, BindingCamera.GetDeviceContext)
             SkirmishGameMap2.Register3DObjects(BindingCamera.Camera3D)
         End If
         With BindingCamera.Camera3D
-            .Position = New PointF3(0, -500, 1000)
-            .Rotation = New PointF3(-0.5, 0, 0)
+            .Position = New RawVector3(200, -350, 1000)
+            .Rotation = New PointF3(-0.5236, 0, 0)
             .CalculateViewP()
             .CalculateViewRX()
             .CalculateViewRY()
             .CalculateViewRZ()
             .RefreshProjection()
             .CalculateWVP()
-
+            .SetCursorRayStatus(0.0F)
         End With
         BindingCamera.RefreshCamera3D()
 
@@ -477,7 +477,7 @@ Public Class SkirmishGameLoop
 
     Public Sub InitializeSkirmishPage()
         Me.SkirmishPage = New GamePageProperty
-        Dim myContext As DeviceContext = Me.BindingCamera.GetDevceContext
+        Dim myContext As DeviceContext = Me.BindingCamera.GetDeviceContext
 
         Me.UI_SkirmishBoard = New GameChessboard
         With Me.UI_SkirmishBoard
@@ -487,6 +487,7 @@ Public Class SkirmishGameLoop
             .Z_Index = 0
         End With
         AddHandler Me.UI_SkirmishBoard.MouseDown, AddressOf Me.GameBoardMouseDown
+        AddHandler Me.UI_SkirmishBoard.MouseMove, AddressOf Me.GameBoardMouseMove
         Me.SkirmishPage.UIElements.Add(Me.UI_SkirmishBoard)
         'TODO
 
@@ -628,6 +629,15 @@ Public Class SkirmishGameLoop
         Else    'is drag
 
         End If
+
+    End Sub
+
+    Public Sub GameBoardMouseMove(e As GameMouseEventArgs)
+
+        'Debug.WriteLine(e.X & "-" & e.Y)
+        Dim hr As PointF2 = BindingCamera.Camera3D.BindingHalfResolve
+        BindingCamera.Camera3D.ScreenCursorOffset.X = (e.X - hr.X) / hr.X
+        BindingCamera.Camera3D.ScreenCursorOffset.Y = -(e.Y - hr.Y) / hr.Y
 
     End Sub
 
