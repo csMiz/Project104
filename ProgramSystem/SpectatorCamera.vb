@@ -285,6 +285,14 @@ Public Class SpectatorCamera
                 .BeginDraw()
                 .Clear(WHITE_COLOUR)
                 .DrawImage(BitmapForOriginalSkirmishMap)
+
+                'test
+                .FillRectangle(New Mathematics.Interop.RawRectangleF(100, 100, 200, 200), BLACK_COLOUR_BRUSH(2))
+                Dim fh2 As FontHelper2 = FontHelper2.Instance
+                Dim tmpTL As DirectWrite.TextLayout = fh2.GetCustomTextLayout("Start Game", "P104_Font1", 20, New PointF2(200, 200))
+                .DrawTextLayout(New Mathematics.Interop.RawVector2(10, 10), tmpTL, BLACK_COLOUR_BRUSH(4))
+                'tmpTL.Dispose()
+
                 .EndDraw()
             End With
         End If

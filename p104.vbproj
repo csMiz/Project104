@@ -176,6 +176,7 @@
     <Compile Include="GameUIElement\GameTextBox.vb" />
     <Compile Include="GameUIElement\GameTreeViewItem.vb" />
     <Compile Include="GameUIElement\IAnimatedControl.vb" />
+    <Compile Include="GameUIElement\TerminalDialog.vb" />
     <Compile Include="GameUIElement\UnitDetailDialog.vb" />
     <Compile Include="MapObject\GameMap.vb" />
     <Compile Include="MapObject\MapBlock.vb" />
@@ -202,6 +203,7 @@
     </Compile>
     <Compile Include="ProgramSystem\CircleArea.vb" />
     <Compile Include="ProgramSystem\FontHelper.vb" />
+    <Compile Include="ProgramSystem\FontHelper2.vb" />
     <Compile Include="ProgramSystem\Game3DObject.vb" />
     <Compile Include="ProgramSystem\Game3DObject2.vb" />
     <Compile Include="ProgramSystem\Game3DObjectReader.vb" />
@@ -211,6 +213,7 @@
     <Compile Include="ProgramSystem\GameEndInfo.vb" />
     <Compile Include="ProgramSystem\GameLive2dImageAnimation.vb" />
     <Compile Include="ProgramSystem\GameLive2dObject.vb" />
+    <Compile Include="ProgramSystem\GameTerminal.vb" />
     <Compile Include="ProgramSystem\GeometryArithmetic.vb" />
     <Compile Include="ProgramSystem\IGameGeometryArea.vb" />
     <Compile Include="ProgramSystem\GameIconRepository.vb" />
@@ -253,6 +256,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\SaveFileFormat_psav.md" />
+    <None Include="bin\Debug\P104_Font1.ttf" />
     <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>

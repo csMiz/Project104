@@ -63,11 +63,11 @@ Namespace My.Resources
         '''<summary>
         '''  查找类似 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
         '''&lt;content&gt;
-        '''  &lt;h id=&quot;0&quot; template=&quot;0&quot;&gt;
+        '''  &lt;h id=&quot;0&quot; template=&quot;0&quot; chessImage=&quot;0&quot;&gt;
         '''    &lt;level value=&quot;1&quot; /&gt;
         '''    &lt;lock value=&quot;Unlocked&quot; /&gt;
         '''  &lt;/h&gt;
-        '''  &lt;h id=&quot;1&quot; template=&quot;1&quot; &gt;
+        '''  &lt;h id=&quot;1&quot; template=&quot;1&quot; chessImage=&quot;0&quot;&gt;
         '''    &lt;level value=&quot;1&quot; /&gt;
         '''    &lt;lock value=&quot;Unlocked&quot; /&gt;
         '''  &lt;/h&gt;
@@ -82,8 +82,8 @@ Namespace My.Resources
         '''<summary>
         '''  查找类似 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
         '''&lt;content&gt;
-        '''  &lt;static id=&quot;0&quot; group=&quot;skirmish_chess&quot; domain=&quot;fine&quot; &gt;
-        '''    &lt;fragment id=&quot;0&quot; from=&quot;skirmish_unit&quot; pos=&quot;0,0&quot; size=&quot;-1,-1&quot;/&gt;
+        '''  &lt;static id=&quot;0&quot; type=&quot;three&quot; group=&quot;skirmish_chess&quot; domain=&quot;fine&quot; size=&quot;200,200&quot;&gt;
+        '''    &lt;fragment id=&quot;0&quot; from=&quot;skirmish_unit&quot; pos=&quot;0,0&quot; size=&quot;200,200&quot;/&gt;
         '''  &lt;/static&gt;
         '''&lt;/content&gt; 的本地化字符串。
         '''</summary>
@@ -143,6 +143,16 @@ Namespace My.Resources
         Friend ReadOnly Property MapScriptTest() As String
             Get
                 Return ResourceManager.GetString("MapScriptTest", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  查找 System.Byte[] 类型的本地化资源。
+        '''</summary>
+        Friend ReadOnly Property P104_Font1() As Byte()
+            Get
+                Dim obj As Object = ResourceManager.GetObject("P104_Font1", resourceCulture)
+                Return CType(obj,Byte())
             End Get
         End Property
         

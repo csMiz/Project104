@@ -59,6 +59,9 @@ Public Class GameComboBox
     ''' </summary>
     Public FlyoutShadowPad As GameShadowPad = Nothing
 
+    Public Event SelectionChanged(nowIndex As Integer, nowContent As String)
+
+
 
     ''' <summary>
     ''' 选项数
@@ -175,10 +178,10 @@ Public Class GameComboBox
 
             .DrawBitmap(Me.TitleImage.FontImage, Me.LabelRect, NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
             .EndDraw()
-            Call Me.SelectedBox.DrawControlAtSelfCanvas(context, spec, Me.ControlCanvas)
+            Me.SelectedBox.DrawControlAtSelfCanvas(context, spec, Me.ControlCanvas)
             .Target = Me.ControlCanvas
             .BeginDraw()
-            Call Me.SelectedBox.DrawControl(context, spec, Me.ControlCanvas)
+            Me.SelectedBox.DrawControl(context, spec, Me.ControlCanvas)
 
             .EndDraw()
         End With
@@ -259,6 +262,7 @@ Public Class GameComboBox
         End If
         If Me.SelectedIndex <> -1 Then
             Me.SelectedBox.SetText(Me.SelectionStrings(Me.SelectedIndex), Me.FlyoutControl.TextItemImages(Me.SelectedIndex))
+            RaiseEvent SelectionChanged(Me.SelectedIndex, Me.SelectionStrings(Me.SelectedIndex))
         End If
         Me.CloseSubMenu()
         e.Deliver = False

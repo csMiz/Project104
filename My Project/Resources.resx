@@ -136,4 +136,7 @@
   <data name="AssembleImages" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\assets\assembleimages.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="P104_Font1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\bin\Debug\P104_Font1.ttf;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>

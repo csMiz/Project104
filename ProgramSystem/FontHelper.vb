@@ -13,6 +13,7 @@ Public Class FontHelper
     Public TextRepository As New List(Of List(Of String))
     Public LocaleList As New List(Of String)
     Public LocaleCodeList As New List(Of Byte())
+
     Public FontRepository As New System.Drawing.Text.PrivateFontCollection
     Private FontForGDI As New List(Of System.Drawing.FontFamily)
 

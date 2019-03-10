@@ -8,6 +8,7 @@ Imports SharpDX.Mathematics.Interop
 ''' 遭遇战GameLoop
 ''' </summary>
 Public Class SkirmishGameLoop
+    Implements IStateMachineRecognizable
 
     Private GameLoopStatus As SingleGameLoopStage = SingleGameLoopStage.MyTurnStart
     Private MapLoaded As MapLoadStatus = MapLoadStatus.NotLoaded
@@ -18,8 +19,13 @@ Public Class SkirmishGameLoop
 
     <Obsolete("use SkirmishMap2", True)>
     Public SkirmishGameMap As SkirmishMap = Nothing
+    ''' <summary>
+    ''' 遭遇战地图类
+    ''' </summary>
     Public SkirmishGameMap2 As SkirmishMap2 = Nothing
-
+    ''' <summary>
+    ''' 绑定的观察者类
+    ''' </summary>
     Public BindingCamera As SpectatorCamera
 
     ''' <summary>
@@ -57,7 +63,7 @@ Public Class SkirmishGameLoop
     ''' </summary>
     Private SkirmishGamePhases As New StateMachine
     ''' <summary>
-    ''' 当前阶段
+    ''' 当前全局阶段
     ''' </summary>
     Public SkirmishGlobalStateIndex As SingleGameLoopStage = SingleGameLoopStage.OutOfTurn
 
@@ -150,6 +156,7 @@ Public Class SkirmishGameLoop
         'SkirmishGameMap.ResourcesLoaded = True
         SkirmishGameMap2.ResourcesLoaded = True
         MapLoaded = MapLoadStatus.Loaded
+
     End Sub
 
     Public Async Function WaitForLoad() As Task(Of Integer)
@@ -275,88 +282,204 @@ Public Class SkirmishGameLoop
         Dim turn_start_phase As New StateMachineSingleState
         turn_start_phase.InitializeStateIndex(0)
         Dim turn_start_phase_s = Sub(sender As IStateMachineRecognizable, senderType As StateInputType)
-                                     If senderType Then
-                                         Debug.WriteLine("回合开始阶段")
-                                         turn_start_phase.ToProcess(sender, senderType)
-                                     Else
-                                         turn_start_phase.ToEnd(sender, senderType)
-                                     End If
+                                     Debug.WriteLine("回合开始阶段")
+                                     turn_start_phase.ToProcess(sender, senderType)
                                  End Sub
         Dim turn_start_phase_p = Sub(sender As IStateMachineRecognizable, senderType As StateInputType)
                                      CType(sender, SkirmishGameLoop).ChangeTurn()
                                      turn_start_phase.ToEnd(sender, senderType)
                                  End Sub
         Dim turn_start_phase_e = Sub(sender As IStateMachineRecognizable, senderType As StateInputType)
-                                     If senderType Then
-                                         Dim c_sender As SkirmishGameLoop = CType(sender, SkirmishGameLoop)
-                                         Dim ifWin As Boolean = c_sender.CheckTurnCountWin()
-                                         If ifWin Then
-                                             sender.SetProcessTag(StateMachineSingleProcessStatus.Abort)
-                                         Else
-                                             sender.SetProcessTag(StateMachineSingleProcessStatus.NA)
+                                     ResetUnitStateCounter()    '重置计数器
+                                     '进入准备阶段
+                                     Dim tmpGlobalPhase As StateMachineSingleState = Me.SkirmishGamePhases.NextState(sender.GetState, SkirmishStateMachineInputAlphabet.NormalGo)
+                                     tmpGlobalPhase.Trigger(sender, senderType)
+                                     '从准备阶段开始启动各单位状态机
+                                     For Each tmpUnit As GameUnit In UnitList
+                                         If tmpUnit.Player = 0 Then
+                                             tmpGlobalPhase.Trigger(tmpUnit, StateInputType.SkirmishGameUnit)
                                          End If
-                                         Dim processContent = Async Sub()
-                                                                  Do While (Not c_sender.AllUnitStateComplete())
-                                                                      Await Task.Delay(50)
-                                                                  Loop
-                                                                  c_sender.ResetUnitStateCounter()
-                                                                  Dim tmpGlobalPhase As StateMachineSingleState = Me.SkirmishGamePhases.NextState(sender.GetState, SkirmishStateMachineInputAlphabet.NormalGo)
-                                                                  tmpGlobalPhase.Trigger(sender, senderType)
-                                                                  For Each tmpUnit As GameUnit In c_sender.UnitList
-                                                                      If tmpUnit.Player = 0 Then
-                                                                          Dim tmpPhase As SkirmishPhaseSingleState = Me.SkirmishGamePhases.NextState(tmpUnit.UnitPhase, SkirmishStateMachineInputAlphabet.NormalGo)
-                                                                          tmpPhase.Trigger(tmpUnit)
-                                                                          Await Task.Delay(50)
-                                                                      End If
-                                                                  Next
-                                                              End Sub
-                                         Dim tmpProcess As New Task(processContent)
-                                         tmpProcess.Start()
-                                     Else
-                                         sender.SetProcessTag(StateMachineSingleProcessStatus.NA)
-                                         Me.MarkUnitStateCompleteCounter()
-                                         Debug.WriteLine("已完成:" & CType(sender, GameUnit).ShownName)
-                                     End If
+                                     Next
+
+                                     'If senderType Then
+                                     '    Dim c_sender As SkirmishGameLoop = CType(sender, SkirmishGameLoop)
+                                     '    Dim ifWin As Boolean = c_sender.CheckTurnCountWin()
+                                     '    If ifWin Then
+                                     '        sender.SetProcessTag(StateMachineSingleProcessStatus.Abort)
+                                     '    Else
+                                     '        sender.SetProcessTag(StateMachineSingleProcessStatus.NA)
+                                     '    End If
+                                     '    Dim processContent = Async Sub()
+                                     '                             Do While (Not c_sender.AllUnitStateComplete())
+                                     '                                 Await Task.Delay(50)
+                                     '                             Loop
+                                     '                             c_sender.ResetUnitStateCounter()
+                                     '                             Dim tmpGlobalPhase As StateMachineSingleState = Me.SkirmishGamePhases.NextState(sender.GetState, SkirmishStateMachineInputAlphabet.NormalGo)
+                                     '                             tmpGlobalPhase.Trigger(sender, senderType)
+                                     '                             For Each tmpUnit As GameUnit In c_sender.UnitList
+                                     '                                 If tmpUnit.Player = 0 Then
+                                     '                                     Dim tmpPhase As SkirmishPhaseSingleState = Me.SkirmishGamePhases.NextState(tmpUnit.UnitPhase, SkirmishStateMachineInputAlphabet.NormalGo)
+                                     '                                     tmpPhase.Trigger(tmpUnit)
+                                     '                                     Await Task.Delay(50)
+                                     '                                 End If
+                                     '                             Next
+                                     '                         End Sub
+                                     '    Dim tmpProcess As New Task(processContent)
+                                     '    tmpProcess.Start()
+                                     'Else
+                                     '    sender.SetProcessTag(StateMachineSingleProcessStatus.NA)
+                                     '    Me.MarkUnitStateCompleteCounter()
+                                     '    Debug.WriteLine("已完成:" & CType(sender, GameUnit).ShownName)
+                                     'End If
                                  End Sub
         AddHandler turn_start_phase.StateStart, turn_start_phase_s
         AddHandler turn_start_phase.StateProcess, turn_start_phase_p
         AddHandler turn_start_phase.StateEnd, turn_start_phase_e
 
-        'HACK: Rewrite those states
         '准备阶段
-        Dim prepare_phase As New SkirmishPreparePhase
-        With prepare_phase
-            .InitializeStateIndex(1)
-        End With
-        AddHandler prepare_phase.UnitStateComplete, AddressOf UnitGoNextState1
-        AddHandler prepare_phase.GlobalStateComplete, AddressOf GlobalGoNextState1
+        Dim prepare_phase As New StateMachineSingleState
+        prepare_phase.InitializeStateIndex(1)
+        Dim prepare_phase_s = Sub(sender As IStateMachineRecognizable, senderType As StateInputType)
+                                  If senderType = StateInputType.SkirmishGameLoop Then
+                                      Debug.WriteLine("准备阶段")
+                                  End If
+                                  prepare_phase.ToProcess(sender, senderType)
+                              End Sub
+        Dim prepare_phase_p = Sub(sender As IStateMachineRecognizable, senderType As StateInputType)
+                                  If senderType Then    '全局
+                                      'TODO: 资源变动
 
+                                      '等待各单位执行完
+                                      Dim tmpGameLoop As SkirmishGameLoop = CType(sender, SkirmishGameLoop)
+                                      If tmpGameLoop.AllUnitStateComplete Then
+                                          prepare_phase.ToEnd(sender, senderType)
+                                      Else
+                                          sender.SetProcessTag(StateMachineSingleProcessStatus.Suspended)
+                                      End If
+                                  Else    '单位
+                                      'TODO: 检查效果队列
+
+                                      'TODO: 检查成就等
+
+                                      '重置单位行动状态
+                                      CType(sender, GameUnit).ResetUnitStatus(UnitStatus.Waiting, 1, 1)
+                                      prepare_phase.ToEnd(sender, senderType)
+                                  End If
+                              End Sub
+        Dim prepare_phase_e = Sub(sender As IStateMachineRecognizable, senderType As StateInputType)
+                                  If senderType Then    '全局
+                                      ResetUnitStateCounter()    '重置计数器
+                                      '进入主要阶段1
+                                      Dim tmpGlobalPhase As StateMachineSingleState = Me.SkirmishGamePhases.NextState(sender.GetState, SkirmishStateMachineInputAlphabet.NormalGo)
+                                      tmpGlobalPhase.Trigger(sender, senderType)
+                                      For Each tmpUnit As GameUnit In UnitList
+                                          If tmpUnit.Player = 0 Then
+                                              tmpGlobalPhase.Trigger(tmpUnit, StateInputType.SkirmishGameUnit)
+                                          End If
+                                      Next
+                                  Else    '单位
+                                      MarkUnitStateCompleteCounter()
+                                      prepare_phase.TryResume(Me, StateInputType.SkirmishGameLoop)
+                                  End If
+                              End Sub
+        Dim prepare_phase_r = Sub(sender As IStateMachineRecognizable, senderType As StateInputType)
+                                  prepare_phase.ToProcess(sender, senderType)
+                              End Sub
+        AddHandler prepare_phase.StateStart, prepare_phase_s
+        AddHandler prepare_phase.StateProcess, prepare_phase_p
+        AddHandler prepare_phase.StateEnd, prepare_phase_e
+        AddHandler prepare_phase.StateResume, prepare_phase_r
+
+        'HACK: Rewrite those states
         '主要阶段1
-        Dim main_a_phase As New SkirmishMainAPhase
-        With main_a_phase
-            .InitializeStateIndex(2)
-        End With
-        AddHandler main_a_phase.UnitStateComplete, AddressOf UnitGoNextState2
-        AddHandler main_a_phase.GlobalStateComplete, AddressOf GlobalGoNextState2
+        Dim main_a_phase As New StateMachineSingleState
+        main_a_phase.InitializeStateIndex(2)
+        Dim main_a_phase_s = Sub(sender As IStateMachineRecognizable, senderType As StateInputType)
+                                 If senderType = StateInputType.SkirmishGameLoop Then
+                                     Debug.WriteLine("主要阶段1")
+                                 End If
+                                 main_a_phase.ToProcess(sender, senderType)
+                             End Sub
+        Dim main_a_phase_p = Sub(sender As IStateMachineRecognizable, senderType As StateInputType)
+                                 If senderType Then    '全局
+                                     '等待玩家操作
+                                     Dim tmpGameLoop As SkirmishGameLoop = CType(sender, SkirmishGameLoop)
+                                     If tmpGameLoop.AllUnitStateComplete Then
+                                         main_a_phase.ToEnd(sender, senderType)
+                                     Else
+                                         sender.SetProcessTag(StateMachineSingleProcessStatus.Suspended)
+                                     End If
+                                 Else    '单位
+                                     '等待玩家操作
+                                     Dim tmpUnit As GameUnit = CType(sender, GameUnit)
+                                     If tmpUnit.AllActionDone Then
+                                         main_a_phase.ToEnd(sender, senderType)
+                                     Else
+                                         sender.SetProcessTag(StateMachineSingleProcessStatus.Suspended)
+                                     End If
+                                 End If
+                             End Sub
+        Dim main_a_phase_e = Sub(sender As IStateMachineRecognizable, senderType As StateInputType)
+                                 If senderType Then    '全局
+                                     '进入主要阶段2
+                                     Dim tmpGlobalPhase As StateMachineSingleState = Me.SkirmishGamePhases.NextState(sender.GetState, SkirmishStateMachineInputAlphabet.NormalGo)
+                                     tmpGlobalPhase.Trigger(sender, senderType)
+                                 Else    '单位
+                                     Dim tmpNextPhase As StateMachineSingleState = Me.SkirmishGamePhases.NextState(sender.GetState, SkirmishStateMachineInputAlphabet.NormalGo)
+                                     tmpNextPhase.Trigger(sender, senderType)
+                                 End If
+                             End Sub
+        Dim main_a_phase_r = Sub(sender As IStateMachineRecognizable, senderType As StateInputType)
+                                 main_a_phase.ToProcess(sender, senderType)
+                             End Sub
+        AddHandler main_a_phase.StateStart, main_a_phase_s
+        AddHandler main_a_phase.StateProcess, main_a_phase_p
+        AddHandler main_a_phase.StateEnd, main_a_phase_e
+        AddHandler main_a_phase.StateResume, main_a_phase_r
 
         '主要阶段2
-        Dim main_b_phase As New SkirmishMainBPhase
-        With main_b_phase
-            .InitializeStateIndex(3)
-        End With
-        AddHandler main_b_phase.UnitStateComplete, AddressOf UnitGoNextState2
-        AddHandler main_b_phase.GlobalStateComplete, AddressOf GlobalGoNextState2
+        Dim main_b_phase As New StateMachineSingleState
+        main_b_phase.InitializeStateIndex(3)
+        Dim main_b_phase_s = Sub(sender As IStateMachineRecognizable, senderType As StateInputType)
+                                 If senderType = StateInputType.SkirmishGameLoop Then
+                                     Debug.WriteLine("主要阶段2")
+                                 End If
+                                 main_b_phase.ToProcess(sender, senderType)
+                             End Sub
+        Dim main_b_phase_p = Sub(sender As IStateMachineRecognizable, senderType As StateInputType)
+                                 If senderType Then    '全局
+                                     ResetUnitStateCounter()
+
+                                 Else    '单位
+                                     MarkUnitStateCompleteCounter()
+                                 End If
+
+                                 main_b_phase.ToEnd(sender, senderType)
+                             End Sub
+        Dim main_b_phase_e = Sub(sender As IStateMachineRecognizable, senderType As StateInputType)
+                                 If senderType Then    '全局
+                                     '进入回合结束阶段
+                                     Dim tmpGlobalPhase As StateMachineSingleState = Me.SkirmishGamePhases.NextState(sender.GetState, SkirmishStateMachineInputAlphabet.NormalGo)
+                                     tmpGlobalPhase.Trigger(sender, senderType)
+
+                                 Else    '单位
+                                     sender.SetState(SingleGameLoopStage.OutOfTurn)
+
+                                 End If
+                             End Sub
+        AddHandler main_b_phase.StateStart, main_b_phase_s
+        AddHandler main_b_phase.StateProcess, main_b_phase_p
+        AddHandler main_b_phase.StateEnd, main_b_phase_e
+
 
         '回合结束阶段
-        Dim turn_end_phase As New SkirmishTurnEndPhase
+        Dim turn_end_phase As New StateMachineSingleState
         With turn_end_phase
             .InitializeStateIndex(4)
         End With
-        AddHandler turn_end_phase.UnitStateComplete, AddressOf UnitGoNextState1
-        AddHandler turn_end_phase.GlobalStateComplete, AddressOf GlobalGoNextState1
 
         '回合外阶段
-        Dim out_of_turn_phase As New SkirmishOutOfTurnPhase
+        Dim out_of_turn_phase As New StateMachineSingleState
         With out_of_turn_phase
             .InitializeStateIndex(5)
         End With
@@ -384,57 +507,15 @@ Public Class SkirmishGameLoop
         Me.ResetUnitStateCounter()
 
         '全局状态进入回合开始阶段
-        Dim tmpGlobalPhase As SkirmishPhaseSingleState = Me.SkirmishGamePhases.NextState(Me.SkirmishGlobalStateIndex, SkirmishStateMachineInputAlphabet.NormalGo)
-        tmpGlobalPhase.Trigger(Me)
-        '每个单位状态进入回合开始阶段
-        For Each tmpUnit As GameUnit In UnitList
-            If tmpUnit.Player = 0 Then
-                Dim tmpPhase As SkirmishPhaseSingleState = Me.SkirmishGamePhases.NextState(tmpUnit.UnitPhase, SkirmishStateMachineInputAlphabet.NormalGo)
-                tmpPhase.Trigger(tmpUnit)
-            End If
-        Next
+        Dim tmpGlobalPhase As StateMachineSingleState = Me.SkirmishGamePhases.NextState(Me.SkirmishGlobalStateIndex, SkirmishStateMachineInputAlphabet.NormalGo)
+        tmpGlobalPhase.Trigger(Me, StateInputType.SkirmishGameLoop)
 
     End Sub
 
     ''' <summary>
-    ''' 用于回合开始阶段，准备阶段和回合结束阶段。全局状态需要与单位状态同步。
+    ''' 设置当前回合数
     ''' </summary>
-    Public Sub UnitGoNextState1(sender As GameUnit)
-        Me.MarkUnitStateCompleteCounter()
-        Debug.WriteLine("已完成:" & sender.ShownName)
-    End Sub
-    Public Sub GlobalGoNextState1(sender As SkirmishGameLoop)
-        Dim processContent = Async Sub()
-                                 Do While (Not Me.AllUnitStateComplete())
-                                     Await Task.Delay(50)
-                                 Loop
-                                 Me.ResetUnitStateCounter()
-
-                                 Dim tmpGlobalPhase As SkirmishPhaseSingleState = Me.SkirmishGamePhases.NextState(sender.SkirmishGlobalStateIndex, SkirmishStateMachineInputAlphabet.NormalGo)
-                                 tmpGlobalPhase.Trigger(sender)
-                                 For Each tmpUnit As GameUnit In sender.UnitList
-                                     If tmpUnit.Player = 0 Then
-                                         Dim tmpPhase As SkirmishPhaseSingleState = Me.SkirmishGamePhases.NextState(tmpUnit.UnitPhase, SkirmishStateMachineInputAlphabet.NormalGo)
-                                         tmpPhase.Trigger(tmpUnit)
-                                         Await Task.Delay(50)
-                                     End If
-                                 Next
-
-                             End Sub
-        Dim tmpProcess As New Task(processContent)
-        tmpProcess.Start()
-    End Sub
-
-    ''' <summary>
-    ''' 用于主要阶段。全局状态停留在主要阶段1直到所有单位完成行动。
-    ''' </summary>
-    Public Sub UnitGoNextState2(sender As GameUnit)
-        Throw New NotImplementedException()
-    End Sub
-    Public Sub GlobalGoNextState2(sender As SkirmishGameLoop)
-        Throw New NotImplementedException()
-    End Sub
-
+    ''' <param name="delta">改变值，默认+1</param>
     Public Sub ChangeTurn(Optional delta As Integer = 1)
         Me.NowTurn.SetValue(Me.NowTurn.GetValue + delta, LogSenderType.Change_Program)
     End Sub
@@ -581,9 +662,8 @@ Public Class SkirmishGameLoop
     ''' 将鼠标点击位置（绘图位置）直接转换为坐标
     ''' </summary>
     ''' <param name="mouse"></param>
-    ''' <returns></returns>
+    <Obsolete>
     Public Function DrawPositionToChessboard(mouse As PointI) As PointI
-        'FIXME:
         'Dim worldPos As PointF2 = ConvertToWorldCursor(mouse)
         'Dim estimateX As Integer = Math.Floor((worldPos.X - SIX_TWO_FIVE) / THREE_SEVEN_FIVE)
         'Dim estimateY As Integer = Math.Floor((worldPos.Y - SIX_TWO_FIVE_ROOT3) / TWO_FIFTY_ROOT3)
@@ -634,7 +714,6 @@ Public Class SkirmishGameLoop
 
     Public Sub GameBoardMouseMove(e As GameMouseEventArgs)
 
-        'Debug.WriteLine(e.X & "-" & e.Y)
         Dim hr As PointF2 = BindingCamera.Camera3D.BindingHalfResolve
         BindingCamera.Camera3D.ScreenCursorOffset.X = (e.X - hr.X) / hr.X
         BindingCamera.Camera3D.ScreenCursorOffset.Y = -(e.Y - hr.Y) / hr.Y
@@ -672,6 +751,21 @@ Public Class SkirmishGameLoop
 
     End Sub
 
+    Public Sub SetState(value As Short) Implements IStateMachineRecognizable.SetState
+        Me.SkirmishGlobalStateIndex = value
+    End Sub
+
+    Public Function GetState() As Short Implements IStateMachineRecognizable.GetState
+        Return Me.SkirmishGlobalStateIndex
+    End Function
+
+    Public Sub SetProcessTag(value As StateMachineSingleProcessStatus) Implements IStateMachineRecognizable.SetProcessTag
+        Me.SkirmishGlobalStateStatus = value
+    End Sub
+
+    Public Function GetProcessTag() As StateMachineSingleProcessStatus Implements IStateMachineRecognizable.GetProcessTag
+        Return Me.SkirmishGlobalStateStatus
+    End Function
 End Class
 
 ''' <summary>
@@ -691,7 +785,7 @@ Public Enum SingleGameLoopStage As Byte
     ''' </summary>
     MainA = 2
     '''' <summary>
-    '''' 战斗阶段
+    '''' 战斗阶段，已整合到MainA中
     '''' </summary>
     'Battle = 3
     ''' <summary>
@@ -714,13 +808,6 @@ Public Enum MapLoadStatus As Byte
     Loaded = 2
 End Enum
 
-Public Enum SkirmishStateMachineRecognizableInfo As Integer
-    Player = 0
-    SingleUnit = 1
-
-End Enum
-
-
 Public Enum SkirmishStateMachineInputAlphabet As Byte
     NormalGo = 0
     GoBackOne = 1
@@ -733,326 +820,3 @@ Public Enum StateInputType As Byte
     SkirmishGameUnit = 0
     SkirmishGameLoop = 1
 End Enum
-
-
-''' <summary>
-''' 遭遇战阶段类，继承状态机单个状态类
-''' </summary>
-Public MustInherit Class SkirmishPhaseSingleState
-    Inherits StateMachineSingleState
-
-    Public Event UnitStateComplete(sender As GameUnit)
-    Public Event GlobalStateComplete(sender As SkirmishGameLoop)
-    Public Event StateProcessAbort()
-
-    ''' <summary>
-    ''' 开始执行
-    ''' </summary>
-    Public Overloads Sub Trigger(sender As GameUnit)
-        sender.UnitPhase = Me.StateIndex
-        sender.UnitPhaseStatus = StateMachineSingleProcessStatus.Starting
-        Me.StateStart(sender, sender.UnitPhaseStatus)
-        If sender.UnitPhaseStatus = StateMachineSingleProcessStatus.Normal Then Me.StateProcess(sender, sender.UnitPhaseStatus)
-        If sender.UnitPhaseStatus = StateMachineSingleProcessStatus.Suspended Then Return
-        Me.StateEnd(sender, sender.UnitPhaseStatus)
-        If sender.UnitPhaseStatus = StateMachineSingleProcessStatus.NA Then
-            RaiseEvent UnitStateComplete(sender)
-        ElseIf sender.UnitPhaseStatus = StateMachineSingleProcessStatus.Abort Then
-            RaiseEvent StateProcessAbort()
-        End If
-
-    End Sub
-    ''' <summary>
-    ''' 开始执行
-    ''' </summary>
-    Public Overloads Sub Trigger(sender As SkirmishGameLoop)
-        sender.SkirmishGlobalStateIndex = Me.StateIndex
-        sender.SkirmishGlobalStateStatus = StateMachineSingleProcessStatus.Starting
-        Me.StateStart(sender, sender.SkirmishGlobalStateStatus)
-        If sender.SkirmishGlobalStateStatus = StateMachineSingleProcessStatus.Normal Then Me.StateProcess(sender, sender.SkirmishGlobalStateStatus)
-        If sender.SkirmishGlobalStateStatus = StateMachineSingleProcessStatus.Suspended Then Return
-        Me.StateEnd(sender, sender.SkirmishGlobalStateStatus)
-        If sender.SkirmishGlobalStateStatus = StateMachineSingleProcessStatus.NA Then
-            RaiseEvent GlobalStateComplete(sender)
-        ElseIf sender.SkirmishGlobalStateStatus = StateMachineSingleProcessStatus.Abort Then
-            RaiseEvent StateProcessAbort()
-        End If
-
-    End Sub
-    ''' <summary>
-    ''' 状态恢复为Normal后尝试重新启动
-    ''' </summary>
-    Public Overloads Sub TryResumeProcess(sender As GameUnit)
-        If sender.UnitPhaseStatus = StateMachineSingleProcessStatus.Normal Then
-            Me.StateProcess(sender, sender.UnitPhaseStatus)
-            If sender.UnitPhaseStatus = StateMachineSingleProcessStatus.Suspended Then Return
-            Me.StateEnd(sender, sender.UnitPhaseStatus)
-            If sender.UnitPhaseStatus = StateMachineSingleProcessStatus.NA Then
-                RaiseEvent UnitStateComplete(sender)
-            ElseIf sender.UnitPhaseStatus = StateMachineSingleProcessStatus.Abort Then
-                RaiseEvent StateProcessAbort()
-            End If
-
-        End If
-    End Sub
-    ''' <summary>
-    ''' 状态恢复为Normal后尝试重新启动
-    ''' </summary>
-    Public Overloads Sub TryResumeProcess(sender As SkirmishGameLoop)
-        If sender.SkirmishGlobalStateStatus = StateMachineSingleProcessStatus.Normal Then
-            Me.StateProcess(sender, sender.SkirmishGlobalStateStatus)
-            If sender.SkirmishGlobalStateStatus = StateMachineSingleProcessStatus.Suspended Then Return
-            Me.StateEnd(sender, sender.SkirmishGlobalStateStatus)
-            If sender.SkirmishGlobalStateStatus = StateMachineSingleProcessStatus.NA Then
-                RaiseEvent GlobalStateComplete(sender)
-            ElseIf sender.SkirmishGlobalStateStatus = StateMachineSingleProcessStatus.Abort Then
-                RaiseEvent StateProcessAbort()
-            End If
-        End If
-    End Sub
-
-    Public MustOverride Overloads Sub StateStart(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-    Public MustOverride Overloads Sub StateStart(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-    Public MustOverride Overloads Sub StateProcess(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-    Public MustOverride Overloads Sub StateProcess(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-    Public MustOverride Overloads Sub StateEnd(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-    Public MustOverride Overloads Sub StateEnd(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-
-End Class
-
-''' <summary>
-''' 遭遇战回合开始阶段类
-''' </summary>
-Public Class SkirmishTurnStartPhase
-    Inherits SkirmishPhaseSingleState
-
-    Public Overrides Sub StateStart(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        status = StateMachineSingleProcessStatus.Ending
-    End Sub
-
-    Public Overrides Sub StateStart(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        Debug.WriteLine("回合开始阶段")
-        status = StateMachineSingleProcessStatus.Normal
-    End Sub
-
-    Public Overrides Sub StateProcess(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-    End Sub
-
-    Public Overrides Sub StateProcess(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        sender.ChangeTurn()
-    End Sub
-
-    Public Overrides Sub StateEnd(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        status = StateMachineSingleProcessStatus.NA
-    End Sub
-
-    Public Overrides Sub StateEnd(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        Dim ifWin As Boolean = sender.CheckTurnCountWin()
-        If ifWin Then
-            status = StateMachineSingleProcessStatus.Abort
-        Else
-            status = StateMachineSingleProcessStatus.NA
-        End If
-    End Sub
-End Class
-
-''' <summary>
-''' 遭遇战准备阶段类
-''' </summary>
-Public Class SkirmishPreparePhase
-    Inherits SkirmishPhaseSingleState
-
-    Public Overrides Sub StateStart(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        status = StateMachineSingleProcessStatus.Normal
-    End Sub
-
-    Public Overrides Sub StateStart(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        Debug.WriteLine("准备阶段")
-        status = StateMachineSingleProcessStatus.Normal
-    End Sub
-
-    Public Overrides Sub StateProcess(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        If sender.Status = UnitStatus.OutOfTurn Then
-            sender.ResetUnitStatus(UnitStatus.Waiting, 1, 1)
-        End If
-    End Sub
-
-    Public Overrides Sub StateProcess(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-    End Sub
-
-    Public Overrides Sub StateEnd(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        status = StateMachineSingleProcessStatus.NA
-    End Sub
-
-    Public Overrides Sub StateEnd(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        status = StateMachineSingleProcessStatus.NA
-    End Sub
-End Class
-
-''' <summary>
-''' 遭遇战主要阶段1类
-''' </summary>
-Public Class SkirmishMainAPhase
-    Inherits SkirmishPhaseSingleState
-
-    Public Overrides Sub StateStart(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        status = StateMachineSingleProcessStatus.Normal
-    End Sub
-
-    Public Overrides Sub StateStart(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        Debug.WriteLine("主要阶段1")
-        status = StateMachineSingleProcessStatus.Normal
-    End Sub
-
-    Public Overrides Sub StateProcess(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        '暂停状态以等待用户操作
-        If Not sender.AllActionDone() Then
-            status = StateMachineSingleProcessStatus.Suspended
-            Return
-        End If
-        '已完成行动，进入主要阶段2
-        status = StateMachineSingleProcessStatus.Ending
-    End Sub
-
-
-    Public Overrides Sub StateProcess(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        If Not sender.AllUnitStateComplete Then
-            status = StateMachineSingleProcessStatus.Suspended
-            Return
-        End If
-        status = StateMachineSingleProcessStatus.Ending
-    End Sub
-
-    Public Overrides Sub StateEnd(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        status = StateMachineSingleProcessStatus.NA
-    End Sub
-
-    Public Overrides Sub StateEnd(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        status = StateMachineSingleProcessStatus.NA
-    End Sub
-End Class
-
-''' <summary>
-''' 遭遇战战斗阶段类
-''' </summary>
-<Obsolete("取消战斗阶段，命令均在主要阶段1进行，完成后进入主要阶段2", True)>
-Public Class SkirmishBattlePhase
-    Inherits SkirmishPhaseSingleState
-
-    Public Overrides Sub StateStart(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateStart(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateProcess(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateProcess(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateEnd(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateEnd(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-End Class
-
-''' <summary>
-''' 遭遇战主要阶段2类
-''' </summary>
-Public Class SkirmishMainBPhase
-    Inherits SkirmishPhaseSingleState
-
-    Public Overrides Sub StateStart(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateStart(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateProcess(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateProcess(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateEnd(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateEnd(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-End Class
-
-''' <summary>
-''' 遭遇战回合结束阶段类
-''' </summary>
-Public Class SkirmishTurnEndPhase
-    Inherits SkirmishPhaseSingleState
-
-    Public Overrides Sub StateStart(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateStart(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateProcess(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateProcess(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateEnd(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateEnd(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-End Class
-
-''' <summary>
-''' 遭遇战回合外阶段类
-''' </summary>
-Public Class SkirmishOutOfTurnPhase
-    Inherits SkirmishPhaseSingleState
-
-    Public Overrides Sub StateStart(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateStart(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateProcess(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateProcess(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateEnd(sender As GameUnit, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-
-    Public Overrides Sub StateEnd(sender As SkirmishGameLoop, ByRef status As StateMachineSingleProcessStatus)
-        Throw New NotImplementedException()
-    End Sub
-End Class

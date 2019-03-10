@@ -266,6 +266,7 @@ Public Class GameScrollViewer
                 '预画子控件
                 For i = 0 To RenderingItems.Count - 1
                     Dim item As GameBasicUIElement = Me.RenderingItems(i)
+                    item.NeedRepaint = True    '暂无优化，总是刷新画布
                     item.TriggerDrawSelfCanvas(context, spec, Me.ControlCanvas)
                 Next
                 '切换context.target
@@ -274,7 +275,7 @@ Public Class GameScrollViewer
                 '清空画布
                 .Clear(Nothing)
                 '画背景
-                .FillRectangle(Me.SelfCanvasRect, BLACK_COLOUR_BRUSH(0))
+                .FillRectangle(Me.SelfCanvasRect, Me.DefaultBackground)
                 '画子控件
                 For i = 0 To RenderingItems.Count - 1
                     Dim item As GameBasicUIElement = Me.RenderingItems(i)

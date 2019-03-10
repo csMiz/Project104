@@ -18,6 +18,10 @@ Public Class StateMachine
         Return Me.States(nextStateIndex)
     End Function
 
+    Public Overridable Function GetState(stateIndex As Short) As StateMachineSingleState
+        Return Me.States(stateIndex)
+    End Function
+
 End Class
 
 ''' <summary>
@@ -29,6 +33,7 @@ Public Class StateMachineSingleState
     Public Event StateStart(sender As IStateMachineRecognizable, senderType As Byte)
     Public Event StateProcess(sender As IStateMachineRecognizable, senderType As Byte)
     Public Event StateEnd(sender As IStateMachineRecognizable, senderType As Byte)
+    Public Event StateResume(sender As IStateMachineRecognizable, senderType As Byte)
     Public Event StateProcessAbort()
 
     Public Sub InitializeStateIndex(index As Short)
@@ -49,10 +54,14 @@ Public Class StateMachineSingleState
     Public Sub ToProcess(sender As IStateMachineRecognizable, senderType As Byte)
         RaiseEvent StateProcess(sender, senderType)
     End Sub
+
     Public Sub ToEnd(sender As IStateMachineRecognizable, senderType As Byte)
         RaiseEvent StateEnd(sender, senderType)
     End Sub
 
+    Public Sub TryResume(sender As IStateMachineRecognizable, senderType As Byte)
+        RaiseEvent StateResume(sender, senderType)
+    End Sub
 
 End Class
 

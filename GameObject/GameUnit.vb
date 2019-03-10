@@ -5,6 +5,8 @@ Imports p104
 ''' 行动单位类
 ''' </summary>
 Public Class GameUnit
+    Implements IStateMachineRecognizable
+
     ''' <summary>
     ''' 一场游戏内单位唯一id，游戏外则为-1
     ''' </summary>
@@ -82,7 +84,7 @@ Public Class GameUnit
     ''' </summary>
     Public SpiritStatus As TachieStatus = TachieStatus.Fine
     ''' <summary>
-    ''' 状态
+    ''' 单位行动状态
     ''' </summary>
     Public Status As UnitStatus
     ''' <summary>
@@ -241,6 +243,21 @@ Public Class GameUnit
 
     End Function
 
+    Public Sub SetState(value As Short) Implements IStateMachineRecognizable.SetState
+        Me.UnitPhase = value
+    End Sub
+
+    Public Function GetState() As Short Implements IStateMachineRecognizable.GetState
+        Return Me.UnitPhase
+    End Function
+
+    Public Sub SetProcessTag(value As StateMachineSingleProcessStatus) Implements IStateMachineRecognizable.SetProcessTag
+        Me.UnitPhaseStatus = value
+    End Sub
+
+    Public Function GetProcessTag() As StateMachineSingleProcessStatus Implements IStateMachineRecognizable.GetProcessTag
+        Return Me.UnitPhaseStatus
+    End Function
 End Class
 
 Public Enum UnitMoveMentType As Byte

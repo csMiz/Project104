@@ -144,6 +144,7 @@ Public Class GameTextBox
         Dim relativeCursorX As Single = e.X - Me.AbsoluteRect.Left
         Dim relativeCursorY As Single = e.Y - Me.AbsoluteRect.Top
         Dim position As New RawVector2(relativeCursorX, relativeCursorY)
+
         Me.ContentLightBrush.Center = position
         Me.BorderLightBrush.Center = position
     End Sub

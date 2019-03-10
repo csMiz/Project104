@@ -26,11 +26,11 @@ p104
 <summary>
   查找类似 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
 &lt;content&gt;
-  &lt;h id=&quot;0&quot; template=&quot;0&quot;&gt;
+  &lt;h id=&quot;0&quot; template=&quot;0&quot; chessImage=&quot;0&quot;&gt;
     &lt;level value=&quot;1&quot; /&gt;
     &lt;lock value=&quot;Unlocked&quot; /&gt;
   &lt;/h&gt;
-  &lt;h id=&quot;1&quot; template=&quot;1&quot; &gt;
+  &lt;h id=&quot;1&quot; template=&quot;1&quot; chessImage=&quot;0&quot;&gt;
     &lt;level value=&quot;1&quot; /&gt;
     &lt;lock value=&quot;Unlocked&quot; /&gt;
   &lt;/h&gt;
@@ -41,8 +41,8 @@ p104
 <summary>
   查找类似 &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
 &lt;content&gt;
-  &lt;static id=&quot;0&quot; group=&quot;skirmish_chess&quot; domain=&quot;fine&quot; &gt;
-    &lt;fragment id=&quot;0&quot; from=&quot;skirmish_unit&quot; pos=&quot;0,0&quot; size=&quot;-1,-1&quot;/&gt;
+  &lt;static id=&quot;0&quot; type=&quot;three&quot; group=&quot;skirmish_chess&quot; domain=&quot;fine&quot; size=&quot;200,200&quot;&gt;
+    &lt;fragment id=&quot;0&quot; from=&quot;skirmish_unit&quot; pos=&quot;0,0&quot; size=&quot;200,200&quot;/&gt;
   &lt;/static&gt;
 &lt;/content&gt; 的本地化字符串。
 </summary>
@@ -90,6 +90,11 @@ p104
         &lt;loseevent name=&quot;Clean&quot; value=&quot;0&quot;/&gt;
         &lt;loseevent name=&quot;Turn&quot; value=&quot;20&quot; /&gt;
       &lt;/l [字符串的其余部分被截断]&quot;; 的本地化字符串。
+</summary>
+</member>
+<member name="P:p104.My.Resources.Resources.P104_Font1">
+<summary>
+  查找 System.Byte[] 类型的本地化资源。
 </summary>
 </member>
 <member name="P:p104.My.Resources.Resources.Skill">
@@ -301,7 +306,7 @@ p104
 </member>
 <member name="F:p104.GameUnit.Status">
  <summary>
- 状态
+ 单位行动状态
  </summary>
 </member>
 <member name="F:p104.GameUnit.UnitPhase">
@@ -974,6 +979,16 @@ p104
  <param name="useDirectWrite">是否使用DW直接绘制</param>
  <param name="DWFontSize">使用DW时的字号</param>
 </member>
+<member name="T:p104.TerminalDialog">
+ <summary>
+ 控制台控件类
+ </summary>
+</member>
+<member name="F:p104.TerminalDialog.BindingTerminal">
+ <summary>
+ 绑定的控制台组件
+ </summary>
+</member>
 <member name="T:p104.UnitDetailDialog">
  <summary>
  Skirmish模式下的单位详细信息面板类
@@ -1248,6 +1263,127 @@ p104
  </summary>
  <param name="source">多语言文本源，需要注意文字编码和换行符的问题</param>
 </member>
+<member name="T:p104.FontHelper2">
+ <summary>
+ 使用DirectWrite的字体助手类ver.2
+ </summary>
+</member>
+<member name="T:p104.CustomFontLoader">
+ <summary>
+ Revised from Sharpdx-sample
+ </summary>
+</member>
+<member name="M:p104.CustomFontLoader.#ctor(SharpDX.DirectWrite.Factory)">
+ <summary>
+ Initializes a New instance of the <see cref="T:p104.CustomFontLoader"/> class.
+ </summary>
+ <param name="factory">The factory.</param>
+</member>
+<member name="P:p104.CustomFontLoader.Key">
+ <summary>
+ Gets the key used to identify the FontCollection as well as storing index for fonts.
+ </summary>
+ <value>The key.</value>
+</member>
+<member name="M:p104.CustomFontLoader.CreateEnumeratorFromKey(SharpDX.DirectWrite.Factory,SharpDX.DataPointer)">
+ <summary>
+ Creates a font file enumerator object that encapsulates a collection of font files. The font system calls back to this interface to create a font collection.
+ </summary>
+ <param name="factory">Pointer to the <see cref="T:SharpDX.DirectWrite.Factory"/> object that was used to create the current font collection.</param>
+ <param name="collectionKey">A font collection key that uniquely identifies the collection of font files within the scope of the font collection loader being used. The buffer allocated for this key must be at least  the size, in bytes, specified by collectionKeySize.</param>
+ <returns>
+ a reference to the newly created font file enumerator.
+ </returns>
+ <unmanaged>HRESULT IDWriteFontCollectionLoader:CreateEnumeratorFromKey([None] IDWriteFactory* factory,[In, Buffer] const void* collectionKey,[None] int collectionKeySize,[Out] IDWriteFontFileEnumerator** fontFileEnumerator)</unmanaged>
+</member>
+<member name="M:p104.CustomFontLoader.CreateStreamFromKey(SharpDX.DataPointer)">
+ <summary>
+ Creates a font file stream object that encapsulates an open file resource.
+ </summary>
+ <param name="fontFileReferenceKey">A reference to a font file reference key that uniquely identifies the font file resource within the scope of the font loader being used. The buffer allocated for this key must at least be the size, in bytes, specified by  fontFileReferenceKeySize.</param>
+ <returns>
+ a reference to the newly created <see cref="T:SharpDX.DirectWrite.FontFileStream"/> object.
+ </returns>
+ <remarks>
+ The resource Is closed when the last reference to fontFileStream Is released.
+ </remarks>
+ <unmanaged>HRESULT IDWriteFontFileLoader:CreateStreamFromKey([In, Buffer] const void* fontFileReferenceKey,[None] int fontFileReferenceKeySize,[Out] IDWriteFontFileStream** fontFileStream)</unmanaged>
+</member>
+<member name="T:p104.CustomFontFileStream">
+ <summary>
+ Revised from Sharpdx-sample
+ </summary>
+</member>
+<member name="F:p104.CustomFontFileStream.ref_mark">
+ <summary>
+ 不知道Sharpdx出了什么问题，总之标记一下不让此对象莫名其妙被清空
+ <para>错误代码见 https://github.com/sharpdx/SharpDX/blob/master/Source/SharpDX/CallbackBase.cs </para>
+ </summary>
+</member>
+<member name="M:p104.CustomFontFileStream.ReadFileFragment(System.IntPtr@,System.Int64,System.Int64,System.IntPtr@)">
+ <summary>
+ Reads a fragment from a font file.
+ </summary>
+ <param name="fragmentStart">When this method returns, contains an address of a  reference to the start of the font file fragment.  This parameter Is passed uninitialized.</param>
+ <param name="fileOffset">The offset of the fragment, in bytes, from the beginning of the font file.</param>
+ <param name="fragmentSize">The size of the file fragment, in bytes.</param>
+ <param name="fragmentContext">When this method returns, contains the address of</param>
+ <remarks>
+ Note that ReadFileFragment implementations must check whether the requested font file fragment Is within the file bounds. Otherwise, an error should be returned from ReadFileFragment.   {{DirectWrite}} may invoke <see cref="T:SharpDX.DirectWrite.FontFileStream"/> methods on the same object from multiple threads simultaneously. Therefore, ReadFileFragment implementations that rely on internal mutable state must serialize access to such state across multiple threads. For example, an implementation that uses separate Seek And Read operations to read a file fragment must place the code block containing Seek And Read calls under a lock Or a critical section.
+ </remarks>
+ <unmanaged>HRESULT IDWriteFontFileStream:ReadFileFragment([Out, Buffer] Const void** fragmentStart, [None] __int64 fileOffset, [None] __int64 fragmentSize, [Out] void** fragmentContext)</unmanaged>
+</member>
+<member name="M:p104.CustomFontFileStream.ReleaseFileFragment(System.IntPtr)">
+ <summary>
+ Releases a fragment from a file.
+ </summary>
+ <param name="fragmentContext">A reference to the client-defined context of a font fragment returned from {{ReadFileFragment}}.</param>
+ <unmanaged>void IDWriteFontFileStream:ReleaseFileFragment([None] void* fragmentContext)</unmanaged>
+</member>
+<member name="M:p104.CustomFontFileStream.GetFileSize">
+ <summary>
+ Obtains the total size of a file.
+ </summary>
+ <returns>the total size of the file.</returns>
+ <remarks>
+ Implementing GetFileSize() for asynchronously loaded font files may require downloading the complete file contents. Therefore, this method should be used only for operations that either require a complete font file to be loaded (for example, copying a font file) Or that need to make decisions based on the value of the file size (for example, validation against a persisted file size).
+ </remarks>
+ <unmanaged>HRESULT IDWriteFontFileStream:GetFileSize([Out] __int64* fileSize)</unmanaged>
+</member>
+<member name="M:p104.CustomFontFileStream.GetLastWriteTime">
+ <summary>
+ Obtains the last modified time of the file.
+ </summary>
+ <returns>
+ the last modified time of the file in the format that represents the number of 100-nanosecond intervals since January 1, 1601 (UTC).
+ </returns>
+ <remarks>
+ The "last modified time" Is used by DirectWrite font selection algorithms to determine whether one font resource Is more up to date than another one.
+ </remarks>
+ <unmanaged>HRESULT IDWriteFontFileStream:GetLastWriteTime([Out] __int64* lastWriteTime)</unmanaged>
+</member>
+<member name="T:p104.CustomFontFileEnumerator">
+ <summary>
+ Revised from Sharpdx-sample
+ </summary>
+</member>
+<member name="P:p104.CustomFontFileEnumerator.CurrentFontFile">
+ <summary>
+ Gets a reference to the current font file.
+ </summary>
+ <value></value>
+ <returns>a reference to the newly created <see cref="T:SharpDX.DirectWrite.FontFile"/> object.</returns>
+ <unmanaged>HRESULT IDWriteFontFileEnumerator:GetCurrentFontFile([Out] IDWriteFontFile** fontFile)</unmanaged>
+</member>
+<member name="M:p104.CustomFontFileEnumerator.MoveNext">
+ <summary>
+ Advances to the next font file in the collection. When it Is first created, the enumerator Is positioned before the first element of the collection And the first call to MoveNext advances to the first file.
+ </summary>
+ <returns>
+ the value TRUE if the enumerator advances to a file; otherwise, FALSE if the enumerator advances past the last file in the collection.
+ </returns>
+ <unmanaged>HRESULT IDWriteFontFileEnumerator:MoveNext([Out] BOOL* hasCurrentFile)</unmanaged>
+</member>
 <member name="F:p104.Game3dObject.RegionCheckSign">
  <summary>
  用于检测是否处于视野外以避免多余绘制的顶点
@@ -1427,6 +1563,27 @@ p104
 <member name="P:p104.GameLive2dBone.BoneLength">
  <summary>
  获取骨骼长度
+ </summary>
+</member>
+<member name="T:p104.GameTerminal">
+ <summary>
+ 游戏控制台终端类
+ </summary>
+</member>
+<member name="F:p104.GameTerminal.TerminalContent">
+ <summary>
+ 显示文本
+ <para>显示最多100行，每行最多40个字符</para>
+ </summary>
+</member>
+<member name="M:p104.GameTerminal.Instance">
+ <summary>
+ 单例
+ </summary>
+</member>
+<member name="M:p104.GameTerminal.CommandInput(System.String)">
+ <summary>
+ 输入指令，最大长度255
  </summary>
 </member>
 <member name="T:p104.GeometryArithmetic">
@@ -1886,6 +2043,16 @@ p104
  遭遇战GameLoop
  </summary>
 </member>
+<member name="F:p104.SkirmishGameLoop.SkirmishGameMap2">
+ <summary>
+ 遭遇战地图类
+ </summary>
+</member>
+<member name="F:p104.SkirmishGameLoop.BindingCamera">
+ <summary>
+ 绑定的观察者类
+ </summary>
+</member>
 <member name="F:p104.SkirmishGameLoop.SkirmishPage">
  <summary>
  处理控件面板等鼠标点击事件
@@ -1918,7 +2085,7 @@ p104
 </member>
 <member name="F:p104.SkirmishGameLoop.SkirmishGlobalStateIndex">
  <summary>
- 当前阶段
+ 当前全局阶段
  </summary>
 </member>
 <member name="F:p104.SkirmishGameLoop.NowPlayer">
@@ -1962,15 +2129,11 @@ p104
  开始遭遇战游戏流程
  </summary>
 </member>
-<member name="M:p104.SkirmishGameLoop.UnitGoNextState1(p104.GameUnit)">
+<member name="M:p104.SkirmishGameLoop.ChangeTurn(System.Int32)">
  <summary>
- 用于回合开始阶段，准备阶段和回合结束阶段。全局状态需要与单位状态同步。
+ 设置当前回合数
  </summary>
-</member>
-<member name="M:p104.SkirmishGameLoop.UnitGoNextState2(p104.GameUnit)">
- <summary>
- 用于主要阶段。全局状态停留在主要阶段1直到所有单位完成行动。
- </summary>
+ <param name="delta">改变值，默认+1</param>
 </member>
 <member name="M:p104.SkirmishGameLoop.MarkUnitStateCompleteCounter(System.Int16)">
  <summary>
@@ -2004,7 +2167,6 @@ p104
  将鼠标点击位置（绘图位置）直接转换为坐标
  </summary>
  <param name="mouse"></param>
- <returns></returns>
 </member>
 <member name="M:p104.SkirmishGameLoop.MouseTryClickUnit(p104.PointI)">
  <summary>
@@ -2045,66 +2207,6 @@ p104
 <member name="F:p104.SingleGameLoopStage.OutOfTurn">
  <summary>
  非己方回合
- </summary>
-</member>
-<member name="T:p104.SkirmishPhaseSingleState">
- <summary>
- 遭遇战阶段类，继承状态机单个状态类
- </summary>
-</member>
-<member name="M:p104.SkirmishPhaseSingleState.Trigger(p104.GameUnit)">
- <summary>
- 开始执行
- </summary>
-</member>
-<member name="M:p104.SkirmishPhaseSingleState.Trigger(p104.SkirmishGameLoop)">
- <summary>
- 开始执行
- </summary>
-</member>
-<member name="M:p104.SkirmishPhaseSingleState.TryResumeProcess(p104.GameUnit)">
- <summary>
- 状态恢复为Normal后尝试重新启动
- </summary>
-</member>
-<member name="M:p104.SkirmishPhaseSingleState.TryResumeProcess(p104.SkirmishGameLoop)">
- <summary>
- 状态恢复为Normal后尝试重新启动
- </summary>
-</member>
-<member name="T:p104.SkirmishTurnStartPhase">
- <summary>
- 遭遇战回合开始阶段类
- </summary>
-</member>
-<member name="T:p104.SkirmishPreparePhase">
- <summary>
- 遭遇战准备阶段类
- </summary>
-</member>
-<member name="T:p104.SkirmishMainAPhase">
- <summary>
- 遭遇战主要阶段1类
- </summary>
-</member>
-<member name="T:p104.SkirmishBattlePhase">
- <summary>
- 遭遇战战斗阶段类
- </summary>
-</member>
-<member name="T:p104.SkirmishMainBPhase">
- <summary>
- 遭遇战主要阶段2类
- </summary>
-</member>
-<member name="T:p104.SkirmishTurnEndPhase">
- <summary>
- 遭遇战回合结束阶段类
- </summary>
-</member>
-<member name="T:p104.SkirmishOutOfTurnPhase">
- <summary>
- 遭遇战回合外阶段类
  </summary>
 </member>
 <member name="T:p104.SpectatorCamera">

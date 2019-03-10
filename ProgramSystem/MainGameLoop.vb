@@ -36,6 +36,8 @@ Public Class MainGameLoop
     Private GG_Combo2 As GameComboBox = Nothing
     Private GG_Combo3 As GameComboBox = Nothing
     Private GG_Shadow1 As GameShadowPad = Nothing
+    Private GG_Button1 As GameFlatButton = Nothing
+    Private GG_Button2 As GameFlatButton = Nothing
 
     Public Skirmish As SkirmishGameLoop
 
@@ -145,6 +147,10 @@ Public Class MainGameLoop
         'Me.Skirmish.SkirmishGameMap.GenerateMoveRange(Me.Skirmish.UnitList(0))
         Me.DrawSkirmish(True)
         Me.StartPaint()
+
+
+        Me.Skirmish.StartSkirmishGameStateMachine()
+
     End Sub
     Private Sub MMG_Button2_MouseDown()
         Debug.WriteLine("进入设置页")
@@ -230,9 +236,10 @@ Public Class MainGameLoop
         Dim scrollWidth As Integer = CInt(Me.Camera.Resolve.X * 0.8)
         Dim scrollLeft As Integer = CInt((Me.Camera.Resolve.X - scrollWidth) / 2)
         With GG_Scroll1
-            .BasicRect = New RawRectangleF(scrollLeft, 0, scrollLeft + scrollWidth, Me.Camera.Resolve.Y)
+            .BasicRect = New RawRectangleF(scrollLeft, 100, scrollLeft + scrollWidth, Me.Camera.Resolve.Y - 200)
             .AbsoluteRect = .BasicRect
             .BindingContext = Me.CameraD2DContext
+            .DefaultBackground = BLACK_COLOUR_BRUSH(0)
             .InitializeControlCanvas()
         End With
 
@@ -273,6 +280,11 @@ Public Class MainGameLoop
             .InitializeComboBox(500)
             .ImportShadowPad(GG_Shadow1, MainMenuPage.UIElements)
         End With
+        'Dim GG_Combo2_SC = Sub(nowIndex As Integer, nowContent As String)
+        '                       '选择时不进行更改
+        '                       '当按下“应用”按钮时再修改
+        '                   End Sub
+        'AddHandler GG_Combo2.SelectionChanged, GG_Combo2_SC
 
         Me.GG_Combo3 = New GameComboBox
         With GG_Combo3
@@ -298,9 +310,35 @@ Public Class MainGameLoop
             .GenerateShownChildren()
         End With
 
+        Me.GG_Button1 = New GameFlatButton
+        With Me.GG_Button1
+            .BindingContext = Me.CameraD2DContext
+            .BorderColour = BLACK_COLOUR_BRUSH(2)
+            .BasicRect = New RawRectangleF(100, 500, 500, 550)
+            .AbsoluteRect = .BasicRect
+            .InitializeControlCanvas()
+            .InitializeCursorLightBrush()
+            .InitializeBorderStyle()
+            .Text = "Apply"
+        End With
+
+        Me.GG_Button2 = New GameFlatButton
+        With Me.GG_Button2
+            .BindingContext = Me.CameraD2DContext
+            .BorderColour = BLACK_COLOUR_BRUSH(2)
+            .BasicRect = New RawRectangleF(100, 550, 500, 600)
+            .AbsoluteRect = .BasicRect
+            .InitializeControlCanvas()
+            .InitializeCursorLightBrush()
+            .InitializeBorderStyle()
+            .Text = "Cancel"
+        End With
+
         With GraphicsSettingGrid
             .Children.Add(GG_Shadow1)
             .Children.Add(GG_Scroll1)
+            .Children.Add(GG_Button1)
+            .Children.Add(GG_Button2)
             .InitializeQuadtree(Me.Camera.Resolve)
         End With
 
