@@ -37,9 +37,11 @@ Public Class SkirmishGameLoop
     ''' </summary>
     Public UI_SkirmishBoard As GameChessboard = Nothing
 
-    Public UI_BottomLeftUnitAvatar As GameContentFrame = Nothing
-
-    Public UI_TopLeftResourceBar As GameContentFrame = Nothing
+    Public UI_BottomLeftUnitAvatar As GameSkirmishAvatarBox = Nothing
+    ''' <summary>
+    ''' 顶部资源区
+    ''' </summary>
+    Public UI_TopLeftResourceBar As GameSkirmishResourceBar = Nothing
 
     Public UI_BottomActionBar As GameContentFrame = Nothing
 
@@ -118,9 +120,28 @@ Public Class SkirmishGameLoop
             SkirmishGameMap2.LoadFromFile(stream, BindingCamera.GetDeviceContext)
             SkirmishGameMap2.Register3DObjects(BindingCamera.Camera3D)
         End If
+
+        'test object remi
+        Dim remi As Game3DObject2 = Object3DLoaderInstance.ObjectRepository2(1)
+        remi.ShaderIndex = 1
+        For i = 0 To remi.SourceFaces.Count - 1
+            Dim tmpFace As Game3dFace2_1 = remi.SourceFaces(i)
+            For j = 0 To tmpFace.Vertices.Count - 1
+                remi.SourceFaces(i).Vertices(j).X *= 5
+                remi.SourceFaces(i).Vertices(j).Y *= 5
+                remi.SourceFaces(i).Vertices(j).Z *= 5
+
+                remi.SourceFaces(i).Vertices(j).X += 50
+                remi.SourceFaces(i).Vertices(j).Y += 50
+                remi.SourceFaces(i).Vertices(j).Z += 80
+            Next
+        Next
+        remi.RegionCheckSign = {New PointF3(0, 0, 80)}
+        BindingCamera.Camera3D.WorldContainer.Add(remi)
+
         With BindingCamera.Camera3D
-            .Position = New RawVector3(200, -350, 1000)
-            .Rotation = New PointF3(-0.5236, 0, 0)
+            .Position = New RawVector3(50, -850, 1000)
+            .Rotation = New PointF3(-0.7236, 0, 0)
             .CalculateViewP()
             .CalculateViewRX()
             .CalculateViewRY()
@@ -192,7 +213,8 @@ Public Class SkirmishGameLoop
                 Dim inputSideName As String = element.GetAttribute("name")
                 Dim inputPlayerType As PlayerType = [Enum].Parse(inputPlayerType.GetType, element.GetAttribute("type"))
                 Dim inputTeamIndex As Short = CShort(element.GetAttribute("team"))
-                Me.Sides.Add(New GameSideInfo(inputSideName, inputPlayerType, inputTeamIndex))
+                Dim tmpSide As New GameSideInfo(inputSideName, inputPlayerType, inputTeamIndex)
+                Me.Sides.Add(tmpSide)
 
                 Dim children2 As XmlNodeList = element.ChildNodes
                 For Each item2 As XmlNode In children2
@@ -221,6 +243,12 @@ Public Class SkirmishGameLoop
                                 Me.UnitList.Add(tmpHero)
                             End If
                         Next
+                    ElseIf element2.Name = "resources" Then
+                        tmpSide.Power = New IntegerProperty(CInt(element2.GetAttribute("power")))
+                        tmpSide.Point = New IntegerProperty(CInt(element2.GetAttribute("point")))
+                        tmpSide.Burden = New IntegerProperty(0)
+                        tmpSide.CurrentTurn = New IntegerProperty(0)
+
                     Else
 
                     End If
@@ -242,11 +270,16 @@ Public Class SkirmishGameLoop
         Me.SkirmishPage.PaintElements(context, spectator, canvasBitmap)
     End Sub
 
-    Public Sub DrawSkirmish2DUILayer(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As Bitmap1)
-        'TODO: DrawSkirmish2DUILayer
+    Public Sub Register2DUILayer()
+
+        Me.BindingCamera.PaintingLayers.Push(AddressOf Me.SkirmishPage.PaintElements)
+        Me.BindingCamera.PaintingLayersDescription.Push(GameImageLayer.SkirmishMap2DUI_Top_Resources)
+
+        'TODO: other controls
 
     End Sub
 
+    <Obsolete("render 3d-skirmish map and 2d-ui separately", False)>
     Private Sub DrawUnitLayer(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As Bitmap1)
 
         'TODO: 完善单位棋子显示
@@ -286,7 +319,9 @@ Public Class SkirmishGameLoop
                                      turn_start_phase.ToProcess(sender, senderType)
                                  End Sub
         Dim turn_start_phase_p = Sub(sender As IStateMachineRecognizable, senderType As StateInputType)
-                                     CType(sender, SkirmishGameLoop).ChangeTurn()
+                                     CType(sender, SkirmishGameLoop).ChangeGlobalTurn()
+                                     Me.Sides(NowPlayer).CurrentTurn.SetValue(Me.Sides(NowPlayer).CurrentTurn.GetValue + 1, LogSenderType.Change_Program)
+                                     Me.UI_TopLeftResourceBar.NeedRepaint = True
                                      turn_start_phase.ToEnd(sender, senderType)
                                  End Sub
         Dim turn_start_phase_e = Sub(sender As IStateMachineRecognizable, senderType As StateInputType)
@@ -301,36 +336,6 @@ Public Class SkirmishGameLoop
                                          End If
                                      Next
 
-                                     'If senderType Then
-                                     '    Dim c_sender As SkirmishGameLoop = CType(sender, SkirmishGameLoop)
-                                     '    Dim ifWin As Boolean = c_sender.CheckTurnCountWin()
-                                     '    If ifWin Then
-                                     '        sender.SetProcessTag(StateMachineSingleProcessStatus.Abort)
-                                     '    Else
-                                     '        sender.SetProcessTag(StateMachineSingleProcessStatus.NA)
-                                     '    End If
-                                     '    Dim processContent = Async Sub()
-                                     '                             Do While (Not c_sender.AllUnitStateComplete())
-                                     '                                 Await Task.Delay(50)
-                                     '                             Loop
-                                     '                             c_sender.ResetUnitStateCounter()
-                                     '                             Dim tmpGlobalPhase As StateMachineSingleState = Me.SkirmishGamePhases.NextState(sender.GetState, SkirmishStateMachineInputAlphabet.NormalGo)
-                                     '                             tmpGlobalPhase.Trigger(sender, senderType)
-                                     '                             For Each tmpUnit As GameUnit In c_sender.UnitList
-                                     '                                 If tmpUnit.Player = 0 Then
-                                     '                                     Dim tmpPhase As SkirmishPhaseSingleState = Me.SkirmishGamePhases.NextState(tmpUnit.UnitPhase, SkirmishStateMachineInputAlphabet.NormalGo)
-                                     '                                     tmpPhase.Trigger(tmpUnit)
-                                     '                                     Await Task.Delay(50)
-                                     '                                 End If
-                                     '                             Next
-                                     '                         End Sub
-                                     '    Dim tmpProcess As New Task(processContent)
-                                     '    tmpProcess.Start()
-                                     'Else
-                                     '    sender.SetProcessTag(StateMachineSingleProcessStatus.NA)
-                                     '    Me.MarkUnitStateCompleteCounter()
-                                     '    Debug.WriteLine("已完成:" & CType(sender, GameUnit).ShownName)
-                                     'End If
                                  End Sub
         AddHandler turn_start_phase.StateStart, turn_start_phase_s
         AddHandler turn_start_phase.StateProcess, turn_start_phase_p
@@ -390,7 +395,6 @@ Public Class SkirmishGameLoop
         AddHandler prepare_phase.StateEnd, prepare_phase_e
         AddHandler prepare_phase.StateResume, prepare_phase_r
 
-        'HACK: Rewrite those states
         '主要阶段1
         Dim main_a_phase As New StateMachineSingleState
         main_a_phase.InitializeStateIndex(2)
@@ -516,8 +520,9 @@ Public Class SkirmishGameLoop
     ''' 设置当前回合数
     ''' </summary>
     ''' <param name="delta">改变值，默认+1</param>
-    Public Sub ChangeTurn(Optional delta As Integer = 1)
+    Public Sub ChangeGlobalTurn(Optional delta As Integer = 1)
         Me.NowTurn.SetValue(Me.NowTurn.GetValue + delta, LogSenderType.Change_Program)
+
     End Sub
 
     ''' <summary>
@@ -571,44 +576,34 @@ Public Class SkirmishGameLoop
         AddHandler Me.UI_SkirmishBoard.MouseMove, AddressOf Me.GameBoardMouseMove
         Me.SkirmishPage.UIElements.Add(Me.UI_SkirmishBoard)
         'TODO
-
-        Dim tmpBottomLeftUnitAvatar As New GameContentFrame
-        With tmpBottomLeftUnitAvatar
-            .BindingContext = myContext
-            .BasicRect = New RawRectangleF(0, 568, 200, 768)
+        Me.UI_BottomLeftUnitAvatar = New GameSkirmishAvatarBox
+        With Me.UI_BottomLeftUnitAvatar
+            Dim avatarHeight As Single = BindingCamera.Resolve.Y * 0.3
+            .BasicRect = New RawRectangleF(0, BindingCamera.Resolve.Y - avatarHeight, avatarHeight, BindingCamera.Resolve.Y)
             .AbsoluteRect = .BasicRect
-            .DefaultBackground = BLACK_COLOUR_BRUSH(2)
+            .BindingContext = myContext
             .InitializeControlCanvas()
+            .Z_Index = 1
         End With
+        Me.SkirmishPage.UIElements.Add(Me.UI_BottomLeftUnitAvatar)
 
-        Dim tmpAvatarPicture As New GamePictureBox
-        With tmpAvatarPicture
-            .Visible = False
-            .BasicRect = New RawRectangleF(0, 568, 200, 768)
+        UI_TopLeftResourceBar = New GameSkirmishResourceBar
+        With Me.UI_TopLeftResourceBar
+            .BasicRect = New RawRectangleF(0, 0, Me.BindingCamera.Resolve.X, Me.BindingCamera.Resolve.Y / 20.0F)
             .AbsoluteRect = .BasicRect
             .BindingContext = myContext
-            .Opacity = NOT_TRANSPARENT
             .Z_Index = 1
             .InitializeControlCanvas()
-            .ImageSource = Nothing
+            .BindingSide = Sides(0)
+            .InitializeBar()
         End With
-        tmpBottomLeftUnitAvatar.Children.Add(tmpAvatarPicture)
-        Dim tmpLeftAvatarMouseDown = Sub()
-                                         Debug.WriteLine("avatar clicked!")
-                                     End Sub
+        Me.SkirmishPage.UIElements.Add(Me.UI_TopLeftResourceBar)
 
-        AddHandler tmpBottomLeftUnitAvatar.MouseDown, tmpLeftAvatarMouseDown
-        'AddHandler tmpBottomLeftUnitAvatar .MouseMove , AddressOf ...
-        Me.SkirmishPage.UIElements.Add(tmpBottomLeftUnitAvatar)
 
         Me.SkirmishPage.UIElements.Add(UnitDetailDialog.Instance)
 
         Me.SkirmishPage.GenerateElementsQuadtree(Me.BindingCamera.Resolve)
         Me.SkirmishPage.InitializeCursor(Me.BindingCamera.CurrentCursorPosition, Me.BindingCamera.Resolve)
-
-        Me.BindingCamera.PaintingLayers.Push(AddressOf Me.SkirmishPage.PaintElements)
-        'TODO: Add painting description
-        Me.BindingCamera.ActivePages.Add(Me.SkirmishPage)
 
     End Sub
 
@@ -686,29 +681,31 @@ Public Class SkirmishGameLoop
     End Function
 
     Public Sub GameBoardMouseDown(e As GameMouseEventArgs)
-        'Me.SkirmishBoardMouseDownPosition = Me.MousePositionToChessboard(Me.ConvertToWorldCursor(e.Position))
-        Me.SkirmishBoardMouseDownPosition = Me.DrawPositionToChessboard(e.Position)        '改用绘图坐标直接进行定位
-        Debug.WriteLine("Pos:" & SkirmishBoardMouseDownPosition.X & ", " & SkirmishBoardMouseDownPosition.Y)
+        ''Me.SkirmishBoardMouseDownPosition = Me.MousePositionToChessboard(Me.ConvertToWorldCursor(e.Position))
+        'Me.SkirmishBoardMouseDownPosition = Me.DrawPositionToChessboard(e.Position)        '改用绘图坐标直接进行定位
+        'Debug.WriteLine("Pos:" & SkirmishBoardMouseDownPosition.X & ", " & SkirmishBoardMouseDownPosition.Y)
 
-        'test
-        'open unit detail dialog
-        Dim dialog As UnitDetailDialog = UnitDetailDialog.Instance
-        dialog.BindUnit(Me.UnitList(0))
-        dialog.Visible = True
-        'BindingCamera.PaintingLayers.Push(AddressOf dialog.DrawControl)
-        'BindingCamera.PaintingLayersDescription.Push(GameImageLayer.Skirmish_UnitDetail)
+        ''test
+        ''open unit detail dialog
+        'Dim dialog As UnitDetailDialog = UnitDetailDialog.Instance
+        'dialog.BindUnit(Me.UnitList(0))
+        'dialog.Visible = True
+        ''BindingCamera.PaintingLayers.Push(AddressOf dialog.DrawControl)
+        ''BindingCamera.PaintingLayersDescription.Push(GameImageLayer.Skirmish_UnitDetail)
+
+        Dim tmpObj As Game3DObject2 = Object3DLoaderInstance.ObjectRepository2(1)
+        For i = 0 To tmpObj.SourceFaces.Count - 1
+            For j = 0 To tmpObj.SourceFaces(i).Vertices.Count - 1
+                tmpObj.SourceFaces(i).Vertices(j).Y = 50 - tmpObj.SourceFaces(i).Vertices(j).Y
+                tmpObj.SourceFaces(i).Normal(j).Y = -tmpObj.SourceFaces(i).Normal(j).Y
+            Next
+        Next
+        BindingCamera.Camera3D.UpdateOneBundle(1)
 
     End Sub
 
     Public Sub GameBoardMouseUp(e As GameMouseEventArgs)
-        Dim position As PointI = Me.DrawPositionToChessboard(e.Position)
-        If position.X = Me.SkirmishBoardMouseDownPosition.X AndAlso position.Y = Me.SkirmishBoardMouseDownPosition.Y Then
-            'is click
-            'show move range
 
-        Else    'is drag
-
-        End If
 
     End Sub
 
@@ -717,6 +714,11 @@ Public Class SkirmishGameLoop
         Dim hr As PointF2 = BindingCamera.Camera3D.BindingHalfResolve
         BindingCamera.Camera3D.ScreenCursorOffset.X = (e.X - hr.X) / hr.X
         BindingCamera.Camera3D.ScreenCursorOffset.Y = -(e.Y - hr.Y) / hr.Y
+
+        Dim hoverIndex As Integer = BindingCamera.Camera3DPixelInfo(0)
+        Me.UI_BottomLeftUnitAvatar.DisplayMapBlock = SkirmishGameMap2.GetBlock(hoverIndex)
+        Me.UI_BottomLeftUnitAvatar .EmptyMapBlock = false
+        Me.UI_BottomLeftUnitAvatar.NeedRepaint = True
 
     End Sub
 

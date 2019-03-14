@@ -19,7 +19,7 @@ Public Class Game3DObjectReader
     <Obsolete>
     Public ObjectRepository As New List(Of Game3dObject)
 
-    Public ObjectRepository2 As New List(Of Game3DObject2)
+    Public ObjectRepository2(255) As Game3DObject2
 
     Private Sub New()
     End Sub
@@ -31,7 +31,25 @@ Public Class Game3DObjectReader
         Return me_instance
     End Function
 
+    Public Sub ReadAll()
+        Dim dirInfo As New System.IO.DirectoryInfo(Application.StartupPath & "\Resources\Models\")
+        Dim allFiles() As System.IO.FileInfo = dirInfo.GetFiles
+
+        For Each file As System.IO.FileInfo In allFiles
+            Dim path As String = file.FullName
+            If path.EndsWith(".pob") Then
+
+                ReadObject2FromPath(path)
+
+            End If
+        Next
+
+    End Sub
+
     Public Sub ReadObject2FromPath(path As String)
+        Dim name As String = path
+        Dim args() As String = name.Remove(name.Length - 4).Split("_")
+        Dim nameIndex As String = args.Last
         Dim fileStr As New FileStream(path, FileMode.Open)
         Dim content As String = vbNullString
         Using sr As New StreamReader(fileStr)
@@ -39,10 +57,10 @@ Public Class Game3DObjectReader
         End Using
         fileStr.Close()
         fileStr.Dispose()
-        ReadObject2(content)
+        ReadObject2(content, CInt(nameIndex))
     End Sub
 
-    Public Sub ReadObject2(content As String)
+    Public Sub ReadObject2(content As String, targetIndex As Integer)
         Dim tmpObj As Game3DObject2 = Nothing
         Dim faceList As New List(Of Game3dFace2_1)
         Dim colourList As New List(Of RawColor4)
@@ -67,12 +85,12 @@ Public Class Game3DObjectReader
                 End With
                 faceList.Add(tmpFace)
             ElseIf cmd = "#end" Then
-                tmpObj.Faces = faceList.ToArray
+                tmpObj.SourceFaces = faceList.ToArray
                 tmpObj.RegionCheckSign = regionCheckList.ToArray
                 If tmpObj.RegionCheckSign.Length = 0 Then
                     tmpObj.RegionCheckSign = {New PointF3(0, 0, 0)}
                 End If
-                ObjectRepository2.Add(tmpObj)
+                ObjectRepository2(targetIndex) = tmpObj
                 faceList.Clear()
                 colourList.Clear()
                 regionCheckList.Clear()

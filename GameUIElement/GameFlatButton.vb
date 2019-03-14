@@ -57,6 +57,7 @@ Public Class GameFlatButton
 
         Dim stopCollection As New GradientStopCollection(Me.BindingContext, stops)
         Me.CursorLightBrush = New RadialGradientBrush(Me.BindingContext, r_brushProperty, NORMAL_BRUSH_PROPERTY, stopCollection)
+        stopCollection.Dispose()
 
         Dim r_brushProperty_2 As New RadialGradientBrushProperties()
         With r_brushProperty_2
@@ -74,6 +75,7 @@ Public Class GameFlatButton
             .Position = 1.0F}
         Dim stopCollection2 As New GradientStopCollection(Me.BindingContext, stops2)
         Me.CursorLightBorderBrush = New RadialGradientBrush(Me.BindingContext, r_brushProperty_2, NORMAL_BRUSH_PROPERTY, stopCollection2)
+        stopCollection2.Dispose()
 
     End Sub
 
@@ -91,7 +93,7 @@ Public Class GameFlatButton
             If Me.HaveFocus Then .FillRectangle(Me.ContentRect, Me.CursorLightBrush)
             .DrawRectangle(Me.SelfCanvasRect, Me.BorderColour, 3.0F)
             .DrawRectangle(Me.SelfCanvasRect, Me.CursorLightBorderBrush, 3.0F)
-            .DrawBitmap(Me.TextImage.FontImage, Me.SelfCanvasRect, NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
+            ButtonText.DrawText(context, New RawVector2(0, 0))
 
             .EndDraw()
         End With

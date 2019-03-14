@@ -44,10 +44,10 @@ Public Class SkirmishMapBlock2
         Me.Model.RegionCheckSign = {pos}
         Me.Model.Tag = GeneratedId
         Dim scale_z As Integer = (AltitudeTop - AltitudeBottom + 1)
-        For i = 0 To Me.Model.Faces.Length - 1
-            Me.Model.Faces(i).Tag = GeneratedId
-            For j = 0 To Me.Model.Faces(i).Vertices.Length - 1
-                With Me.Model.Faces(i).Vertices(j)
+        For i = 0 To Me.Model.SourceFaces.Length - 1
+            Me.Model.SourceFaces(i).Tag = GeneratedId
+            For j = 0 To Me.Model.SourceFaces(i).Vertices.Length - 1
+                With Me.Model.SourceFaces(i).Vertices(j)
                     .Z *= scale_z
                     .X += pos.X
                     .Y += pos.Y

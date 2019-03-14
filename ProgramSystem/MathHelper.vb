@@ -85,10 +85,10 @@ Public Module MathHelper
     Public Function ParseRawColor4(input As String) As SharpDX.Mathematics.Interop.RawColor4
         Dim value() As String = Regex.Split(input, COMMA)
         Dim result As New SharpDX.Mathematics.Interop.RawColor4 With {
-            .R = CShort(value(0)) / 255.0F,
-            .G = CShort(value(1)) / 255.0F,
-            .B = CShort(value(2)) / 255.0F,
-            .A = CShort(value(3)) / 255.0F}
+            .R = CSng(value(0)),
+            .G = CSng(value(1)),
+            .B = CSng(value(2)),
+            .A = CSng(value(3))}
         Return result
     End Function
 
@@ -118,6 +118,48 @@ Public Module MathHelper
 
     Public Function PointF32RV3(input As PointF3) As SharpDX.Mathematics.Interop.RawVector3
         Return New SharpDX.Mathematics.Interop.RawVector3(input.X, input.Y, input.Z)
+    End Function
+
+    Public Function GetUppercaseChineseNumbers(input As Integer) As String
+        If input <= 9 Then
+            Return GetUppercaseChineseDigit(input)
+        ElseIf input <= 99 Then
+            Dim num1 As Integer = input Mod 10
+            Dim num10 As Integer = input \ 10
+            Dim result As String = ""
+            result = result & GetUppercaseChineseDigit(num10) & "拾"
+            If num1 <> 0 Then
+                result = result & GetUppercaseChineseDigit(num1)
+            End If
+            Return result
+        End If
+        Return ""
+    End Function
+
+    Private Function GetUppercaseChineseDigit(input As Integer) As String
+        Select Case input
+            Case 0
+                Return "零"
+            Case 1
+                Return "壹"
+            Case 2
+                Return "贰"
+            Case 3
+                Return "叁"
+            Case 4
+                Return "肆"
+            Case 5
+                Return "伍"
+            Case 6
+                Return "陆"
+            Case 7
+                Return "柒"
+            Case 8
+                Return "捌"
+            Case 9
+                Return "玖"
+        End Select
+        Return ""
     End Function
 
     Public Function CalculatePerspMatrix(input() As KeyValuePair(Of PointF2, PointF2)) As Double()

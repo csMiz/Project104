@@ -18,9 +18,9 @@ Public Class FontHelper2
 
     Private DWFactory As New Factory
 
-    Public CurrentResourceFontLoader As CustomFontLoader
+    Private CurrentCustomFontLoader As CustomFontLoader
 
-    Public CurrentFontCollection As FontCollection
+    Private CurrentFontCollection As FontCollection
 
 
     Private Sub New()
@@ -29,9 +29,9 @@ Public Class FontHelper2
 
     Public Sub InitializeCustomFontComponents()
 
-        CurrentResourceFontLoader = New CustomFontLoader(DWFactory)
+        CurrentCustomFontLoader = New CustomFontLoader(DWFactory)
 
-        CurrentFontCollection = New FontCollection(DWFactory, CurrentResourceFontLoader, CurrentResourceFontLoader.Key)
+        CurrentFontCollection = New FontCollection(DWFactory, CurrentCustomFontLoader, CurrentCustomFontLoader.Key)
 
     End Sub
 
@@ -62,7 +62,79 @@ Public Class FontHelper2
         Return result
     End Function
 
+    Public Function GetTextLayout(text As String, font As TextFormat, maxSize As PointF2) As TextLayout
+        Dim result As New TextLayout(DWFactory, text, font, maxSize.X, maxSize.Y)
+        Return result
+    End Function
 
+End Class
+
+''' <summary>
+''' 字体类型枚举
+''' </summary>
+Public Enum GameFontType As Byte
+    ''' <summary>
+    ''' 系统字体
+    ''' </summary>
+    SystemFont = 0
+    ''' <summary>
+    ''' 自定义字体
+    ''' </summary>
+    CustomFont = 1
+End Enum
+
+Public Class TextItem2
+    ''' <summary>
+    ''' 文字
+    ''' </summary>
+    Public Text As String = vbNullString
+    ''' <summary>
+    ''' 字体类型
+    ''' </summary>
+    Public FontType As GameFontType
+    ''' <summary>
+    ''' 字体名称
+    ''' </summary>
+    Public FontName As String
+    ''' <summary>
+    ''' 字体大小
+    ''' </summary>
+    Public FontSize As Single = 18.0F
+    ''' <summary>
+    ''' 画布大小
+    ''' </summary>
+    Public CanvasSize As PointF2
+    ''' <summary>
+    ''' 字体颜色画刷
+    ''' </summary>
+    Public FontBrush As Direct2D1.Brush
+
+    ''' <summary>
+    ''' 用于绘制的TextLayout对象
+    ''' </summary>
+    Private TextImage As TextLayout = Nothing
+
+    Public Sub GenerateTextLayout()
+        If TextImage IsNot Nothing Then
+            TextImage.Dispose()
+        End If
+        If FontType Then
+            TextImage = GameFontHelper2.GetCustomTextLayout(Text, FontName, FontSize, CanvasSize)
+        Else
+            TextImage = GameFontHelper2.GetSystemTextLayout(Text, FontName, FontSize, CanvasSize)
+        End If
+    End Sub
+
+    Public Sub DrawText(ByRef context As Direct2D1.DeviceContext, position As Mathematics.Interop.RawVector2)
+        context.DrawTextLayout(position, TextImage, FontBrush)
+    End Sub
+
+    Public Sub Dispose(alsoDisposeBrush As Boolean)
+        Me.TextImage.Dispose()
+        If alsoDisposeBrush Then
+            Me.FontBrush.Dispose()
+        End If
+    End Sub
 
 End Class
 
@@ -257,7 +329,7 @@ Public Class CustomFontFileStream
 
     Private Function IUnknown_AddReference() As Integer Implements IUnknown.AddReference
         Dim r As Integer = AddReference()
-        Debug.WriteLine("addref called! ref:" & r)
+        'Debug.WriteLine("addref called! ref:" & r)
         ref_mark = r
         Return r
     End Function
@@ -266,11 +338,11 @@ Public Class CustomFontFileStream
 
         If ref_mark <> 1 Then
             Dim r As Integer = Release()
-            Debug.WriteLine("release called! ref:" & r)
+            'Debug.WriteLine("release called! ref:" & r)
             ref_mark = r
             Return r
         End If
-        Debug.WriteLine("release BLOCKED! ref:1")
+        'Debug.WriteLine("release BLOCKED! ref:1")
         Return 1
     End Function
 End Class

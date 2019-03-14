@@ -19,16 +19,12 @@ Public Class GameComboBox
     ''' <summary>
     ''' 标签文字
     ''' </summary>
-    Private TitleImage As TextItem = Nothing
+    Public TitleText As New TextItem2
     ''' <summary>
     ''' 当前所选内容文本框控件
     ''' </summary>
     Private SelectedBox As GameTextBox = Nothing
 
-    ''' <summary>
-    ''' 标签纯文本
-    ''' </summary>
-    Public TitleString As String = vbNullString     'TODO: change to TextResource
     ''' <summary>
     ''' 所有选项
     ''' </summary>
@@ -109,13 +105,19 @@ Public Class GameComboBox
             .BackgroundBrush = TRANSPARENT_BRUSH
             .BindingContext = Me.BindingContext
             .InitializeControlCanvas()
-            .UseTextImage = True
             If Me.SelectedIndex >= 0 Then
-                .Text = Me.SelectionStrings(Me.SelectedIndex)
+                .TextItem.Text = Me.SelectionStrings(Me.SelectedIndex)
             Else
-                .Text = Me.PlaceHolder
+                .TextItem.Text = Me.PlaceHolder
             End If
-            .InitializeTextImage()
+            With .TextItem
+                .CanvasSize = New PointF2(Me.Width - labelWidth, Me.Height - 20)
+                .FontType = GameFontType.CustomFont
+                .FontName = Me.TitleText.FontName
+                .FontSize = 18.0F
+                .FontBrush = PURE_BLACK_BRUSH
+                .GenerateTextLayout()
+            End With
             .InitializeLightBrush()
         End With
 
@@ -132,15 +134,19 @@ Public Class GameComboBox
             .Z_Index = 5
             .Visible = False
             .Items = Me.SelectionStrings
+            With .ChildrenFontStyle
+                .FontType = Me.TitleText.FontType
+                .FontName = Me.TitleText.FontName
+                .FontBrush = PURE_BLACK_BRUSH
+                .FontSize = Me.TitleText.FontSize
+            End With
             .GenerateTextItems()
         End With
-        AddHandler Me.FlyoutControl.MouseDown, AddressOf Me.FLyoutMouseDown
+        AddHandler Me.FlyoutControl.MouseDown, AddressOf Me.FlyoutMouseDown
 
-        Me.TitleImage = New TextItem(Me.TitleString, labelSize)
-        With Me.TitleImage
-            .LoadFont(GameFontHelper.GetFontFamily(0), 18, Brushes.Black, Color.Gray)
-            .GenerateImage(Me.BindingContext)
-        End With
+        Me.TitleText.CanvasSize = New PointF2(labelWidth, Me.Height - 20)
+        Me.TitleText.GenerateTextLayout()
+
     End Sub
 
     Public Overrides Sub RefreshRects()
@@ -176,7 +182,7 @@ Public Class GameComboBox
             .BeginDraw()
             .Clear(Nothing)
 
-            .DrawBitmap(Me.TitleImage.FontImage, Me.LabelRect, NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
+            Me.TitleText.DrawText(context, New RawVector2(0, 0))
             .EndDraw()
             Me.SelectedBox.DrawControlAtSelfCanvas(context, spec, Me.ControlCanvas)
             .Target = Me.ControlCanvas
@@ -261,7 +267,7 @@ Public Class GameComboBox
             Me.SelectedIndex = -1
         End If
         If Me.SelectedIndex <> -1 Then
-            Me.SelectedBox.SetText(Me.SelectionStrings(Me.SelectedIndex), Me.FlyoutControl.TextItemImages(Me.SelectedIndex))
+            Me.SelectedBox.ChangeText(Me.SelectionStrings(Me.SelectedIndex))
             RaiseEvent SelectionChanged(Me.SelectedIndex, Me.SelectionStrings(Me.SelectedIndex))
         End If
         Me.CloseSubMenu()

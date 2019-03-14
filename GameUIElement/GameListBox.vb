@@ -15,9 +15,11 @@ Public Class GameListBox
 
     Public Items As New List(Of String)
 
+    Public ChildrenFontStyle As New TextItem2
+
     Public SelectedIndex As Integer = -1
     Public HoveringIndex As Integer = -1
-    Public TextItemImages As List(Of TextItem) = Nothing
+    Public TextItems As List(Of TextItem2) = Nothing
     Public SelectionHeight As Single = 0
     Private SelectionBoxTemplate As PointI = Nothing
 
@@ -35,20 +37,25 @@ Public Class GameListBox
     End Sub
 
     Public Sub GenerateTextItems()
-        If Me.TextItemImages IsNot Nothing Then
+        If Me.TextItems IsNot Nothing Then
             Me.DisposeTextImages()
         End If
-        Me.TextItemImages = New List(Of TextItem)
+        Me.TextItems = New List(Of TextItem2)
         If Me.Items.Count Then
             Me.SelectionHeight = Me.Height / Me.Items.Count
             Me.SelectionBoxTemplate = New PointI(Me.Width, Me.SelectionHeight)
             For i = 0 To Me.Items.Count - 1
-                Dim tmpImage As New TextItem(Me.Items(i), Me.SelectionBoxTemplate)
+                Dim tmpImage As New TextItem2
                 With tmpImage
-                    .LoadFont(GameFontHelper.GetFontFamily(0), 18, Brushes.Black, Color.Gray)
-                    .GenerateImage(Me.BindingContext)
+                    .Text = Me.Items(i)
+                    .FontType = ChildrenFontStyle.FontType
+                    .FontName = ChildrenFontStyle.FontName
+                    .FontBrush = ChildrenFontStyle.FontBrush
+                    .FontSize = ChildrenFontStyle.FontSize
+                    .CanvasSize = New PointF2(Me.Width, Me.SelectionHeight)
+                    .GenerateTextLayout()
                 End With
-                Me.TextItemImages.Add(tmpImage)
+                Me.TextItems.Add(tmpImage)
             Next
         End If
     End Sub
@@ -64,10 +71,9 @@ Public Class GameListBox
                 Dim tmpRect As New RawRectangleF(0, Me.HoveringIndex * Me.SelectionHeight, Me.SelectionBoxTemplate.X, (Me.HoveringIndex + 1) * Me.SelectionHeight)
                 .FillRectangle(tmpRect, WHITE_COLOUR_BRUSH(2))
             End If
-            If Me.TextItemImages.Count Then
-                For i = 0 To Me.TextItemImages.Count - 1
-                    Dim drawRect As New RawRectangleF(0, i * Me.SelectionHeight, Me.SelectionBoxTemplate.X, (i + 1) * Me.SelectionHeight)
-                    .DrawBitmap(Me.TextItemImages(i).FontImage, drawRect, NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
+            If Me.TextItems.Count Then
+                For i = 0 To Me.TextItems.Count - 1
+                    TextItems(i).DrawText(context, New RawVector2(0, i * Me.SelectionHeight))
                 Next
             End If
 
@@ -77,9 +83,12 @@ Public Class GameListBox
 
     ''' <summary>
     ''' 销毁所有缓存的文字图片对象
+    ''' <para>注意，此处画笔对象不会被销毁</para>
     ''' </summary>
     Public Sub DisposeTextImages()
-        'TODO
+        For Each item As TextItem2 In Me.TextItems
+            item.Dispose(False)
+        Next
     End Sub
 
     Public Sub DefaultMouseMove(e As GameMouseEventArgs)

@@ -113,7 +113,9 @@ Public Class GameUnit
     Public View As SingleProperty
 
     Public Hide As SingleProperty
-
+    ''' <summary>
+    ''' 用于绑定显示的模型
+    ''' </summary>
     Public SkirmishChessImageIndex As Integer
 
 
@@ -196,8 +198,13 @@ Public Class GameUnit
         Return SIDE_COLOUR(Me.Player)
     End Function
 
+    <Obsolete>
     Public Function GetSkirmishChessImage() As IGameImage
         Return UnitImages.GetChessImage(Me.SkirmishChessImageIndex, Me.SpiritStatus)
+    End Function
+
+    Public Function GetSkirmishChessModel() As Game3DObject2
+        Return Object3DLoaderInstance.ObjectRepository2(Me.SkirmishChessImageIndex)
     End Function
 
     Public Sub ResetUnitStatus(inputStatus As UnitStatus, Optional mov_count As Integer = -1, Optional atk_count As Integer = -1)

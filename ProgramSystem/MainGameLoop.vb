@@ -79,7 +79,16 @@ Public Class MainGameLoop
             .InitializeControlCanvas()
             .InitializeCursorLightBrush()
             .InitializeBorderStyle()
-            .Text = "Start Game"
+            With .ButtonText
+                .Text = "Start Game"
+                .CanvasSize = New PointF2(400, 50)
+                .FontType = GameFontType.CustomFont
+                .FontName = "P104_Font1"
+                .FontSize = 18.0F
+                .FontBrush = PURE_BLACK_BRUSH
+                .GenerateTextLayout()
+            End With
+
         End With
 
         'Settings Button
@@ -92,7 +101,16 @@ Public Class MainGameLoop
             .InitializeControlCanvas()
             .InitializeCursorLightBrush()
             .InitializeBorderStyle()
-            .Text = "Settings"
+            With .ButtonText
+                .Text = "Settings"
+                .CanvasSize = New PointF2(400, 50)
+                .FontType = GameFontType.CustomFont
+                .FontName = "P104_Font1"
+                .FontSize = 18.0F
+                .FontBrush = PURE_BLACK_BRUSH
+                .GenerateTextLayout()
+            End With
+
         End With
 
         'Exit Button
@@ -105,7 +123,15 @@ Public Class MainGameLoop
             .InitializeControlCanvas()
             .InitializeCursorLightBrush()
             .InitializeBorderStyle()
-            .Text = "End Game"
+            With .ButtonText
+                .Text = "End Game"
+                .CanvasSize = New PointF2(400, 50)
+                .FontType = GameFontType.CustomFont
+                .FontName = "P104_Font1"
+                .FontSize = 18.0F
+                .FontBrush = PURE_BLACK_BRUSH
+                .GenerateTextLayout()
+            End With
         End With
 
         'Dim tmpTB As New GameTextBlock(True)
@@ -180,7 +206,15 @@ Public Class MainGameLoop
             .InitializeControlCanvas()
             .InitializeCursorLightBrush()
             .InitializeBorderStyle()
-            .Text = "Graphics"       'TODO： 使用TextResource
+            With .ButtonText
+                .Text = "Graphics"
+                .CanvasSize = New PointF2(400, 50)
+                .FontType = GameFontType.CustomFont
+                .FontName = "P104_Font1"
+                .FontSize = 18.0F
+                .FontBrush = PURE_BLACK_BRUSH
+                .GenerateTextLayout()
+            End With
         End With
 
         '1 声音设置
@@ -193,7 +227,15 @@ Public Class MainGameLoop
             .InitializeControlCanvas()
             .InitializeCursorLightBrush()
             .InitializeBorderStyle()
-            .Text = "Audio"       'TODO： 使用TextResource
+            With .ButtonText
+                .Text = "Audio"
+                .CanvasSize = New PointF2(400, 50)
+                .FontType = GameFontType.CustomFont
+                .FontName = "P104_Font1"
+                .FontSize = 18.0F
+                .FontBrush = PURE_BLACK_BRUSH
+                .GenerateTextLayout()
+            End With
         End With
 
         With SettingGrid
@@ -257,7 +299,15 @@ Public Class MainGameLoop
         Me.GG_Combo1 = New GameComboBox
         With GG_Combo1
             .BasicRect = New RawRectangleF(0, 0, 800, 50)
-            .TitleString = "显示模式"
+            With .TitleText
+                .Text = "显示模式"
+                ' .CanvasSize在InitializeComboBox中自动设置
+                .FontType = GameFontType.CustomFont
+                .FontName = "P104_Font1"
+                .FontSize = 18.0F
+                .FontBrush = PURE_BLACK_BRUSH
+                ' .GenerateTextLayout()在InitializeComboBox中自动设置
+            End With
             .SelectionStrings.Add("窗口模式")
             .SelectionStrings.Add("全屏模式")
             .SelectedIndex = 0
@@ -269,7 +319,15 @@ Public Class MainGameLoop
         Me.GG_Combo2 = New GameComboBox
         With GG_Combo2
             .BasicRect = New RawRectangleF(0, 50, 800, 100)
-            .TitleString = "分辨率"
+            With .TitleText
+                .Text = "分辨率"
+                ' .CanvasSize在InitializeComboBox中自动设置
+                .FontType = GameFontType.CustomFont
+                .FontName = "P104_Font1"
+                .FontSize = 18.0F
+                .FontBrush = PURE_BLACK_BRUSH
+                ' .GenerateTextLayout()在InitializeComboBox中自动设置
+            End With
             .SelectionStrings.Add("800*600")
             .SelectionStrings.Add("1024*768")
             .SelectionStrings.Add("1280*768")
@@ -289,7 +347,15 @@ Public Class MainGameLoop
         Me.GG_Combo3 = New GameComboBox
         With GG_Combo3
             .BasicRect = New RawRectangleF(0, 100, 800, 150)
-            .TitleString = "图像绘制帧速率"
+            With .TitleText
+                .Text = "图像绘制帧速率"
+                ' .CanvasSize在InitializeComboBox中自动设置
+                .FontType = GameFontType.CustomFont
+                .FontName = "P104_Font1"
+                .FontSize = 18.0F
+                .FontBrush = PURE_BLACK_BRUSH
+                ' .GenerateTextLayout()在InitializeComboBox中自动设置
+            End With
             .SelectionStrings.Add("30")
             .SelectionStrings.Add("60")
             .SelectedIndex = 0
@@ -319,7 +385,15 @@ Public Class MainGameLoop
             .InitializeControlCanvas()
             .InitializeCursorLightBrush()
             .InitializeBorderStyle()
-            .Text = "Apply"
+            With .ButtonText
+                .Text = "Apply"
+                .CanvasSize = New PointF2(400, 50)
+                .FontType = GameFontType.CustomFont
+                .FontName = "P104_Font1"
+                .FontSize = 18.0F
+                .FontBrush = PURE_BLACK_BRUSH
+                .GenerateTextLayout()
+            End With
         End With
 
         Me.GG_Button2 = New GameFlatButton
@@ -331,7 +405,15 @@ Public Class MainGameLoop
             .InitializeControlCanvas()
             .InitializeCursorLightBrush()
             .InitializeBorderStyle()
-            .Text = "Cancel"
+            With .ButtonText
+                .Text = "Cancel"
+                .CanvasSize = New PointF2(400, 50)
+                .FontType = GameFontType.CustomFont
+                .FontName = "P104_Font1"
+                .FontSize = 18.0F
+                .FontBrush = PURE_BLACK_BRUSH
+                .GenerateTextLayout()
+            End With
         End With
 
         With GraphicsSettingGrid
@@ -479,10 +561,11 @@ Public Class MainGameLoop
             '-------------ver1.2---------------
             .Camera3D.Enable = True
             .PaintingLayers.Push(AddressOf .DrawLink3DImage)
-            .PaintingLayers.Push(AddressOf Me.Skirmish.DrawSkirmish2DUILayer)
+            Me.Skirmish.Register2DUILayer()
             .PaintingLayersDescription.Push(GameImageLayer.SkirmishMap3DOnly)
             .PaintingLayersDescription.Push(GameImageLayer.SkirmishMap2DUI)
             .ActivePages.Add(Me.Skirmish.SkirmishPage)
+
         End With
 
     End Sub

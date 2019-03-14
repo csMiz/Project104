@@ -11,7 +11,7 @@ Public Class BasicImageRepository
 
     Private LeftPanelFragmentImages As New List(Of BasicImagePair)
     Private SkirmishUnitFragmentImages As New List(Of BasicImagePair)
-
+    Private ControlImages As New List(Of BasicImagePair)
 
     Private Sub New()
     End Sub
@@ -25,6 +25,7 @@ Public Class BasicImageRepository
         Dim loadPath As String = Application.StartupPath & "\Resources\Images\"
         Me.LoadToDirectory(context, loadPath & "UnitDetailLP\", LeftPanelFragmentImages)
         Me.LoadToDirectory(context, loadPath & "SkirmishUnit\", SkirmishUnitFragmentImages)
+        Me.LoadToDirectory(context, loadPath & "Control\", ControlImages)
 
     End Sub
 
@@ -36,9 +37,9 @@ Public Class BasicImageRepository
             Dim tmpImage As SharpDX.Direct2D1.Bitmap1 = GameResources.LoadBitmapUsingWIC(context, readStream)
 
             Dim filename As String = file.Name
-            Dim keys() As String = Regex.Split(filename, UNDERLINE)
+            Dim keys() As String = Regex.Split(filename.Remove(filename.Length - 4), UNDERLINE)
             Dim tmpPair As New BasicImagePair With {
-                .Key = New List(Of String)(keys),
+                .Key = keys,
                 .Image = tmpImage}
 
             group.Add(tmpPair)
@@ -50,6 +51,12 @@ Public Class BasicImageRepository
             Return Me.SkirmishUnitFragmentImages(index).Image
 
             'TODO
+        ElseIf domain = CONTROL_IMAGE_DOMAIN Then
+            For Each tmpImg As BasicImagePair In Me.ControlImages
+                If index = CInt(tmpImg.Key.Last) Then
+                    Return tmpImg.Image
+                End If
+            Next
 
         End If
         Return Nothing
@@ -58,7 +65,7 @@ Public Class BasicImageRepository
 End Class
 
 Public Class BasicImagePair
-    Public Key As List(Of String)
+    Public Key As String()
     Public Image As Bitmap1
 
 End Class

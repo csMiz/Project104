@@ -79,6 +79,8 @@ Public Class SpectatorCamera
 
     Public Camera3D As New GameCamera3D
 
+    Public Camera3DPixelInfo(0) As Integer
+
     Public Sub InitializeDirectComponents()
         '-------setup d3d11--------
         'create device and swapchain
@@ -106,7 +108,7 @@ Public Class SpectatorCamera
         D3DContext = GlobalDevice.ImmediateContext.QueryInterface(Of SharpDX.Direct3D11.DeviceContext1)()
         'create rasterizer
         Dim rsd = New Direct3D11.RasterizerStateDescription With {
-            .CullMode = Direct3D11.CullMode.Front,
+            .CullMode = Direct3D11.CullMode.None,
             .FillMode = Direct3D11.FillMode.Solid}
         D3DContext.Rasterizer.State = New Direct3D11.RasterizerState(GlobalDevice, rsd)
         'create depth stencil
@@ -259,7 +261,7 @@ Public Class SpectatorCamera
     Public Sub PaintImage()
         If Me.Camera3D.Enable Then
             'clear canvas
-            D3DContext.ClearRenderTargetView(D3DRenderTargetView, New Mathematics.Interop.RawColor4(0.5, 0.8, 0.5, 1))
+            D3DContext.ClearRenderTargetView(D3DRenderTargetView, New Mathematics.Interop.RawColor4(0.35, 0.5, 0.35, 1))
             D3DContext.ClearDepthStencilView(D3DDepthStencilView, Direct3D11.DepthStencilClearFlags.Depth, 1, 0)
             'draw d3d
             Me.Camera3D.DrawContainer3D(GlobalDevice, D3DContext)
@@ -267,7 +269,8 @@ Public Class SpectatorCamera
             D3DRenderImage.CopyFromBitmap(D2DTarget)
 
             Dim firstPixel As Byte() = GetLink3DImagePixelInfo(D2DContext)
-            Camera3D.PointingAt = firstPixel(0) + firstPixel(1) * 256
+            Camera3DPixelInfo(0) = firstPixel(0) + firstPixel(1) * 256
+            Camera3D.PointingAt = Camera3DPixelInfo(0)
 
         End If
         'draw d2d
@@ -285,13 +288,6 @@ Public Class SpectatorCamera
                 .BeginDraw()
                 .Clear(WHITE_COLOUR)
                 .DrawImage(BitmapForOriginalSkirmishMap)
-
-                'test
-                .FillRectangle(New Mathematics.Interop.RawRectangleF(100, 100, 200, 200), BLACK_COLOUR_BRUSH(2))
-                Dim fh2 As FontHelper2 = FontHelper2.Instance
-                Dim tmpTL As DirectWrite.TextLayout = fh2.GetCustomTextLayout("Start Game", "P104_Font1", 20, New PointF2(200, 200))
-                .DrawTextLayout(New Mathematics.Interop.RawVector2(10, 10), tmpTL, BLACK_COLOUR_BRUSH(4))
-                'tmpTL.Dispose()
 
                 .EndDraw()
             End With
@@ -350,6 +346,8 @@ Public Enum GameImageLayer As Byte
     SkirmishMap3DOnly = 34
 
     SkirmishMap2DUI = 35
+
+    SkirmishMap2DUI_Top_Resources = 36
 
     BattleAnimation = 64
 End Enum

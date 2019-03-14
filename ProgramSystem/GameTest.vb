@@ -32,7 +32,7 @@ Public Class GameTest
         MainGame.StartLoadGlobalResources()
         Dim loadResult As Integer = Await MainGame.WaitForLoad()
 
-        'TODO: draw main menu
+        'draw main menu
         MainGame.DrawMainMenu()
 
         MainGame.StartPaint()
@@ -212,6 +212,7 @@ Public Class GameTest
 
     End Sub
 
+    <Obsolete>
     Public Sub SpectatorTest()
         'LoadMapTest()
 

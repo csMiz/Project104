@@ -28,15 +28,20 @@ Module GameResources
     ''' </summary>
     Public GameIcons As GameIconRepository = GameIconRepository.Instance
 
+
     Public FragmentImages As BasicImageRepository = BasicImageRepository.Instance
 
     Public Live2dImages As LiveImageRepository = LiveImageRepository.Instance
+    '''' <summary>
+    '''' 文字字体助手
+    '''' </summary>
+    '<Obsolete("use DirectWrite in FontHelper2", True)>
+    'Public GameFontHelper As FontHelper = FontHelper.Instance
     ''' <summary>
-    ''' 文字字体助手
+    ''' 文字字体助手ver.2
     ''' </summary>
-    Public GameFontHelper As FontHelper = FontHelper.Instance
+    Public GameFontHelper2 As FontHelper2 = Nothing
 
-    Public DirectWriteFactoryInstance As DirectWrite.Factory = New DirectWrite.Factory
     ''' <summary>
     ''' 全局三维模型载入器
     ''' </summary>
@@ -72,6 +77,7 @@ Module GameResources
     Public Const ESCAPE_VERTICAL_LINE As String = "\|"
     Public Const TYPE_THREE_IMAGES As String = "three"
     Public Const SKIRMISH_FRAGMENT_DOMAIN As String = "skirmish_unit"
+    Public Const CONTROL_IMAGE_DOMAIN As String = "control_image"
     Public Const SKIRMISH_IMAGE_GROUP As String = "skirmish_chess"
     Public Const NOT_TRANSPARENT As Single = 1.0F
     Public Const UNIT_DETAIL_HV_RATIO As Single = 1.618
@@ -79,6 +85,7 @@ Module GameResources
     Public ReadOnly ROOT_THREE As Single = Sqrt(3)
     Public Const ONE_THIRD As Single = 1 / 3
     Public Const TERRAIN_COST_MAX As Single = 999.9F
+
 
     Public SystemDefaultFontFamilyName As String = "Segoe UI"
     ''' <summary>
@@ -93,6 +100,11 @@ Module GameResources
     ''' 由透明到不透明的白色SolidBrush，索引为0到4
     ''' </summary>
     Public WHITE_COLOUR_BRUSH As List(Of SolidColorBrush)
+    Public PURE_BLACK_BRUSH As SolidColorBrush
+    Public PURE_WHITE_BRUSH As SolidColorBrush
+    Public GREY_WHITE_BRUSH As SolidColorBrush
+
+
     Public WHITE_COLOUR As New RawColor4(1, 1, 1, 1)
     Public TRANSPARENT_BRUSH As SolidColorBrush = Nothing
 
@@ -173,9 +185,10 @@ Module GameResources
         Live2dImages.LoadSpritesFromFile(context)
         Live2dImages.LoadLiveConfigFromFiles()
         '载入字体助手
-        GameFontHelper.LoadTextFromFiles()
+        'GameFontHelper.LoadTextFromFiles()
+        GameFontHelper2 = FontHelper2.Instance    'Initialize
 
-        Object3DLoaderInstance.ReadObject2FromPath(Application.StartupPath & "\Resources\Models\base3d_0.pob")
+        Object3DLoaderInstance.ReadAll()
 
         SIDE_COLOUR = SolidColorBrushSet.LoadFromXml(context, My.Resources.Colours)
 
@@ -196,8 +209,11 @@ Module GameResources
             .Add(New SolidColorBrush(context, New RawColor4(1, 1, 1, 0.5 + ONE_THIRD)))
         End With
         TRANSPARENT_BRUSH = New SolidColorBrush(context, New RawColor4(1, 1, 1, 0))
+        PURE_BLACK_BRUSH = New SolidColorBrush(context, New RawColor4(0, 0, 0, 1))
+        PURE_WHITE_BRUSH = New SolidColorBrush(context, New RawColor4(1, 1, 1, 1))
+        GREY_WHITE_BRUSH = New SolidColorBrush(context, New RawColor4(0.8, 0.8, 0.8, 1))
 
-        GameFontHelper.AddFontFile(Application.StartupPath & "\P104_Font1.ttf", "P104_Font1")
+        'GameFontHelper.AddFontFile(Application.StartupPath & "\P104_Font1.ttf", "P104_Font1")
 
         SkirmishTerrain.Initialize()
 

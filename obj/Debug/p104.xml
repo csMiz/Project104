@@ -329,6 +329,11 @@ p104
  此单位归属于
  </summary>
 </member>
+<member name="F:p104.GameUnit.SkirmishChessImageIndex">
+ <summary>
+ 用于绑定显示的模型
+ </summary>
+</member>
 <member name="T:p104.GameUnitType">
  <summary>
  单位类型字段枚举
@@ -412,26 +417,6 @@ p104
 <member name="P:p104.HeroSkillTreeItem.LinkId">
  <summary>
  对应技能的id
- </summary>
-</member>
-<member name="T:p104.Player">
- <summary>
- 游戏玩家类
- </summary>
-</member>
-<member name="F:p104.Player.Power">
- <summary>
- Power
- </summary>
-</member>
-<member name="F:p104.Player.Point">
- <summary>
- 点
- </summary>
-</member>
-<member name="F:p104.Player.Burden">
- <summary>
- 负载
  </summary>
 </member>
 <member name="T:p104.PropertyChangeBuffSkillEffect">
@@ -588,6 +573,11 @@ p104
  <para>一般情况下为(0,0,Width,Height)</para>
  </summary>
 </member>
+<member name="F:p104.GameBasicUIElement.Z_Index">
+ <summary>
+ 前后次序，数字越大越在上层，区间0-5
+ </summary>
+</member>
 <member name="F:p104.GameBasicUIElement.BindingContext">
  <summary>
  绑定的D2dDeviceContext
@@ -645,12 +635,17 @@ p104
  按钮是否有效，相当于Enable
  </summary>
 </member>
+<member name="F:p104.GameButton.ButtonText">
+ <summary>
+ 按钮上的文字
+ </summary>
+</member>
 <member name="T:p104.GameComboBox">
  <summary>
  组合框控件类
  </summary>
 </member>
-<member name="F:p104.GameComboBox.TitleImage">
+<member name="F:p104.GameComboBox.TitleText">
  <summary>
  标签文字
  </summary>
@@ -658,11 +653,6 @@ p104
 <member name="F:p104.GameComboBox.SelectedBox">
  <summary>
  当前所选内容文本框控件
- </summary>
-</member>
-<member name="F:p104.GameComboBox.TitleString">
- <summary>
- 标签纯文本
  </summary>
 </member>
 <member name="F:p104.GameComboBox.SelectionStrings">
@@ -809,6 +799,7 @@ p104
 <member name="M:p104.GameListBox.DisposeTextImages">
  <summary>
  销毁所有缓存的文字图片对象
+ <para>注意，此处画笔对象不会被销毁</para>
  </summary>
 </member>
 <member name="T:p104.GameMouseEventArgs">
@@ -952,32 +943,25 @@ p104
  阴影层控件类
  </summary>
 </member>
+<member name="F:p104.GameSkirmishResourceBar.IconEdgeDistance">
+ <summary>
+ 反光矩形框距离控件边缘的长度
+ </summary>
+</member>
+<member name="F:p104.GameSkirmishResourceBar.DefaultFont">
+ <summary>
+ render 'Power','Point',etc
+ </summary>
+</member>
+<member name="F:p104.GameSkirmishResourceBar.DefaultFont2">
+ <summary>
+ render values
+ </summary>
+</member>
 <member name="T:p104.GameTextBlock">
  <summary>
  游戏文本标签控件类
  </summary>
-</member>
-<member name="F:p104.GameTextBlock.Text">
- <summary>
- 文本
- </summary>
-</member>
-<member name="F:p104.GameTextBlock.DWFontBrush">
- <summary>
- DW模式下绘制文本的笔刷
- </summary>
-</member>
-<member name="F:p104.GameTextBlock.TextImage">
- <summary>
- TextItem模式下的TI对象
- </summary>
-</member>
-<member name="M:p104.GameTextBlock.#ctor(System.Boolean,System.Single)">
- <summary>
- 构造函数
- </summary>
- <param name="useDirectWrite">是否使用DW直接绘制</param>
- <param name="DWFontSize">使用DW时的字号</param>
 </member>
 <member name="T:p104.TerminalDialog">
  <summary>
@@ -1268,6 +1252,56 @@ p104
  使用DirectWrite的字体助手类ver.2
  </summary>
 </member>
+<member name="T:p104.GameFontType">
+ <summary>
+ 字体类型枚举
+ </summary>
+</member>
+<member name="F:p104.GameFontType.SystemFont">
+ <summary>
+ 系统字体
+ </summary>
+</member>
+<member name="F:p104.GameFontType.CustomFont">
+ <summary>
+ 自定义字体
+ </summary>
+</member>
+<member name="F:p104.TextItem2.Text">
+ <summary>
+ 文字
+ </summary>
+</member>
+<member name="F:p104.TextItem2.FontType">
+ <summary>
+ 字体类型
+ </summary>
+</member>
+<member name="F:p104.TextItem2.FontName">
+ <summary>
+ 字体名称
+ </summary>
+</member>
+<member name="F:p104.TextItem2.FontSize">
+ <summary>
+ 字体大小
+ </summary>
+</member>
+<member name="F:p104.TextItem2.CanvasSize">
+ <summary>
+ 画布大小
+ </summary>
+</member>
+<member name="F:p104.TextItem2.FontBrush">
+ <summary>
+ 字体颜色画刷
+ </summary>
+</member>
+<member name="F:p104.TextItem2.TextImage">
+ <summary>
+ 用于绘制的TextLayout对象
+ </summary>
+</member>
 <member name="T:p104.CustomFontLoader">
  <summary>
  Revised from Sharpdx-sample
@@ -1316,7 +1350,7 @@ p104
 </member>
 <member name="F:p104.CustomFontFileStream.ref_mark">
  <summary>
- 不知道Sharpdx出了什么问题，总之标记一下不让此对象莫名其妙被清空
+ 不知道SharpDX出了什么问题，引用计数器会把引用减到0导致此对象被释放，总之用一个变量标记一下，不让此对象引用计数器减到零而莫名其妙被清掉
  <para>错误代码见 https://github.com/sharpdx/SharpDX/blob/master/Source/SharpDX/CallbackBase.cs </para>
  </summary>
 </member>
@@ -1408,6 +1442,11 @@ p104
 <member name="M:p104.Game3DObject2.CopyTemplate">
  <summary>
  返回复制各顶点的新模型
+ </summary>
+</member>
+<member name="M:p104.Game3DFace2_1Bundle.RefreshBuffer">
+ <summary>
+ 根据已有的Face的reference更新面片数据（例如骨骼动画），此方法需要另开线程并监听BufferFinished
  </summary>
 </member>
 <member name="M:p104.Game3DObjectReader.Instance">
@@ -1671,9 +1710,9 @@ p104
  游戏图标资源仓库
  </summary>
 </member>
-<member name="F:p104.GameResources.GameFontHelper">
+<member name="F:p104.GameResources.GameFontHelper2">
  <summary>
- 文字字体助手
+ 文字字体助手ver.2
  </summary>
 </member>
 <member name="F:p104.GameResources.Object3DLoaderInstance">
@@ -1790,14 +1829,34 @@ p104
  遭遇战势力信息类
  </summary>
 </member>
-<member name="P:p104.GameSideInfo.SideName">
+<member name="F:p104.GameSideInfo.SideName">
  <summary>
  势力名
  </summary>
 </member>
-<member name="P:p104.GameSideInfo.Control">
+<member name="F:p104.GameSideInfo.Control">
  <summary>
  操作者类型
+ </summary>
+</member>
+<member name="F:p104.GameSideInfo.Power">
+ <summary>
+ Power
+ </summary>
+</member>
+<member name="F:p104.GameSideInfo.Point">
+ <summary>
+ 点
+ </summary>
+</member>
+<member name="F:p104.GameSideInfo.Burden">
+ <summary>
+ 负载
+ </summary>
+</member>
+<member name="F:p104.GameSideInfo.CurrentTurn">
+ <summary>
+ 此玩家当前的回合数
  </summary>
 </member>
 <member name="T:p104.GameStaticImage">
@@ -2063,6 +2122,11 @@ p104
  地图鼠标交互层
  </summary>
 </member>
+<member name="F:p104.SkirmishGameLoop.UI_TopLeftResourceBar">
+ <summary>
+ 顶部资源区
+ </summary>
+</member>
 <member name="F:p104.SkirmishGameLoop.SkirmishBoardMouseDownPosition">
  <summary>
  MouseDown对应的Block坐标，用于检查与MouseUp时是否一致
@@ -2129,7 +2193,7 @@ p104
  开始遭遇战游戏流程
  </summary>
 </member>
-<member name="M:p104.SkirmishGameLoop.ChangeTurn(System.Int32)">
+<member name="M:p104.SkirmishGameLoop.ChangeGlobalTurn(System.Int32)">
  <summary>
  设置当前回合数
  </summary>

@@ -22,7 +22,7 @@
         <loseevent name="Turn" value="20" />
       </lose>
     </endgame>
-    <resources point="20" />
+    <resources power="20" point="20"/>
   </side>
 
   <side value="1" name="Reimu" type="AI" team="1" >
@@ -34,7 +34,7 @@
     <building>
 
     </building>
-    <resources point="20" />
+    <resources power="20" point="20" />
   </side>
 
 

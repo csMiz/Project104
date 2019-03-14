@@ -35,11 +35,11 @@ Public Class GameCamera3D
     ''' <summary>
     ''' 近处屏幕，即最近可见位置（显示屏位置）
     ''' </summary>
-    Public ZNear As Single = 1
+    Public ZNear As Single = 100
     ''' <summary>
     ''' 远处屏幕，即最远可见位置
     ''' </summary>
-    Public ZFar As Single = 1000
+    Public ZFar As Single = 5000
 
     Private View_Position As New MathMatrixS(4, 4)
 
@@ -85,15 +85,15 @@ Public Class GameCamera3D
 
     Public BindingHalfResolve As PointF2
 
-    Public GlobalInputElement As Direct3D11.InputElement()
+    Public InputElementRepository As New List(Of Direct3D11.InputElement())
 
     Public InputSignatureRepository As ShaderSignature()
 
     Public HLSLFileEffectRepository As Direct3D11.Effect()
 
-    Public VertexShaderRepository As Direct3D11.VertexShader()
+    'Public VertexShaderRepository As Direct3D11.VertexShader()
 
-    Public PixelShaderRepository As Direct3D11.PixelShader()
+    'Public PixelShaderRepository As Direct3D11.PixelShader()
 
     Public Sub LoadAllShaders(d3dDevice As Direct3D11.Device1, context As Direct3D11.DeviceContext1)
         'set input element
@@ -102,7 +102,13 @@ Public Class GameCamera3D
             New Direct3D11.InputElement("NORMAL", 0, DXGI.Format.R32G32B32_Float, 12, 0),
             New Direct3D11.InputElement("COLOR", 0, DXGI.Format.R32G32B32A32_Float, 24, 0),
             New Direct3D11.InputElement("Output", 0, DXGI.Format.R32_UInt, 40, 0)}
-        GlobalInputElement = ie
+        InputElementRepository.Add(ie)
+        Dim ie2() As Direct3D11.InputElement = {
+            New Direct3D11.InputElement("POSITION", 0, DXGI.Format.R32G32B32_Float, 0, 0),
+            New Direct3D11.InputElement("NORMAL", 0, DXGI.Format.R32G32B32_Float, 12, 0),
+            New Direct3D11.InputElement("COLOR", 0, DXGI.Format.R32G32B32A32_Float, 24, 0)}
+        InputElementRepository.Add(ie2)
+
         'set input signature and load vertex shaders, pixel shader
         Dim fileList As New List(Of KeyValuePair(Of Integer, String))
         Dim dirInfo As New System.IO.DirectoryInfo(Application.StartupPath & "\Resources\Models\ModelConfig\")
@@ -117,9 +123,9 @@ Public Class GameCamera3D
                                                                               Return a.Key - b.Key
                                                                           End Function))
 
-        ReDim VertexShaderRepository(fileList.Count - 1)
+        'ReDim VertexShaderRepository(fileList.Count - 1)
         ReDim InputSignatureRepository(fileList.Count - 1)
-        ReDim PixelShaderRepository(fileList.Count - 1)
+        'ReDim PixelShaderRepository(fileList.Count - 1)
         ReDim HLSLFileEffectRepository(fileList.Count - 1)
         For Each tmpPair In fileList
             Dim tmpIndex As Integer = tmpPair.Key
@@ -127,11 +133,11 @@ Public Class GameCamera3D
 
             Using bytecode As ShaderBytecode = SharpDX.D3DCompiler.ShaderBytecode.CompileFromFile(tmpName, "VShader", "vs_4_0", ShaderFlags.None, EffectFlags.None)
                 InputSignatureRepository(tmpIndex) = ShaderSignature.GetInputSignature(bytecode)
-                VertexShaderRepository(tmpIndex) = New VertexShader(d3dDevice, bytecode)
+                'VertexShaderRepository(tmpIndex) = New VertexShader(d3dDevice, bytecode)
             End Using
-            Using bytecode As ShaderBytecode = SharpDX.D3DCompiler.ShaderBytecode.CompileFromFile(tmpName, "PShader", "ps_4_0", ShaderFlags.None, EffectFlags.None)
-                PixelShaderRepository(tmpIndex) = New PixelShader(d3dDevice, bytecode)
-            End Using
+            'Using bytecode As ShaderBytecode = SharpDX.D3DCompiler.ShaderBytecode.CompileFromFile(tmpName, "PShader", "ps_4_0", ShaderFlags.None, EffectFlags.None)
+            '    PixelShaderRepository(tmpIndex) = New PixelShader(d3dDevice, bytecode)
+            'End Using
             Using bytecode As ShaderBytecode = SharpDX.D3DCompiler.ShaderBytecode.CompileFromFile(tmpName, "fx_5_0", ShaderFlags.None, EffectFlags.None)
                 HLSLFileEffectRepository(tmpIndex) = New Direct3D11.Effect(d3dDevice, bytecode)
             End Using
@@ -228,6 +234,7 @@ Public Class GameCamera3D
         '2-临时区域容器，包含了正在载入的候选区3D对象
         '3-区域容器，用于实际渲染
         '当视角变化时，对1号总世界容器内的对象进行遍历，重新计算候选区，将处于候选区内的3D对象添加到2号临时容器内
+        '只有个别物体变化时，可以仅调用Game3DFace2_1Bundle.RefreshBuffer()进行更新（例如骨骼动画）
         '当计算完成后，将2号临时容器写入3号区域容器，清空2号容器
 
         '此方法需要另开一个线程
@@ -260,28 +267,12 @@ Public Class GameCamera3D
                     ProcessingContainer.Add(New Game3DFace2_1Bundle With {.ShaderIndex = tmpObj.ShaderIndex})
                     matchShaderIndex = ProcessingContainer.Count - 1
                 End If
-                ProcessingContainer(matchShaderIndex).Faces.AddRange(tmpObj.Faces)
+                ProcessingContainer(matchShaderIndex).Faces.AddRange(tmpObj.SourceFaces)
             End If
         Next
+
         For Each tmpBundle As Game3DFace2_1Bundle In ProcessingContainer
-            tmpBundle.Buffer = New DataStream(44 * 3 * tmpBundle.Faces.Count, True, True)
-            With tmpBundle.Buffer
-                For Each tmpFace As Game3dFace2_1 In tmpBundle.Faces
-                    .Write(tmpFace.Vertices(0))
-                    .Write(tmpFace.Normal(0))
-                    .Write(tmpFace.Colour)
-                    .Write(tmpFace.Tag)
-                    .Write(tmpFace.Vertices(1))
-                    .Write(tmpFace.Normal(1))
-                    .Write(tmpFace.Colour)
-                    .Write(tmpFace.Tag)
-                    .Write(tmpFace.Vertices(2))
-                    .Write(tmpFace.Normal(1))
-                    .Write(tmpFace.Colour)
-                    .Write(tmpFace.Tag)
-                Next
-                .Position = 0
-            End With
+            tmpBundle.RefreshBuffer()
         Next
         '写入3号容器
         While ContainerLock
@@ -298,6 +289,16 @@ Public Class GameCamera3D
 
     End Sub
 
+    Public Sub UpdateOneBundle(bundleIndex As Integer)
+        While ContainerLock
+            'wait
+        End While
+        ContainerLock = True
+        Dim tmpBundle As Game3DFace2_1Bundle = ProcessingContainer(bundleIndex)
+        tmpBundle.RefreshBuffer()
+        ContainerLock = False
+    End Sub
+
     ''' <summary>
     ''' 绘制3号容器内的三维面，使用D3D11
     ''' </summary>
@@ -310,14 +311,16 @@ Public Class GameCamera3D
         'Draw d3d11
         For Each tmpBundle As Game3DFace2_1Bundle In RegionContainer
             Dim shaderIndex As Integer = tmpBundle.ShaderIndex
-            Dim layout As InputLayout = New InputLayout(d3dDevice, InputSignatureRepository(shaderIndex).Data, GlobalInputElement)
+            Dim layout As InputLayout = New InputLayout(d3dDevice, InputSignatureRepository(shaderIndex).Data, InputElementRepository(shaderIndex))
             Dim vertexBuffer As Buffer = New Buffer(d3dDevice, tmpBundle.Buffer, tmpBundle.Buffer.Length, ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0)
 
             With context
                 'set input format
                 .InputAssembler.InputLayout = layout
                 .InputAssembler.PrimitiveTopology = Direct3D.PrimitiveTopology.TriangleList
-                .InputAssembler.SetVertexBuffers(0, New VertexBufferBinding(vertexBuffer, 44, 0))
+                .InputAssembler.SetVertexBuffers(0, New VertexBufferBinding(vertexBuffer, GetShaderInputLength(shaderIndex), 0))
+
+
                 '[method1: use VS/PS and set ConstantBuffer separately]-------------
                 'set VS/PS
                 '.VertexShader.Set(VertexShaderRepository(shaderIndex))
@@ -327,15 +330,18 @@ Public Class GameCamera3D
 
                 With HLSLFileEffectRepository(shaderIndex)
                     .GetVariableByName("GlobalWVP").AsMatrix().SetMatrix(Me.WVP)
-                    .GetVariableByName("CursorInput").AsVector().Set(Me.ScreenCursorOffset)
-                    .GetVariableByName("SelectedObjectId").AsScalar().Set(Me.PointingAt)
-                    .GetVariableByName("ScreenHHeight").AsScalar().Set(Me.BindingHalfResolve.Y)
-                    .GetVariableByName("ScreenHWidth").AsScalar().Set(Me.BindingHalfResolve.X)
+                    If shaderIndex = 0 Then
+                        .GetVariableByName("CursorInput").AsVector().Set(Me.ScreenCursorOffset)
+                        .GetVariableByName("SelectedObjectId").AsScalar().Set(Me.PointingAt)
+                        .GetVariableByName("ScreenHHeight").AsScalar().Set(Me.BindingHalfResolve.Y)
+                        .GetVariableByName("ScreenHWidth").AsScalar().Set(Me.BindingHalfResolve.X)
+                    End If
                     .GetTechniqueByIndex(0).GetPassByIndex(0).Apply(context)
                 End With
                 '-------------------------------------------------------------------
                 'render
                 .Draw(tmpBundle.Faces.Count * 3, 0)
+                '                .Draw(tmpBundle.Faces.Count * 3, 0)
 
             End With
 
@@ -453,5 +459,20 @@ Public Class GameCamera3D
         context.BeginDraw()
     End Sub
 
+    Public Function GetShaderInputLength(shaderIndex As Integer) As Integer
+        Select Case shaderIndex
+            Case 0
+                Return VertexShaderInputLength.Position_Normal_Color_Tag
+            Case 1
+                Return VertexShaderInputLength.Position_Normal_Color
 
+        End Select
+        Return 0
+    End Function
 End Class
+
+Public Enum VertexShaderInputLength As Integer
+    Position_Normal_Color_Tag = 44
+    Position_Normal_Color = 40
+
+End Enum

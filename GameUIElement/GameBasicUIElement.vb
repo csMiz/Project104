@@ -53,6 +53,9 @@ Public MustInherit Class GameBasicUIElement
             Return CInt(BasicRect.Right - BasicRect.Left)
         End Get
     End Property
+    ''' <summary>
+    ''' 前后次序，数字越大越在上层，区间0-5
+    ''' </summary>
     Public Z_Index As Short = 0
     Public DefaultBackground As Brush = TRANSPARENT_BRUSH
     Public Visible As Boolean = True

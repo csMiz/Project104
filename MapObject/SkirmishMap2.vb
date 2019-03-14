@@ -42,7 +42,8 @@ Public Class SkirmishMap2
         Next
 
         Dim cur As Integer = 0
-        Dim counter As Integer = 0
+        Dim lastX As Integer = -1, lastY As Integer = -1
+        Dim XYSameCounter As Integer = 0
         Do While cur < content.Length
             Dim tmpBlock As New SkirmishMapBlock2
             With tmpBlock
@@ -51,13 +52,21 @@ Public Class SkirmishMap2
                 .Terrain = content(cur + 2)
                 .AltitudeBottom = content(cur + 3) \ 16
                 .AltitudeTop = content(cur + 3) Mod 16
-                .GeneratedId = counter
+                '.GeneratedId = counter
+                .GeneratedId = .X * 500 + .Y * 10 + XYSameCounter
+
                 .GenerateModel(context)    'must load template models in advance
 
             End With
             Blocks(tmpBlock.X, tmpBlock.Y).Add(tmpBlock)
             cur += 4
-            counter += 1
+            If tmpBlock.X = lastX AndAlso tmpBlock.Y = lastY Then
+                XYSameCounter += 1
+            Else
+                XYSameCounter = 0
+            End If
+            lastX = tmpBlock.X
+            lastY = tmpBlock.Y
         Loop
 
         content = Nothing
@@ -91,5 +100,13 @@ Public Class SkirmishMap2
     <Obsolete("不再使用DrawHexMap委托，绘制过程已移到GameCamera3D", True)>
     Public Sub DrawHexMap(ByRef context As SharpDX.Direct2D1.DeviceContext, ByRef spectator As SpectatorCamera, canvasBitmap As SharpDX.Direct2D1.Bitmap1)
     End Sub
+
+    Public Function GetBlock(blockId As Integer) As SkirmishMapBlock2
+        Dim tmpX As Integer = blockId \ 500
+        Dim tmpY As Integer = (blockId Mod 500) \ 10
+        Dim tmpIndex As Integer = (blockId Mod 500) Mod 10
+        Return Blocks(0, 0)(0)
+        'Return Blocks(tmpX, tmpY)(tmpIndex)
+    End Function
 
 End Class

@@ -5,13 +5,30 @@ Public Class GameSideInfo
     ''' <summary>
     ''' 势力名
     ''' </summary>
-    Public Property SideName As String = DEFAULT_STRING
+    Public SideName As String = DEFAULT_STRING
     ''' <summary>
     ''' 操作者类型
     ''' </summary>
-    Public Property Control As PlayerType
+    Public Control As PlayerType
 
-    Public Property Team As GameTeamInfo
+    ''' <summary>
+    ''' Power
+    ''' </summary>
+    Public Power As IntegerProperty
+    ''' <summary>
+    ''' 点
+    ''' </summary>
+    Public Point As IntegerProperty
+    ''' <summary>
+    ''' 负载
+    ''' </summary>
+    Public Burden As IntegerProperty
+    ''' <summary>
+    ''' 此玩家当前的回合数
+    ''' </summary>
+    Public CurrentTurn As IntegerProperty
+
+    Public Team As GameTeamInfo
 
 
     Public Sub New(name As String, inputPlayer As PlayerType, teamIndex As Short)

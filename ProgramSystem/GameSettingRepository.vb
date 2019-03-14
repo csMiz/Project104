@@ -47,7 +47,7 @@ Public Class GameSettingRepository
         With Me
             .Username = "Player"
             .UserDomain = UserDomainType.Retail
-            .UserLanguageIndex = GameFontHelper.findLanguageIndex("ENGL")
+            '.UserLanguageIndex = GameFontHelper.findLanguageIndex("ENGL")    TODO: implement locale system
             .GameWindowType = WindowType.Window
             .UserResolve = New PointI(1024, 768)
             .FPSMax = 30
@@ -122,10 +122,10 @@ Public Class GameSettingRepository
             contentBuffer(i) = domainCode(i - 20)
         Next
 
-        Dim usingLanguageCode() As Byte = GameFontHelper.GetLanguageCode(Me.UserLanguageIndex)
-        For i = 24 To 27
-            contentBuffer(i) = usingLanguageCode(i - 24)
-        Next
+        'Dim usingLanguageCode() As Byte = GameFontHelper.GetLanguageCode(Me.UserLanguageIndex)
+        'For i = 24 To 27
+        '    contentBuffer(i) = usingLanguageCode(i - 24)
+        'Next
 
         contentBuffer(28) = Me.GameWindowType
 

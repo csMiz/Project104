@@ -2,6 +2,7 @@
 Imports SharpDX.Direct2D1
 Imports System.Math
 
+<Obsolete("use SkirmishMap2", False)>
 Public Class SkirmishMap
     Public Blocks(49, 49) As SkirmishMapBlock
     Public MapSizeXMax As Short = 49
@@ -268,7 +269,7 @@ Public Class SkirmishMap
         Next
 
 
-        'HACK: 不可行
+        ' 不可行
 
 
     End Sub

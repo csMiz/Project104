@@ -26,7 +26,7 @@ VS2PS VShader(VtxInput dataIn)
     VS2PS result;
     result.VtxPosition = mul(GlobalWVP,dataIn.VtxPosition);
     result.VtxPosition.z /= result.VtxPosition.w;
-    result.VtxPosition.z = result.VtxPosition.z - 1.0f;
+
     result.VtxPosition.x /= result.VtxPosition.w;
     result.VtxPosition.y /= result.VtxPosition.w;
     result.VtxPosition.w = 1.0f;
@@ -37,6 +37,10 @@ VS2PS VShader(VtxInput dataIn)
         ht += 0.05 * dataIn.VtxPosition.z / 20.0f;
     }
     ht *= 0.5;
+    //if (dataIn.Tag == SelectedObjectId)
+    //{
+    //    ht += 0.2;
+    //}
     result.VtxColor = float4(ht, ht, ht, 1.0f);
 	return result;
 }
@@ -64,6 +68,11 @@ void GShader(triangle VS2PS input[3], inout TriangleStream<VS2PS> output)
 
             float tmpConst = tmpNormalX * input[0].VtxPosition.x + tmpNormalY * input[0].VtxPosition.y + tmpNormalZ * input[0].VtxPosition.z;
             tmpZ = (tmpConst - tmpNormalX * CursorInput.x - tmpNormalY * CursorInput.y) / tmpNormalZ;
+            if (tmpZ >= 0.0f && tmpZ <= 1.0f)
+            {
+                tmpZ = 0.5 + 0.5 * tmpZ;
+            }
+
         }
     }
 

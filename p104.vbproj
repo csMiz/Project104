@@ -149,7 +149,6 @@
     <Compile Include="GameObject\GameUnit.vb" />
     <Compile Include="GameObject\SkillSystem\HeroSkill.vb" />
     <Compile Include="GameObject\SkillSystem\HeroSkillTree.vb" />
-    <Compile Include="GameObject\Player.vb" />
     <Compile Include="GameObject\SkillSystem\PropertyChangeBuffSkillEffect.vb" />
     <Compile Include="GameObject\SkillSystem\SkillEffect.vb" />
     <Compile Include="GameObject\SkillSystem\SkillRepository.vb" />
@@ -172,6 +171,8 @@
     <Compile Include="GameUIElement\GameProgressBar.vb" />
     <Compile Include="GameUIElement\GameScrollViewer.vb" />
     <Compile Include="GameUIElement\GameShadowPad.vb" />
+    <Compile Include="GameUIElement\GameSkirmishAvatarBox.vb" />
+    <Compile Include="GameUIElement\GameSkirmishResourceBar.vb" />
     <Compile Include="GameUIElement\GameTextBlock.vb" />
     <Compile Include="GameUIElement\GameTextBox.vb" />
     <Compile Include="GameUIElement\GameTreeViewItem.vb" />
@@ -255,8 +256,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\P104_Font1.ttf" />
     <None Include="Assets\SaveFileFormat_psav.md" />
-    <None Include="bin\Debug\P104_Font1.ttf" />
     <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>

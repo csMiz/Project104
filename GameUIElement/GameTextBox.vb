@@ -13,7 +13,8 @@ Imports SharpDX.Mathematics.Interop
 Public Class GameTextBox
     Inherits GameBasicUIElement
 
-    Public Text As String = vbNullString
+    Public TextItem As New TextItem2
+
     Public Editable As Boolean = True
     Public Pressed As Boolean = False
 
@@ -22,37 +23,15 @@ Public Class GameTextBox
     Public ContentLightBrush As RadialGradientBrush = Nothing
     Public BorderLightBrush As RadialGradientBrush = Nothing
 
-    'TextBox控件可以直接使用系统字体
-    Public UseTextImage As Boolean = False
-    Private TextImage As TextItem = Nothing
-
     Public Sub New(Optional defaultEvent As Boolean = True)
         If defaultEvent Then
             Me.RegisterRelativeMouseEvents()
         End If
     End Sub
 
-    Public Sub InitializeTextImage()
-        Me.TextImage = New TextItem(Me.Text, New PointI(Me.Width, Me.Height))
-        With Me.TextImage
-            .LoadFont(GameFontHelper.GetFontFamily(0), 18, Brushes.Black, Color.Gray)
-            .GenerateImage(Me.BindingContext)
-        End With
-    End Sub
-
-    Public Sub SetText(inputText As String)
-        Me.Text = inputText
-        Call Me.RefreshTextImage()
-    End Sub
-
-    Public Sub SetText(inputText As String, importImage As TextItem)
-        Me.Text = inputText
-        Me.TextImage = importImage
-    End Sub
-
-    Public Sub RefreshTextImage()
-        Me.TextImage.Text = Me.Text
-        Me.TextImage.GenerateImage(Me.BindingContext)
+    Public Sub ChangeText(text As String)
+        Me.TextItem.Text = text
+        Me.TextItem.GenerateTextLayout()
     End Sub
 
     Public Sub InitializeLightBrush()
@@ -112,11 +91,7 @@ Public Class GameTextBox
                 .FillRectangle(Me.SelfCanvasRect, WHITE_COLOUR_BRUSH(0))
                 .FillRectangle(Me.SelfCanvasRect, Me.ContentLightBrush)
             End If
-            If Me.UseTextImage Then
-                .DrawBitmap(Me.TextImage.FontImage, Me.SelfCanvasRect, NOT_TRANSPARENT, BitmapInterpolationMode.Linear)
-            Else
-                'TODO: use directwrite
-            End If
+            Me.TextItem.DrawText(context, New RawVector2(0, 0))
             .DrawRectangle(Me.SelfCanvasRect, BorderBrush, 3.0F)
             .DrawRectangle(Me.SelfCanvasRect, BorderLightBrush, 3.0F)
 
